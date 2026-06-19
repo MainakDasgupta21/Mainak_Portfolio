@@ -9,7 +9,6 @@ import Field from "../components/ui/Field"
 import Input from "../components/ui/Input"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
-import Select from "../components/ui/Select"
 
 const CATEGORIES = [
   "Programming Languages",
@@ -18,6 +17,39 @@ const CATEGORIES = [
   "Technologies & Tools",
   "Web Development",
   "ML & AI",
+  "Frontend Development",
+  "Backend Development",
+  "Frameworks & Libraries",
+  "Mobile Development",
+  "DevOps & CI/CD",
+  "Cloud & Infrastructure",
+  "Containers & Orchestration",
+  "Operating Systems",
+  "Testing & QA",
+  "Data Engineering",
+  "Data Science & Analytics",
+  "Big Data",
+  "Deep Learning",
+  "Generative AI & LLMs",
+  "Computer Vision",
+  "NLP",
+  "Cybersecurity",
+  "Networking",
+  "System Design & Architecture",
+  "API & Integration",
+  "Message Queues & Streaming",
+  "Caching",
+  "Monitoring & Observability",
+  "Infrastructure as Code",
+  "Scripting & Automation",
+  "Tools & IDEs",
+  "UI/UX & Design",
+  "Game Development",
+  "Embedded & IoT",
+  "Blockchain & Web3",
+  "AR/VR",
+  "Project Management & Methodologies",
+  "Soft Skills",
 ]
 
 const initialState = {
@@ -120,18 +152,19 @@ const AddSkill = ({ token }) => {
       <Card className="max-w-xl p-4 sm:p-5">
         <form onSubmit={onSubmit} className="space-y-3">
           <Field label="Category" htmlFor="skill-category" required>
-            <Select
+            <Input
               id="skill-category"
+              list="skill-categories"
               value={form.category}
               onChange={(e) => setField("category", e.target.value)}
+              placeholder="Select or type a category"
               required
-            >
+            />
+            <datalist id="skill-categories">
               {CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
+                <option key={category} value={category} />
               ))}
-            </Select>
+            </datalist>
           </Field>
 
           <Field label="Name" htmlFor="skill-name" required>
