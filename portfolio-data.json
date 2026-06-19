@@ -1,0 +1,291 @@
+{
+  "personal": {
+    "name": "MAINAK DASGUPTA",
+    "title": "Software Developer",
+    "tagline": "Building scalable systems and intelligent solutions",
+    "email": "dasguptamainak02@gmail.com",
+    "phone": "(+91) 9366415050",
+    "bio": "I’m Mainak Dasgupta, a passionate and detail-oriented Software Developer who thrives on solving complex challenges through intelligent, efficient, and well-structured code. With a solid foundation in C/C++, Artificial Intelligence, Machine Learning, and the MERN Stack, I specialize in building scalable, high-performance applications that merge technical precision with exceptional user experience.\n\nMy work spans across diverse domains — from developing an advanced Chakma OCR System that recognizes and translates one of the world’s rarest scripts, to designing real-time chat applications and robust e-commerce platforms that deliver smooth, secure, and interactive digital experiences. Each project I take on is crafted with attention to performance, reliability, and clean design principles.\n\nI bring a strong command over problem-solving, algorithmic logic, and system design, enabling me to transform ideas into real-world, production-ready solutions. Whether it’s optimizing backend systems, enhancing UI responsiveness, or architecting full-stack applications, I aim to build technology that’s intelligent, impactful, and built to last."
+  },
+  "branding": {
+    "brandShortName": "Mainak.",
+    "brandMonogram": "M"
+  },
+  "heroUi": {
+    "badge": "Crafting Unique Solutions",
+    "introPrefix": "Hi, I'm",
+    "role": "Software Developer",
+    "primaryCtaLabel": "Book a Free Call",
+    "primaryCtaHref": "#contact",
+    "secondaryCtaLabel": "See Projects",
+    "secondaryCtaHref": "#projects",
+    "scrollHintTop": "Scroll down",
+    "scrollHintBottom": "to see projects"
+  },
+  "media": {
+    "heroVideoSrc": "/back.mp4",
+    "heroPosterSrc": "/back-poster.jpg",
+    "heroProfileSrc": "/me.png",
+    "aboutProfileSrc": "/my-picture-informal-1.jpg",
+    "resumePdf": ""
+  },
+  "sectionSubtitles": {
+    "about": "",
+    "projects": "Transforming ideas into elegant solutions",
+    "experience": "Professional journey building impactful solutions",
+    "skills": "Technical expertise across multiple domains",
+    "achievements": "Recognition and milestones that define excellence",
+    "testimonials": "What colleagues and mentors say",
+    "contact": "Let's discuss your next project"
+  },
+  "education": [
+    {
+      "degree": "Bachelors in Technology",
+      "field": "Computer Science & Engineering",
+      "institution": "NIT Agartala",
+      "year": "2026",
+      "grade": "7.27 (CGPA)",
+      "status": "Pursuing"
+    },
+    {
+      "degree": "AISSCE (Class 12 / Higher Secondary)",
+      "field": "",
+      "institution": "Pranavananda Vidyamandir",
+      "year": "2021",
+      "grade": "77%",
+      "status": "Completed"
+    },
+    {
+      "degree": "Madhayamik (Class 10 / Secondary)",
+      "field": "",
+      "institution": "Umakanta Academy (English Medium)",
+      "year": "2019",
+      "grade": "86%",
+      "status": "Completed"
+    }
+  ],
+  "experience": [
+    {
+      "company": "National Informatics Centre (NIC), India",
+      "role": "AI/ML Intern",
+      "period": "June 2025 - July 2025",
+      "link": "https://www.nic.gov.in/",
+      "logo": "/NIC.png",
+      "certificate": "https://drive.google.com/file/d/1j7yuqIuQNsZNVhs6RQs1z86OrhwmdfTt/view?usp=sharing",
+      "highlights": [
+        "Engineered a Python + Pollar data synthesis pipeline to generate large-scale OCR datasets for the Dhama language, achieving 6 distinct model scales (3m-56m+ parameters) on Linux and macOS.",
+        "Utilized Jinja2 templates & Indic font libraries to create 300k+ synthetic training images with automated workflows with Git, shell scripting, and Python environments."
+      ]
+    },
+    {
+      "company": "Oil and Natural Gas Corporation (ONGC)",
+      "role": "Data Analyst Intern",
+      "period": "May 2025 - June 2025",
+      "link": "https://www.ongcindia.com/",
+      "logo": "/ONGC.png",
+      "certificate": "https://drive.google.com/file/d/1GO-cKNIX9rxiSRCfoabHtXawQRQuoqRa/view?usp=sharing",
+      "highlights": [
+        "The 'ONGC Gas Production Visual Analytics Dashboard' is a Python tool developed to transform data extraction and reservoir pressure analysis for over 100+ wells, interactive visuals, aiming Streamlit for UI, Plotly for charts, Tkinter for the interface, Pandas for data processing, and Matplotlib for charting.",
+        "The 'Data Acquisition Tool for Perforation and Object Testing' projects is a Python-based tool built to automate the extraction and analysis of technical well reports from Word documents.",
+        "The primary objective is to replace error-prone manual analysis with an efficient, data-driven approach that leverages Python docx library for parsing documents and integrates a Hugging Face transformers AI model (BART) to generate concise summaries of complex textual content."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "FOREVER",
+      "description": "FOREVER — a complete, production-ready MERN stack e-commerce platform providing end-to-end shopping experience with admin controls, secure payments, and order management.",
+      "technologies": ["MongoDB Atlas", "Express.js", "React.js", "Node.js", "Stripe", "Cloudinary"],
+      "highlights": [
+        "Full MERN implementation with RESTful APIs for products, users, carts, and orders",
+        "User authentication and authorization with JWT and protected routes; role-based admin panel for product & order management",
+        "Integrated Stripe for secure payment processing and order checkout flow",
+        "Product image upload and management via Cloudinary; optimized image delivery for performance",
+        "Advanced product features: category filters, search, pagination, reviews & ratings, and inventory management",
+        "Order lifecycle with status updates (placed, processed, shipped, delivered) and user order history",
+        "Responsive, accessible React frontend with optimized client-side state management and lazy loading",
+        "Deployed using Vercel (frontend) and Render/Heroku (backend) with MongoDB Atlas for production DB and CI/CD pipeline"
+      ],
+      "github": "https://github.com/MainakDasgupta21/forever",
+      "demo": "https://forever-store.vercel.app/",
+      "featured": true
+    },
+    {
+      "name": "QuickChat",
+      "description": "Developed a feature-rich, real-time chat application (QuickChat) with one-to-one and group communication functionality.",
+      "technologies": ["Socket.IO", "React", "Node.js", "MongoDB", "Express.js"],
+      "highlights": [
+        "Implemented Socket.IO-driven instant communication using Socket.IO for instant message delivery and live typing indicators",
+        "Designed a responsive frontend with ReactJS, ensuring smooth UX across devices",
+        "Built the backend with Node.js and Express, providing robust APIs for scalable message and user data storage",
+        "Implemented chat persistence so users can retrieve past conversations anytime",
+        "Deployed on Vercel with persistent chat history and scalable architecture for smooth user experience"
+      ],
+      "github": "https://github.com/MainakDasgupta21/quickCHAT",
+      "demo": "https://quick-chat-tau.vercel.app/",
+      "featured": true
+    },
+    {
+      "name": "Amazon Clone",
+      "description": "Designed and developed a fully functional Amazon-like e-commerce website using HTML, CSS, and Vanilla JavaScript.",
+      "technologies": ["HTML", "CSS", "JavaScript", "Jasmine"],
+      "highlights": [
+        "Implemented a shopping cart feature, allowing users to add, view, and remove products, while maintaining product state and storage using JavaScript",
+        "Gained hands-on experience with basic JavaScript fundamentals to handle DOM manipulation, event handling and local storage for persistent user data",
+        "Learned testing and debugging techniques using JASMINE to ensure the website's functionality and performance"
+      ],
+      "github": "https://github.com/MainakDasgupta21/AMAZON-CLONE",
+      "demo": "https://glowing-nougat-791dc6.netlify.app/",
+      "featured": true
+    },
+    {
+      "name": "Tournament Manager",
+      "description": "A simple React application for creating and managing small tournaments locally — ideal for quick bracket setup and score tracking without a backend.",
+      "technologies": ["React.js", "HTML", "CSS", "LocalStorage"],
+      "highlights": [
+        "Built as a lightweight React SPA to create tournaments, add teams, and record match results",
+        "Used local component state and LocalStorage for persistence (no backend required)",
+        "Implemented simple bracket and leaderboard views with responsive layout",
+        "Focused on clean, minimal UI for quick setup and ease of use",
+        "Deployed as a static site for fast, zero-maintenance hosting"
+      ],
+      "github": "https://github.com/MainakDasgupta21/tournament-manager",
+      "demo": "https://sensational-cendol-93cc00.netlify.app/",
+      "featured": true
+    },
+    {
+      "name": "YouTube Clone",
+      "description": "A simple, static front-end recreation of YouTube's layout using only HTML and CSS — built to practice responsive layout and UI composition.",
+      "technologies": ["HTML", "CSS"],
+      "highlights": [
+        "Recreated YouTube-like responsive layout using semantic HTML and modern CSS (Flexbox & Grid)",
+        "Implemented responsive video cards, navigation, and search UI purely with CSS (no API or backend)",
+        "Focused on pixel-perfect layout, accessibility-friendly markup, and mobile-first responsiveness",
+        "Optimized the static design for fast load times and easy reuse as a UI template",
+        "Perfect for showcasing front-end craftsmanship and CSS skills on portfolios"
+      ],
+      "github": "https://github.com/MainakDasgupta21/YouTubeClone",
+      "demo": "https://harmonious-puppy-b51efd.netlify.app/",
+      "featured": true
+    }
+  ],
+  "skills": {
+    "Programming Languages": [
+      { "name": "C++", "proficiency": 90 },
+      { "name": "C", "proficiency": 85 },
+      { "name": "Python", "proficiency": 92 },
+      { "name": "JavaScript", "proficiency": 88 },
+      { "name": "TypeScript", "proficiency": 85 },
+      { "name": "Java", "proficiency": 80 },
+      { "name": "Bash", "proficiency": 82 },
+      { "name": "SQL", "proficiency": 87 }
+    ],
+    "Version Control": [
+      { "name": "Git", "proficiency": 90 },
+      { "name": "GitHub", "proficiency": 90 }
+    ],
+    "Databases": [
+      { "name": "MySQL", "proficiency": 85 },
+      { "name": "MongoDB", "proficiency": 88 },
+      { "name": "PostgreSQL", "proficiency": 80 }
+    ],
+    "Technologies & Tools": [
+      { "name": "Docker", "proficiency": 85 },
+      { "name": "Celery", "proficiency": 78 },
+      { "name": "Tesseract OCR", "proficiency": 82 },
+      { "name": "AWS", "proficiency": 80 },
+      { "name": "Testing Frameworks", "proficiency": 85 },
+      { "name": "Jupyter Notebook", "proficiency": 88 },
+      { "name": "phpMyAdmin", "proficiency": 80 },
+      { "name": "SQL Workbench", "proficiency": 82 }
+    ],
+    "Web Development": [
+      { "name": "HTML", "proficiency": 95 },
+      { "name": "CSS", "proficiency": 92 },
+      { "name": "MERN Stack", "proficiency": 88 },
+      { "name": "React", "proficiency": 90 },
+      { "name": "Node.js", "proficiency": 87 },
+      { "name": "Django", "proficiency": 83 }
+    ],
+    "ML & AI": [
+      { "name": "TensorFlow", "proficiency": 82 },
+      { "name": "PyTorch", "proficiency": 85 },
+      { "name": "Hugging Face", "proficiency": 88 },
+      { "name": "Transformers", "proficiency": 85 },
+      { "name": "Scikit-learn", "proficiency": 87 },
+      { "name": "Pandas", "proficiency": 92 },
+      { "name": "Matplotlib", "proficiency": 90 },
+      { "name": "Power BI", "proficiency": 80 },
+      { "name": "LLM/ChatGPT/Claude API", "proficiency": 85 }
+    ]
+  },
+  "coursework": [
+    "Data Structure & Algorithms (C/C++/Java)",
+    "OOPS, Design Patterns",
+    "Programming (C++)",
+    "Operating System (UNIX/LINUX/WINDOWS)",
+    "Database Management System",
+    "Computer Networks",
+    "Digital Logic",
+    "Artificial Intelligence",
+    "Machine Learning",
+    "Cryptography and Network Security",
+    "Compiler Design",
+    "Theory of Computation",
+    "Computer Organization",
+    "Cloud Computing",
+    "Soft Computing",
+    "Discrete Mathematics"
+  ],
+  "achievements": [
+    {
+      "title": "LeetCode Top Performer",
+      "description": "Solved 400+ problems out of 91,599 in LeetCode Weekly Contest 450, demonstrating strong problem-solving skills",
+      "icon": "trophy"
+    },
+    {
+      "title": "Top 4 Percentile - JEE Main 2022",
+      "description": "Ranked among the top 4 percentile students in JEE Main 2022, among approximately 9.3 million candidates",
+      "icon": "award"
+    },
+    {
+      "title": "Silver Medalist - IMO",
+      "description": "International Mathematics Olympiad (IMO), State Level, ranked among top performers in mathematics and logical reasoning",
+      "icon": "medal"
+    }
+  ],
+  "links": {
+    "linkedin": "https://www.linkedin.com/in/mainak-dasgupta-244a7525b/",
+    "github": "https://github.com/MainakDasgupta21",
+    "leetcode": "https://leetcode.com/u/MAINAK_DASGUPTA_2021/",
+    "codeforces": "https://codeforces.com/profile/MAINAK_DASGUPTA",
+    "geekforgeeks": "https://www.geeksforgeeks.org/user/mainakdasgupta1234567890/",
+    "twitter": "https://x.com/MainakDG33"
+  },
+  "testimonials": [
+    {
+      "name": "Dr. Priya Sharma",
+      "role": "Senior Data Scientist at NIC",
+      "company": "National Informatics Centre",
+      "image": "",
+      "quote": "Mainak's ability to build scalable data pipelines is exceptional. His OCR synthesis system for regional languages showcased both technical excellence and creative problem-solving. A dedicated professional who consistently delivers high-quality work.",
+      "rating": 5
+    },
+    {
+      "name": "Rajesh Kumar",
+      "role": "Chief Engineer, Analytics Division",
+      "company": "ONGC",
+      "image": "",
+      "quote": "Working with Mainak was a seamless experience. His visual analytics dashboard transformed how we analyze reservoir pressure data across hundreds of wells. The tool's intuitive interface and powerful insights have become indispensable for our team.",
+      "rating": 5
+    },
+    {
+      "name": "Prof. Ananya Chatterjee",
+      "role": "Associate Professor, CSE Department",
+      "company": "NIT Agartala",
+      "image": "",
+      "quote": "Mainak stands out for his strong foundation in algorithms and data structures, combined with practical application skills. His projects demonstrate a rare blend of theoretical knowledge and hands-on implementation expertise.",
+      "rating": 5
+    }
+  ]
+}
