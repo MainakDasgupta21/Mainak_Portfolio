@@ -16,7 +16,7 @@ const utilityItems = [
 ]
 
 const getNavClass = ({ isActive }) =>
-  `rounded-md border-l-2 px-2.5 py-2 text-sm transition-colors ${
+  `block w-full rounded-md border-l-2 px-2.5 py-2 text-sm transition-colors ${
     isActive
       ? "active border-l-brand font-medium"
       : "border-l-transparent text-text-muted hover:bg-surface-soft/70 hover:text-text-main"
@@ -35,11 +35,11 @@ const Sidebar = ({ mobileOpen, onClose }) => {
       ) : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-[min(100vw-2.5rem,16rem)] border-r border-border/70 bg-surface px-3 py-4 transition-transform duration-200 ease-out md:sticky md:inset-y-auto md:left-auto md:top-14 md:h-[calc(100vh-3.5rem)] md:w-56 ${
+        className={`fixed inset-y-0 left-0 z-40 w-[min(100vw-2.5rem,16rem)] overflow-x-hidden border-r border-border/70 bg-surface px-3 py-4 transition-transform duration-200 ease-out md:sticky md:inset-y-auto md:left-auto md:top-14 md:h-[calc(100vh-3.5rem)] md:w-56 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        <nav aria-label="Admin navigation" className="flex h-full flex-col overflow-y-auto">
+        <nav aria-label="Admin navigation" className="flex h-full flex-col overflow-x-hidden overflow-y-auto">
           <div className="mb-2 md:hidden">
             <button
               type="button"

@@ -65,7 +65,7 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-canvas text-text-main">
+    <div className="min-h-screen overflow-x-hidden bg-canvas text-text-main">
       <ToastConfig />
       <a href="#main-content" className="skip-link">
         Skip to content
