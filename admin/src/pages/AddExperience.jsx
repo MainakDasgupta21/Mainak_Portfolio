@@ -124,7 +124,8 @@ const AddExperience = ({ token }) => {
 
       <Card className="max-w-3xl p-4 sm:p-5">
         <form onSubmit={onSubmit} className="space-y-3">
-          <Field label="Company logo">
+          <div className="flex flex-col gap-1.5 text-sm">
+            <span className="font-medium text-text-main">Company logo</span>
             <FilePicker
               id="logo"
               file={logo}
@@ -133,7 +134,7 @@ const AddExperience = ({ token }) => {
               fallbackSrc={assets.upload_area}
               accept="image/*"
             />
-          </Field>
+          </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Company" htmlFor="experience-company" required>

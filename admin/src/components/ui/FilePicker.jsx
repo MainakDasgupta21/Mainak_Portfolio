@@ -13,15 +13,21 @@ const FilePicker = ({ id, file, onChange, fallbackSrc, label, currentUrl = "", a
   }, [previewUrl])
 
   return (
-    <label htmlFor={id} className="flex cursor-pointer flex-col gap-2">
+    <div className="flex flex-col gap-2">
       {label ? <span className="text-xs font-medium text-text-muted">{label}</span> : null}
-      <img
-        className="h-16 w-16 rounded-md border border-border object-cover"
-        src={previewUrl || currentUrl || fallbackSrc}
-        alt=""
-      />
-      <input id={id} type="file" accept={accept} hidden onChange={(e) => onChange(e.target.files?.[0] || null)} />
-    </label>
+      <label
+        htmlFor={id}
+        title="Click to upload"
+        className="inline-flex w-fit cursor-pointer self-start rounded-md focus-within:ring-2 focus-within:ring-brand/40"
+      >
+        <img
+          className="h-16 w-16 rounded-md border border-border object-cover"
+          src={previewUrl || currentUrl || fallbackSrc}
+          alt=""
+        />
+        <input id={id} type="file" accept={accept} hidden onChange={(e) => onChange(e.target.files?.[0] || null)} />
+      </label>
+    </div>
   )
 }
 

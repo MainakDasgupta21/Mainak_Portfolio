@@ -138,7 +138,8 @@ const AddProject = ({ token }) => {
 
       <Card className="max-w-3xl p-4 sm:p-5">
         <form onSubmit={onSubmit} className="space-y-3">
-          <Field label="Project images (up to 4)">
+          <div className="flex flex-col gap-1.5 text-sm">
+            <span className="font-medium text-text-main">Project images (up to 4)</span>
             <div className="flex flex-wrap gap-2">
               {["image1", "image2", "image3", "image4"].map((field, index) => (
                 <FilePicker
@@ -152,7 +153,7 @@ const AddProject = ({ token }) => {
                 />
               ))}
             </div>
-          </Field>
+          </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Name" htmlFor="project-name" required className="sm:col-span-2">
