@@ -59,8 +59,8 @@ const Experience = memo(function Experience() {
                   const highlights = Array.isArray(exp.highlights) ? exp.highlights : []
                   const periodLabel = (exp.period || "Timeline unavailable").trim()
                   const connectorClass = isLeft
-                    ? "hidden md:block absolute top-9 right-1/2 mr-2 h-px w-12 bg-gradient-to-l from-border/70 to-transparent"
-                    : "hidden md:block absolute top-9 left-1/2 ml-2 h-px w-12 bg-gradient-to-r from-border/70 to-transparent"
+                    ? "hidden md:block absolute top-9 right-1/2 mr-2 h-[2px] w-14 rounded-full bg-gradient-to-l from-accent via-accent/45 to-transparent opacity-95"
+                    : "hidden md:block absolute top-9 left-1/2 ml-2 h-[2px] w-14 rounded-full bg-gradient-to-r from-accent via-accent/45 to-transparent opacity-95"
                   const cardDockClass = isLeft
                     ? "md:mr-auto md:pr-14"
                     : "md:ml-auto md:pl-14"
