@@ -292,6 +292,37 @@
     animation: glow-pulse 2s ease-in-out infinite;
   }
 
+  @keyframes shimmer-slide {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .loading-shimmer {
+    position: relative;
+    overflow: hidden;
+    background: hsl(var(--muted) / 0.6);
+  }
+
+  .loading-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      110deg,
+      transparent 0%,
+      hsl(var(--foreground) / 0.08) 45%,
+      hsl(var(--foreground) / 0.14) 50%,
+      hsl(var(--foreground) / 0.08) 55%,
+      transparent 100%
+    );
+    animation: shimmer-slide 1.5s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .glow-button,
     .glow-button-strong,
@@ -301,7 +332,8 @@
     .animate-float-slow-reverse,
     .animate-float-particle,
     .animate-spin-slow,
-    .profile-halo {
+    .profile-halo,
+    .loading-shimmer::after {
       animation: none !important;
     }
   }

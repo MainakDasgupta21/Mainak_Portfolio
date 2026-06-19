@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css"
 
 import Header from "./components/Header"
 import Hero from "./components/Hero"
+import AppLoader from "./components/AppLoader"
 import LazySection from "./components/LazySection"
 import SectionSkeleton from "./components/SectionSkeleton"
 import { PortfolioContext } from "./context/PortfolioContext"
@@ -45,15 +46,7 @@ const App = () => {
             </Suspense>
           )}
         </div>
-        <main className="min-h-screen flex items-center justify-center px-4">
-          <div
-            role="status"
-            aria-live="polite"
-            className="rounded-xl border border-border/20 bg-card/45 px-4 py-3 text-sm text-muted-foreground backdrop-blur-md"
-          >
-            Loading portfolio...
-          </div>
-        </main>
+        <AppLoader />
       </div>
     )
   }
