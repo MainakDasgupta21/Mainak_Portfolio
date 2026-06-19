@@ -41,4 +41,10 @@ app.get('/', (req, res) => {
     res.send("API Working")
 })
 
-app.listen(port, () => console.log('Server started on PORT : ' + port))
+// On Vercel the app is imported and invoked per-request, so we must NOT call
+// listen() there. Locally (no VERCEL env var) we start a normal HTTP server.
+if (!process.env.VERCEL) {
+    app.listen(port, () => console.log('Server started on PORT : ' + port))
+}
+
+export default app

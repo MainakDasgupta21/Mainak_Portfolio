@@ -1,14 +1,9 @@
 import multer from "multer";
 
-// Disk storage mirrors Forever's `middleware/multer.js`.
-// NOTE for production: Vercel's serverless filesystem is read-only outside
-// /tmp, so swap to `multer.memoryStorage()` (and stream `file.buffer` into
-// `cloudinary.uploader.upload_stream`) before deploying to Vercel.
-const storage = multer.diskStorage({
-    filename: function (req, file, callback) {
-        callback(null, Date.now() + "-" + file.originalname)
-    }
-})
+// Memory storage keeps each upload in `file.buffer` instead of writing to disk.
+// Required on serverless hosts (e.g. Vercel) whose filesystem is read-only.
+// The buffer is streamed straight into Cloudinary via `uploadBufferToCloudinary`.
+const storage = multer.memoryStorage()
 
 const upload = multer({ storage })
 

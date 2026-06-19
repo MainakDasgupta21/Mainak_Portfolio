@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from "cloudinary"
 import projectModel from "../models/projectModel.js"
+import uploadBufferToCloudinary from "../utils/cloudinaryUpload.js"
 
 // Pull up-to-four uploaded files (image1..image4) and upload each to Cloudinary.
 // Mirrors Forever's productController.addProduct image handling.
@@ -10,7 +10,7 @@ const uploadProjectImages = async (files) => {
     if (!items.length) return [];
 
     return Promise.all(items.map(async (item) => {
-        const result = await cloudinary.uploader.upload(item.path, { resource_type: "image" });
+        const result = await uploadBufferToCloudinary(item, { resource_type: "image" });
         return result.secure_url;
     }));
 }

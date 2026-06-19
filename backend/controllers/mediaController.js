@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary"
 import mediaModel from "../models/mediaModel.js"
+import uploadBufferToCloudinary from "../utils/cloudinaryUpload.js"
 
 // Generic uploader used by the admin Media page.
 // Accepts a single `file` field via multer.single("file").
@@ -18,7 +19,7 @@ const uploadMedia = async (req, res) => {
                 ? "image"
                 : "raw";
 
-        const result = await cloudinary.uploader.upload(file.path, {
+        const result = await uploadBufferToCloudinary(file, {
             resource_type: resourceType,
         });
 

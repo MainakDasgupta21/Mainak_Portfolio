@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from "cloudinary"
 import experienceModel from "../models/experienceModel.js"
+import uploadBufferToCloudinary from "../utils/cloudinaryUpload.js"
 
 function parseListField(value) {
     if (Array.isArray(value)) return value.filter(Boolean);
@@ -15,7 +15,7 @@ function parseListField(value) {
 async function uploadLogo(req) {
     const file = req.files?.logo?.[0] || req.file;
     if (!file) return null;
-    const result = await cloudinary.uploader.upload(file.path, { resource_type: "image" });
+    const result = await uploadBufferToCloudinary(file, { resource_type: "image" });
     return result.secure_url;
 }
 
