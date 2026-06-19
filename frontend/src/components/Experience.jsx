@@ -19,7 +19,7 @@ const Experience = memo(function Experience() {
   const timelineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"])
 
   return (
-    <section id="experience" className="py-20 md:py-32 bg-muted/30" ref={sectionRef}>
+    <section className="py-20 md:py-32 bg-muted/30" ref={sectionRef}>
       <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 50 }}

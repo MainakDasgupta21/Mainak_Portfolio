@@ -49,7 +49,7 @@ const Contact = memo(function Contact() {
   }
 
   return (
-    <section id="contact" className="py-20 md:py-32 bg-muted/30" ref={ref}>
+    <section className="py-20 md:py-32 bg-muted/30" ref={ref}>
       <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 50 }}

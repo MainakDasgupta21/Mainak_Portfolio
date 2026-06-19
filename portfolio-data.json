@@ -1,7 +1,7 @@
 {
   "personal": {
-    "name": "MAINAK DASGUPTA",
-    "title": "Software Developer",
+    "name": "Mainak",
+    "title": "Dasgupta",
     "tagline": "Building scalable systems and intelligent solutions",
     "email": "dasguptamainak02@gmail.com",
     "phone": "(+91) 9366415050",
@@ -30,7 +30,7 @@
     "resumePdf": ""
   },
   "sectionSubtitles": {
-    "about": "",
+    "about": "Passionate developer building scalable systems and intelligent solutions",
     "projects": "Transforming ideas into elegant solutions",
     "experience": "Professional journey building impactful solutions",
     "skills": "Technical expertise across multiple domains",
@@ -267,7 +267,7 @@
       "name": "Dr. Priya Sharma",
       "role": "Senior Data Scientist at NIC",
       "company": "National Informatics Centre",
-      "image": "",
+      "image": "https://ui-avatars.com/api/?name=Dr+Priya+Sharma&background=111111&color=ffffff&size=256",
       "quote": "Mainak's ability to build scalable data pipelines is exceptional. His OCR synthesis system for regional languages showcased both technical excellence and creative problem-solving. A dedicated professional who consistently delivers high-quality work.",
       "rating": 5
     },
@@ -275,7 +275,7 @@
       "name": "Rajesh Kumar",
       "role": "Chief Engineer, Analytics Division",
       "company": "ONGC",
-      "image": "",
+      "image": "https://ui-avatars.com/api/?name=Rajesh+Kumar&background=111111&color=ffffff&size=256",
       "quote": "Working with Mainak was a seamless experience. His visual analytics dashboard transformed how we analyze reservoir pressure data across hundreds of wells. The tool's intuitive interface and powerful insights have become indispensable for our team.",
       "rating": 5
     },
@@ -283,7 +283,7 @@
       "name": "Prof. Ananya Chatterjee",
       "role": "Associate Professor, CSE Department",
       "company": "NIT Agartala",
-      "image": "",
+      "image": "https://ui-avatars.com/api/?name=Prof+Ananya+Chatterjee&background=111111&color=ffffff&size=256",
       "quote": "Mainak stands out for his strong foundation in algorithms and data structures, combined with practical application skills. His projects demonstrate a rare blend of theoretical knowledge and hands-on implementation expertise.",
       "rating": 5
     }

@@ -124,7 +124,8 @@
     pointer-events: none;
   }
 
-  section[id] {
+  section[id],
+  [data-section] {
     scroll-margin-top: 5.5rem;
     contain: paint;
   }

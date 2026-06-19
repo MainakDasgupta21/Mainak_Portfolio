@@ -65,13 +65,13 @@ const App = () => {
       <main>
         <Hero />
         <Suspense fallback={<SectionSkeleton />}>
-          <LazySection><About /></LazySection>
-          <LazySection><Experience /></LazySection>
-          <LazySection><Projects /></LazySection>
-          <LazySection><Skills /></LazySection>
-          <LazySection><Achievements /></LazySection>
-          <LazySection><Testimonials /></LazySection>
-          <LazySection><Contact /></LazySection>
+          <LazySection id="about"><About /></LazySection>
+          <LazySection id="experience"><Experience /></LazySection>
+          <LazySection id="projects"><Projects /></LazySection>
+          <LazySection id="skills"><Skills /></LazySection>
+          <LazySection id="achievements"><Achievements /></LazySection>
+          <LazySection id="testimonials"><Testimonials /></LazySection>
+          <LazySection id="contact"><Contact /></LazySection>
           <LazySection minHeight={200}><Footer /></LazySection>
         </Suspense>
       </main>

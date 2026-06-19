@@ -1,4 +1,10 @@
-import { motion, AnimatePresence } from "framer-motion"
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+} from "framer-motion"
 import { memo, useContext, useEffect, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
@@ -13,6 +19,7 @@ const NAV_ITEMS = [
   { label: "Achievements", href: "#achievements" },
   { label: "Contact", href: "#contact" },
 ]
+const PRIMARY_CTA = { label: "Let's Talk", href: "#contact" }
 
 function getBrandShortName(profile, fallbackName) {
   if (profile.brandShortName?.trim()) return profile.brandShortName
@@ -27,6 +34,14 @@ function getBrandMonogram(profile, fallbackName) {
 }
 
 const Header = memo(function Header() {
+  const shouldReduceMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll()
+  const progressScaleX = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 30,
+    mass: 0.2,
+  })
+
   const { loading, profile } = useContext(PortfolioContext)
   const displayName = getProfileDisplayName(profile, loading ? "" : "Mainak Dasgupta")
   const brandShortName = getBrandShortName(profile, displayName)
@@ -37,17 +52,13 @@ const Header = memo(function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [active, setActive] = useState("#home")
   const menuRef = useRef(null)
+  const toggleButtonRef = useRef(null)
 
   useEffect(() => {
     let ticking = false
-    let lastScrolled = false
     const update = () => {
       ticking = false
-      const next = window.scrollY > 40
-      if (next !== lastScrolled) {
-        lastScrolled = next
-        setScrolled(next)
-      }
+      setScrolled(window.scrollY > 28)
     }
     const onScroll = () => {
       if (!ticking) {
@@ -61,40 +72,75 @@ const Header = memo(function Header() {
   }, [])
 
   useEffect(() => {
-    const sections = []
-    NAV_ITEMS.forEach((item) => {
-      const el = document.querySelector(item.href)
-      if (el instanceof HTMLElement) sections.push(el)
-    })
-    if (!sections.length) return
-
+    let io = null
     const ratios = new Map()
-    sections.forEach((s) => ratios.set(s, 0))
 
     const recompute = () => {
       let bestId = "#home"
       let bestRatio = 0
-      ratios.forEach((ratio, el) => {
+
+      ratios.forEach((ratio, section) => {
         if (ratio > bestRatio) {
           bestRatio = ratio
-          bestId = `#${el.id}`
+          bestId = `#${section.id}`
         }
       })
-      setActive(bestId)
+
+      if (window.scrollY < 72) {
+        bestId = "#home"
+      } else if (bestRatio === 0) {
+        const viewportProbe = window.innerHeight * 0.35
+        ratios.forEach((_, section) => {
+          if (section.getBoundingClientRect().top - viewportProbe <= 0) {
+            bestId = `#${section.id}`
+          }
+        })
+      }
+
+      setActive((prev) => (prev === bestId ? prev : bestId))
     }
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) ratios.set(e.target, e.intersectionRatio)
-        recompute()
-      },
-      {
-        threshold: [0, 0.15, 0.35, 0.55, 0.75, 1],
-        rootMargin: "-30% 0px -30% 0px",
-      }
-    )
-    sections.forEach((s) => io.observe(s))
-    return () => io.disconnect()
+    const observeSections = () => {
+      const sections = NAV_ITEMS.map((item) => document.querySelector(item.href)).filter(
+        (el) => el instanceof HTMLElement
+      )
+
+      if (!sections.length) return false
+
+      io?.disconnect()
+      ratios.clear()
+      sections.forEach((section) => ratios.set(section, 0))
+
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            ratios.set(entry.target, entry.intersectionRatio)
+          }
+          recompute()
+        },
+        {
+          threshold: [0, 0.1, 0.25, 0.45, 0.65, 0.85, 1],
+          rootMargin: "-24% 0px -48% 0px",
+        }
+      )
+      sections.forEach((section) => io.observe(section))
+      recompute()
+      return true
+    }
+
+    if (observeSections()) {
+      return () => io?.disconnect()
+    }
+
+    const mutationObserver = new MutationObserver(() => {
+      if (observeSections()) mutationObserver.disconnect()
+    })
+    mutationObserver.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      mutationObserver.disconnect()
+      io?.disconnect()
+    }
   }, [])
 
   useEffect(() => {
@@ -108,113 +154,233 @@ const Header = memo(function Header() {
   useEffect(() => {
     const onClick = (e) => {
       if (!mobileOpen) return
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      const target = e.target
+      if (!(target instanceof Node)) return
+
+      const clickedMenu = menuRef.current?.contains(target)
+      const clickedToggle = toggleButtonRef.current?.contains(target)
+
+      if (!clickedMenu && !clickedToggle) {
         setMobileOpen(false)
       }
     }
-    window.addEventListener("mousedown", onClick)
-    return () => window.removeEventListener("mousedown", onClick)
+    window.addEventListener("pointerdown", onClick)
+    return () => window.removeEventListener("pointerdown", onClick)
   }, [mobileOpen])
+
+  const focusRingClass =
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+  const shellClassName = scrolled || mobileOpen
+    ? "glass-card border border-border/35 shadow-elegant"
+    : "border border-white/10 bg-black/25 backdrop-blur-md md:border-transparent md:bg-transparent md:backdrop-blur-0"
+  const mobileMenuVariants = {
+    hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.98 },
+    visible: shouldReduceMotion
+      ? { opacity: 1, transition: { duration: 0.16 } }
+      : {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          transition: {
+            duration: 0.24,
+            ease: [0.22, 1, 0.36, 1],
+            when: "beforeChildren",
+            staggerChildren: 0.045,
+          },
+        },
+    exit: shouldReduceMotion
+      ? { opacity: 0, transition: { duration: 0.12 } }
+      : {
+          opacity: 0,
+          y: -8,
+          scale: 0.98,
+          transition: { duration: 0.18, ease: "easeOut" },
+        },
+  }
+  const mobileItemVariants = {
+    hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 },
+    visible: shouldReduceMotion
+      ? { opacity: 1, transition: { duration: 0.12 } }
+      : { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
+  }
 
   return (
     <motion.header
-      initial={{ y: -18, opacity: 0 }}
+      initial={shouldReduceMotion ? false : { y: -18, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
       style={{
         transform: "translateZ(0)",
-        willChange: "backdrop-filter, background-color",
       }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || mobileOpen
-          ? "backdrop-blur-md bg-card/70 border-b border-border/20 shadow-elegant"
-          : "bg-gradient-to-b from-black/35 via-black/10 to-transparent md:bg-transparent"
-      }`}
+      className="fixed inset-x-0 top-0 z-50 pointer-events-none"
     >
-      <nav className="container mx-auto px-4 sm:px-6 py-2.5 md:py-3">
-        <div className="flex items-center justify-between">
-          <motion.a
-            href="#home"
-            className="text-2xl md:text-3xl font-bold cursive-brand leading-none flex items-center gap-3"
-            whileHover={{ scale: 1.03 }}
-            aria-label={`${ariaDisplayName} - Home`}
-          >
-            <span
-              className="inline-block w-9 h-9 rounded-md bg-gradient-to-br from-foreground/90 to-accent flex items-center justify-center text-black font-bold"
-              aria-hidden
-            >
-              {brandMonogram || "P"}
-            </span>
-            <span className="hidden md:inline">{brandShortName || "Portfolio"}</span>
-          </motion.a>
+      {!shouldReduceMotion && (
+        <motion.div
+          aria-hidden
+          className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/95 to-transparent origin-left"
+          style={{ scaleX: progressScaleX }}
+        />
+      )}
 
-          <div className="hidden md:flex items-center gap-8">
-            {NAV_ITEMS.map((item, idx) => {
-              const isActive = active === item.href
-              return (
-                <motion.a
-                  key={item.href}
-                  href={item.href}
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className={`relative text-sm transition-colors px-1 py-1 ${
-                    isActive ? "text-foreground font-semibold" : "text-muted-foreground"
-                  }`}
-                  style={{ WebkitTapHighlightColor: "transparent" }}
-                >
-                  {item.label}
-                  <span
-                    aria-hidden
-                    className={`absolute left-0 right-0 -bottom-1 h-0.5 rounded-full transition-all ${
-                      isActive ? "bg-foreground/90 w-full" : "bg-foreground/0 w-0"
-                    }`}
-                  />
-                </motion.a>
-              )
-            })}
-          </div>
-
-          <div className="md:hidden flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setMobileOpen((s) => !s)}
-              aria-expanded={mobileOpen}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              className="h-10 w-10 rounded-md bg-black/25 hover:bg-black/35 border border-white/10 flex items-center justify-center text-foreground"
+      <nav className="container pointer-events-auto mx-auto px-4 sm:px-6 pt-3 md:pt-4" aria-label="Primary">
+        <motion.div
+          className={`rounded-2xl md:rounded-[999px] transition-all duration-300 ${shellClassName}`}
+          animate={shouldReduceMotion ? undefined : { y: scrolled ? 0 : -2 }}
+        >
+          <div className="flex items-center justify-between gap-3 px-3 sm:px-4 md:px-5 py-2.5">
+            <motion.a
+              href="#home"
+              aria-label={`${ariaDisplayName} - Home`}
+              onClick={() => {
+                setActive("#home")
+                setMobileOpen(false)
+              }}
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+              className={`inline-flex items-center gap-2.5 rounded-full px-1.5 py-1 ${focusRingClass}`}
             >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+              <span
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-foreground to-foreground/80 text-background font-semibold text-sm"
+                aria-hidden
+              >
+                {brandMonogram || "P"}
+              </span>
+              <span className="text-xl md:text-2xl font-bold cursive-brand leading-none">
+                {brandShortName || "Portfolio"}
+              </span>
+            </motion.a>
+
+            <div className="hidden md:flex items-center gap-3">
+              <div className="relative flex items-center gap-1 rounded-full border border-border/35 bg-background/30 p-1 backdrop-blur-md">
+                {NAV_ITEMS.map((item, idx) => {
+                  const isActive = active === item.href
+                  return (
+                    <motion.a
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setActive(item.href)}
+                      aria-current={isActive ? "page" : undefined}
+                      initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={shouldReduceMotion ? undefined : { delay: 0.03 + idx * 0.04 }}
+                      className={`relative inline-flex h-9 items-center justify-center rounded-full px-3 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      } ${focusRingClass}`}
+                      style={{ WebkitTapHighlightColor: "transparent" }}
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="navActivePill"
+                          aria-hidden
+                          className="absolute inset-0 rounded-full border border-foreground/20 bg-foreground/10"
+                          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                        />
+                      )}
+                      <span className="relative z-10">{item.label}</span>
+                    </motion.a>
+                  )
+                })}
+              </div>
+
+              <a
+                href={PRIMARY_CTA.href}
+                className={`inline-flex h-10 items-center justify-center rounded-full border border-foreground/30 bg-foreground px-4 text-sm font-semibold text-background hover-glow hover:bg-foreground/90 transition-colors ${focusRingClass}`}
+              >
+                {PRIMARY_CTA.label}
+              </a>
+            </div>
+
+            <div className="md:hidden flex items-center">
+              <button
+                ref={toggleButtonRef}
+                type="button"
+                onClick={() => setMobileOpen((isOpen) => !isOpen)}
+                aria-expanded={mobileOpen}
+                aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/30 bg-background/45 text-foreground hover:bg-muted/40 transition-colors ${focusRingClass}`}
+              >
+                {shouldReduceMotion ? (
+                  mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />
+                ) : (
+                  <AnimatePresence mode="wait" initial={false}>
+                    {mobileOpen ? (
+                      <motion.span
+                        key="close"
+                        initial={{ opacity: 0, rotate: -45 }}
+                        animate={{ opacity: 1, rotate: 0 }}
+                        exit={{ opacity: 0, rotate: 45 }}
+                        transition={{ duration: 0.16, ease: "easeOut" }}
+                        className="inline-flex"
+                      >
+                        <X className="h-5 w-5" />
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        key="open"
+                        initial={{ opacity: 0, rotate: 45 }}
+                        animate={{ opacity: 1, rotate: 0 }}
+                        exit={{ opacity: 0, rotate: -45 }}
+                        transition={{ duration: 0.16, ease: "easeOut" }}
+                        className="inline-flex"
+                      >
+                        <Menu className="h-5 w-5" />
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                )}
+              </button>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
               ref={menuRef}
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
+              variants={mobileMenuVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
               data-lenis-prevent
-              className="mt-3 md:hidden rounded-xl p-3 bg-card/80 border border-border/20 backdrop-blur-md shadow-elegant max-h-[70vh] overflow-y-auto"
+              className="mt-2 md:hidden rounded-2xl border border-border/30 bg-card/85 p-3 backdrop-blur-xl shadow-elegant max-h-[70vh] overflow-y-auto"
             >
-              <div className="flex flex-col gap-1.5">
-                {NAV_ITEMS.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`block text-sm px-3.5 py-2.5 rounded-md transition-colors ${
-                      active === item.href
-                        ? "text-foreground font-semibold bg-accent/5"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/10"
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                ))}
+              <div className="flex flex-col gap-1">
+                {NAV_ITEMS.map((item) => {
+                  const isActive = active === item.href
+                  return (
+                    <motion.a
+                      key={item.href}
+                      href={item.href}
+                      variants={mobileItemVariants}
+                      aria-current={isActive ? "page" : undefined}
+                      onClick={() => {
+                        setActive(item.href)
+                        setMobileOpen(false)
+                      }}
+                      className={`block rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-foreground/10 text-foreground border border-foreground/15"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/30 border border-transparent"
+                      }`}
+                    >
+                      {item.label}
+                    </motion.a>
+                  )
+                })}
               </div>
+
+              <motion.a
+                href={PRIMARY_CTA.href}
+                variants={mobileItemVariants}
+                onClick={() => {
+                  setActive(PRIMARY_CTA.href)
+                  setMobileOpen(false)
+                }}
+                className={`mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl border border-foreground/30 bg-foreground px-4 text-sm font-semibold text-background hover:bg-foreground/90 transition-colors ${focusRingClass}`}
+              >
+                {PRIMARY_CTA.label}
+              </motion.a>
             </motion.div>
           )}
         </AnimatePresence>
