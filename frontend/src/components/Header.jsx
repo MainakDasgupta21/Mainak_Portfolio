@@ -17,17 +17,17 @@ function getBrandShortName(profile, fallbackName) {
   if (profile.brandShortName?.trim()) return profile.brandShortName
   const name = (profile.name?.trim() || fallbackName || "").trim()
   const first = name.split(/\s+/)[0]
-  return first ? `${first}.` : "Portfolio"
+  return first ? `${first}.` : ""
 }
 function getBrandMonogram(profile, fallbackName) {
   if (profile.brandMonogram?.trim()) return profile.brandMonogram
-  const name = profile.name?.trim() || fallbackName || "P"
-  return name.charAt(0).toUpperCase()
+  const name = (profile.name?.trim() || fallbackName || "").trim()
+  return name ? name.charAt(0).toUpperCase() : ""
 }
 
 const Header = memo(function Header() {
-  const { profile } = useContext(PortfolioContext)
-  const displayName = profile.name || "Mainak Dasgupta"
+  const { loading, profile } = useContext(PortfolioContext)
+  const displayName = profile.name?.trim() || (loading ? "" : "Mainak Dasgupta")
   const brandShortName = getBrandShortName(profile, displayName)
   const brandMonogram = getBrandMonogram(profile, displayName)
 
@@ -141,9 +141,9 @@ const Header = memo(function Header() {
               className="inline-block w-9 h-9 rounded-md bg-gradient-to-br from-foreground/90 to-accent flex items-center justify-center text-black font-bold"
               aria-hidden
             >
-              {brandMonogram}
+              {brandMonogram || "P"}
             </span>
-            <span className="hidden md:inline">{brandShortName}</span>
+            <span className="hidden md:inline">{brandShortName || "Portfolio"}</span>
           </motion.a>
 
           <div className="hidden md:flex items-center gap-8">

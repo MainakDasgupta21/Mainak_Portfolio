@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react"
+import { lazy, Suspense, useContext, useEffect, useState } from "react"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
@@ -6,6 +6,7 @@ import Header from "./components/Header"
 import Hero from "./components/Hero"
 import LazySection from "./components/LazySection"
 import SectionSkeleton from "./components/SectionSkeleton"
+import { PortfolioContext } from "./context/PortfolioContext"
 import useSmoothScroll from "./hooks/useSmoothScroll"
 
 const About = lazy(() => import("./components/About"))
@@ -20,6 +21,7 @@ const AnimatedBackground = lazy(() => import("./components/AnimatedBackground"))
 
 const App = () => {
   useSmoothScroll()
+  const { loading } = useContext(PortfolioContext)
 
   const [bgReady, setBgReady] = useState(false)
   useEffect(() => {
@@ -31,6 +33,30 @@ const App = () => {
       return () => clearTimeout(t)
     }
   }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen relative">
+        <ToastContainer position="bottom-right" theme="dark" />
+        <div className="fixed inset-0 -z-10">
+          {bgReady && (
+            <Suspense fallback={null}>
+              <AnimatedBackground />
+            </Suspense>
+          )}
+        </div>
+        <main className="min-h-screen flex items-center justify-center px-4">
+          <div
+            role="status"
+            aria-live="polite"
+            className="rounded-xl border border-border/20 bg-card/45 px-4 py-3 text-sm text-muted-foreground backdrop-blur-md"
+          >
+            Loading portfolio...
+          </div>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen relative">

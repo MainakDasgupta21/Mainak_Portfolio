@@ -62,6 +62,7 @@ const PortfolioContextProvider = (props) => {
   const [achievements, setAchievements] = useState(DEFAULTS.achievements)
   const [testimonials, setTestimonials] = useState(DEFAULTS.testimonials)
   const [education, setEducation] = useState(DEFAULTS.education)
+  // `loading` tracks the initial content hydration window.
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -139,6 +140,7 @@ const PortfolioContextProvider = (props) => {
   const value = {
     backendUrl,
     loading,
+    isHydrated: !loading,
     profile,
     projects,
     experience,

@@ -5,17 +5,17 @@ import { PortfolioContext } from "../context/PortfolioContext"
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion()
-  const { profile } = useContext(PortfolioContext)
+  const { loading, profile } = useContext(PortfolioContext)
   const heroUi = profile.heroUi || {}
   const media = profile.media || {}
-  const displayName = profile.name || "Mainak Dasgupta"
+  const displayName = profile.name?.trim() || (loading ? "" : "Mainak Dasgupta")
   const heroRole = typeof heroUi.role === "string" ? heroUi.role.trim() : ""
-  const role = heroRole || "Software Developer"
-  const introPrefix = heroUi.introPrefix || "Hi, I'm"
-  const badgeText = heroUi.badge || "Crafting Unique Solutions"
-  const tagline = profile.tagline || "Building scalable systems and intelligent solutions"
-  const scrollHintTop = heroUi.scrollHintTop || "Scroll down"
-  const scrollHintBottom = heroUi.scrollHintBottom || "to see projects"
+  const role = heroRole || (loading ? "" : "Software Developer")
+  const introPrefix = heroUi.introPrefix || (loading ? "" : "Hi, I'm")
+  const badgeText = heroUi.badge || (loading ? "" : "Crafting Unique Solutions")
+  const tagline = profile.tagline || (loading ? "" : "Building scalable systems and intelligent solutions")
+  const scrollHintTop = heroUi.scrollHintTop || (loading ? "" : "Scroll down")
+  const scrollHintBottom = heroUi.scrollHintBottom || (loading ? "" : "to see projects")
   const heroVideoSrc = media.heroVideoSrc || "/back.mp4"
   const heroPosterSrc = media.heroPosterSrc || "/back-poster.jpg"
   const heroProfileSrc = media.heroProfileSrc || "/me.png"
