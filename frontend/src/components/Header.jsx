@@ -53,6 +53,8 @@ const Header = memo(function Header() {
   const [active, setActive] = useState("#home")
   const menuRef = useRef(null)
   const toggleButtonRef = useRef(null)
+  const activeLockRef = useRef(null)
+  const activeLockUntilRef = useRef(0)
 
   useEffect(() => {
     let ticking = false
@@ -76,6 +78,24 @@ const Header = memo(function Header() {
     const ratios = new Map()
 
     const recompute = () => {
+      const lockedTarget = activeLockRef.current
+      if (lockedTarget) {
+        const targetSection = document.querySelector(lockedTarget)
+        if (targetSection instanceof HTMLElement) {
+          const ratio = ratios.get(targetSection) || 0
+          const distanceFromTop = Math.abs(targetSection.getBoundingClientRect().top - 88)
+          const reachedTarget = ratio >= 0.35 || distanceFromTop <= 28
+          const expiredLock = performance.now() > activeLockUntilRef.current
+
+          if (!reachedTarget && !expiredLock) {
+            setActive((prev) => (prev === lockedTarget ? prev : lockedTarget))
+            return
+          }
+        }
+
+        activeLockRef.current = null
+      }
+
       let bestId = "#home"
       let bestRatio = 0
 
@@ -86,9 +106,7 @@ const Header = memo(function Header() {
         }
       })
 
-      if (window.scrollY < 72) {
-        bestId = "#home"
-      } else if (bestRatio === 0) {
+      if (bestRatio === 0) {
         const viewportProbe = window.innerHeight * 0.35
         ratios.forEach((_, section) => {
           if (section.getBoundingClientRect().top - viewportProbe <= 0) {
@@ -203,6 +221,11 @@ const Header = memo(function Header() {
       ? { opacity: 1, transition: { duration: 0.12 } }
       : { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
   }
+  const lockActiveItem = (href) => {
+    activeLockRef.current = href
+    activeLockUntilRef.current = performance.now() + 1400
+    setActive(href)
+  }
 
   return (
     <motion.header
@@ -232,7 +255,7 @@ const Header = memo(function Header() {
               href="#home"
               aria-label={`${ariaDisplayName} - Home`}
               onClick={() => {
-                setActive("#home")
+                lockActiveItem("#home")
                 setMobileOpen(false)
               }}
               whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
@@ -257,7 +280,7 @@ const Header = memo(function Header() {
                     <motion.a
                       key={item.href}
                       href={item.href}
-                      onClick={() => setActive(item.href)}
+                      onClick={() => lockActiveItem(item.href)}
                       aria-current={isActive ? "page" : undefined}
                       initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -274,7 +297,7 @@ const Header = memo(function Header() {
                           layoutId="navActivePill"
                           aria-hidden
                           className="absolute inset-0 rounded-full border border-foreground/20 bg-foreground/10"
-                          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                          transition={{ type: "spring", stiffness: 460, damping: 42, mass: 0.6 }}
                         />
                       )}
                       <span className="relative z-10">{item.label}</span>
@@ -355,7 +378,7 @@ const Header = memo(function Header() {
                       variants={mobileItemVariants}
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => {
-                        setActive(item.href)
+                        lockActiveItem(item.href)
                         setMobileOpen(false)
                       }}
                       className={`block rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
@@ -374,7 +397,7 @@ const Header = memo(function Header() {
                 href={PRIMARY_CTA.href}
                 variants={mobileItemVariants}
                 onClick={() => {
-                  setActive(PRIMARY_CTA.href)
+                  lockActiveItem(PRIMARY_CTA.href)
                   setMobileOpen(false)
                 }}
                 className={`mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl border border-foreground/30 bg-foreground px-4 text-sm font-semibold text-background hover:bg-foreground/90 transition-colors ${focusRingClass}`}
