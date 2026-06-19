@@ -2,6 +2,7 @@ import { m, AnimatePresence, useInView } from "framer-motion"
 import { memo, useContext, useEffect, useRef, useState } from "react"
 import { ExternalLink, Github, X } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
+import { lockLenisScroll, unlockLenisScroll } from "../hooks/useSmoothScroll"
 
 const Projects = memo(function Projects() {
   const ref = useRef(null)
@@ -15,17 +16,20 @@ const Projects = memo(function Projects() {
   // Esc closes the modal.
   useEffect(() => {
     if (!selected) return
+
+    lockLenisScroll()
+
     const onKey = (e) => { if (e.key === "Escape") setSelected(null) }
     window.addEventListener("keydown", onKey)
-    document.body.style.overflow = "hidden"
+
     return () => {
       window.removeEventListener("keydown", onKey)
-      document.body.style.overflow = ""
+      unlockLenisScroll()
     }
   }, [selected])
 
   return (
-    <section className="py-20 md:py-32 bg-muted/30" ref={ref}>
+    <section id="projects" className="py-20 md:py-32 bg-muted/30" ref={ref}>
       <div className="container mx-auto px-4 sm:px-6">
         <m.div
           initial={{ opacity: 0, y: 50 }}
@@ -131,6 +135,7 @@ const Projects = memo(function Projects() {
                 exit={{ opacity: 0, y: 20, scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 220, damping: 26 }}
                 className="modal-card"
+                data-lenis-prevent
                 role="dialog"
                 aria-modal="true"
               >

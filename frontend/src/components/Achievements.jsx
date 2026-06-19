@@ -28,6 +28,7 @@ const Achievements = memo(function Achievements() {
 
   return (
     <section
+      id="achievements"
       ref={ref}
       className="py-20 md:py-32 bg-gradient-to-br from-background via-muted/20 to-accent/5 relative overflow-hidden"
     >

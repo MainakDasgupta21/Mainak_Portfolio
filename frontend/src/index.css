@@ -118,14 +118,13 @@
     overscroll-behavior: contain;
   }
   .lenis.lenis-stopped {
-    overflow: hidden;
+    overflow: clip;
   }
   .lenis.lenis-scrolling iframe {
     pointer-events: none;
   }
 
-  section[id],
-  [data-section] {
+  section[id] {
     scroll-margin-top: 5.5rem;
     contain: paint;
   }

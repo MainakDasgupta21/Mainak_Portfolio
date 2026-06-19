@@ -9,6 +9,7 @@ import { memo, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { getProfileDisplayName } from "../utils/profileDisplay"
+import { lockLenisScroll, unlockLenisScroll } from "../hooks/useSmoothScroll"
 
 const NAV_ITEMS = [
   { label: "Home", href: "#home" },
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { label: "Testimonials", href: "#testimonials" },
 ]
 const PRIMARY_CTA = { label: "Let's Talk", href: "#contact" }
+const OBSERVED_SECTION_HASHES = [...new Set([...NAV_ITEMS.map((item) => item.href), PRIMARY_CTA.href])]
 
 function getBrandShortName(profile, fallbackName) {
   if (profile.brandShortName?.trim()) return profile.brandShortName
@@ -53,14 +55,17 @@ const Header = memo(function Header() {
   const [active, setActive] = useState("#home")
   const menuRef = useRef(null)
   const toggleButtonRef = useRef(null)
-  const activeLockRef = useRef(null)
-  const activeLockUntilRef = useRef(0)
+  const lastScrolledRef = useRef(false)
 
   useEffect(() => {
     let ticking = false
     const update = () => {
       ticking = false
-      setScrolled(window.scrollY > 28)
+      const nextValue = window.scrollY > 28
+      if (nextValue !== lastScrolledRef.current) {
+        lastScrolledRef.current = nextValue
+        setScrolled(nextValue)
+      }
     }
     const onScroll = () => {
       if (!ticking) {
@@ -75,27 +80,11 @@ const Header = memo(function Header() {
 
   useEffect(() => {
     let io = null
+    let rafId = 0
+    let observedSections = []
     const ratios = new Map()
 
     const recompute = () => {
-      const lockedTarget = activeLockRef.current
-      if (lockedTarget) {
-        const targetSection = document.querySelector(lockedTarget)
-        if (targetSection instanceof HTMLElement) {
-          const ratio = ratios.get(targetSection) || 0
-          const distanceFromTop = Math.abs(targetSection.getBoundingClientRect().top - 88)
-          const reachedTarget = ratio >= 0.35 || distanceFromTop <= 28
-          const expiredLock = performance.now() > activeLockUntilRef.current
-
-          if (!reachedTarget && !expiredLock) {
-            setActive((prev) => (prev === lockedTarget ? prev : lockedTarget))
-            return
-          }
-        }
-
-        activeLockRef.current = null
-      }
-
       let bestId = "#home"
       let bestRatio = 0
 
@@ -106,20 +95,28 @@ const Header = memo(function Header() {
         }
       })
 
-      if (bestRatio === 0) {
-        const viewportProbe = window.innerHeight * 0.35
-        ratios.forEach((_, section) => {
-          if (section.getBoundingClientRect().top - viewportProbe <= 0) {
+      if (bestRatio < 0.05 && observedSections.length > 0) {
+        const probeY = window.scrollY + window.innerHeight * 0.35
+        for (const section of observedSections) {
+          if (section.offsetTop <= probeY) {
             bestId = `#${section.id}`
           }
-        })
+        }
       }
 
       setActive((prev) => (prev === bestId ? prev : bestId))
     }
 
+    const scheduleRecompute = () => {
+      if (rafId) return
+      rafId = requestAnimationFrame(() => {
+        rafId = 0
+        recompute()
+      })
+    }
+
     const observeSections = () => {
-      const sections = NAV_ITEMS.map((item) => document.querySelector(item.href)).filter(
+      const sections = OBSERVED_SECTION_HASHES.map((hash) => document.querySelector(hash)).filter(
         (el) => el instanceof HTMLElement
       )
 
@@ -127,6 +124,7 @@ const Header = memo(function Header() {
 
       io?.disconnect()
       ratios.clear()
+      observedSections = sections
       sections.forEach((section) => ratios.set(section, 0))
 
       io = new IntersectionObserver(
@@ -134,15 +132,15 @@ const Header = memo(function Header() {
           for (const entry of entries) {
             ratios.set(entry.target, entry.intersectionRatio)
           }
-          recompute()
+          scheduleRecompute()
         },
         {
-          threshold: [0, 0.1, 0.25, 0.45, 0.65, 0.85, 1],
-          rootMargin: "-24% 0px -48% 0px",
+          threshold: [0, 0.2, 0.4, 0.6, 0.8],
+          rootMargin: "-18% 0px -56% 0px",
         }
       )
       sections.forEach((section) => io.observe(section))
-      recompute()
+      scheduleRecompute()
       return true
     }
 
@@ -156,6 +154,7 @@ const Header = memo(function Header() {
     mutationObserver.observe(document.body, { childList: true, subtree: true })
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId)
       mutationObserver.disconnect()
       io?.disconnect()
     }
@@ -167,6 +166,12 @@ const Header = memo(function Header() {
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
+  }, [mobileOpen])
+
+  useEffect(() => {
+    if (!mobileOpen) return
+    lockLenisScroll()
+    return () => unlockLenisScroll()
   }, [mobileOpen])
 
   useEffect(() => {
@@ -227,12 +232,6 @@ const Header = memo(function Header() {
     }),
     [shouldReduceMotion]
   )
-  const lockActiveItem = (href) => {
-    activeLockRef.current = href
-    activeLockUntilRef.current = performance.now() + 1400
-    setActive(href)
-  }
-
   return (
     <m.header
       initial={shouldReduceMotion ? false : { y: -18, opacity: 0 }}
@@ -261,7 +260,7 @@ const Header = memo(function Header() {
               href="#home"
               aria-label={`${ariaDisplayName} - Home`}
               onClick={() => {
-                lockActiveItem("#home")
+                setActive("#home")
                 setMobileOpen(false)
               }}
               whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
@@ -286,7 +285,7 @@ const Header = memo(function Header() {
                     <m.a
                       key={item.href}
                       href={item.href}
-                      onClick={() => lockActiveItem(item.href)}
+                      onClick={() => setActive(item.href)}
                       aria-current={isActive ? "page" : undefined}
                       initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -384,7 +383,7 @@ const Header = memo(function Header() {
                       variants={mobileItemVariants}
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => {
-                        lockActiveItem(item.href)
+                        setActive(item.href)
                         setMobileOpen(false)
                       }}
                       className={`block rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
@@ -403,7 +402,7 @@ const Header = memo(function Header() {
                 href={PRIMARY_CTA.href}
                 variants={mobileItemVariants}
                 onClick={() => {
-                  lockActiveItem(PRIMARY_CTA.href)
+                  setActive(PRIMARY_CTA.href)
                   setMobileOpen(false)
                 }}
                 className={`mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl border border-foreground/30 bg-foreground px-4 text-sm font-semibold text-background hover:bg-foreground/90 transition-colors ${focusRingClass}`}

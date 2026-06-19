@@ -1,24 +1,35 @@
-import { memo } from "react"
+import { memo, useEffect, useState } from "react"
 import useLazyMount from "../hooks/useLazyMount"
 import SectionSkeleton from "./SectionSkeleton"
 
 const LazySection = memo(function LazySection({
-  id,
   children,
   rootMargin = "400px",
   className = "",
   minHeight = 400,
 }) {
   const { ref, mounted } = useLazyMount(rootMargin)
-  const wrapperClassName = `scroll-mt-[5.5rem] ${className}`.trim()
+  const [reserveHeight, setReserveHeight] = useState(true)
+  const wrapperClassName = className.trim()
+
+  useEffect(() => {
+    if (!mounted) {
+      setReserveHeight(true)
+      return
+    }
+
+    const timerId = window.setTimeout(() => {
+      setReserveHeight(false)
+    }, 180)
+
+    return () => window.clearTimeout(timerId)
+  }, [mounted])
 
   return (
     <div
-      id={id}
       ref={ref}
-      data-section={id ? "true" : undefined}
       className={wrapperClassName}
-      style={{ minHeight: mounted ? undefined : minHeight }}
+      style={{ minHeight: reserveHeight ? minHeight : undefined }}
     >
       {mounted ? children : <SectionSkeleton />}
     </div>

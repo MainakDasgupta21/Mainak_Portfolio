@@ -1,10 +1,11 @@
-import { m, useScroll, useTransform } from "framer-motion"
+import { m, useInView } from "framer-motion"
 import { memo, useContext, useRef, useState } from "react"
 import { FileText, Globe } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 
 const Experience = memo(function Experience() {
   const sectionRef = useRef(null)
+  const timelineInView = useInView(sectionRef, { once: true, margin: "-20% 0px -20% 0px" })
   const [hoveredIndex, setHoveredIndex] = useState(null)
   const { experience, profile } = useContext(PortfolioContext)
   const hasExperience = experience.length > 0
@@ -12,15 +13,8 @@ const Experience = memo(function Experience() {
     profile.sectionSubtitles?.experience ||
     "Professional journey building impactful solutions"
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  })
-
-  const timelineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"])
-
   return (
-    <section className="py-20 md:py-32 bg-muted/30" ref={sectionRef}>
+    <section id="experience" className="py-20 md:py-32 bg-muted/30" ref={sectionRef}>
       <div className="container mx-auto px-4 sm:px-6">
         <m.div
           initial={{ opacity: 0, y: 50 }}
@@ -45,13 +39,17 @@ const Experience = memo(function Experience() {
 
               <m.div
                 className="absolute left-1/2 -translate-x-1/2 top-0 w-[8px] rounded-full overflow-hidden"
-                style={{ height: timelineHeight }}
+                initial={{ height: "0%" }}
+                animate={{ height: timelineInView ? "100%" : "0%" }}
+                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="w-full h-full relative bg-gradient-to-b from-white/10 via-white/60 to-white/10" />
               </m.div>
 
               <m.div
-                style={{ top: timelineHeight }}
+                initial={{ top: "0%" }}
+                animate={{ top: timelineInView ? "100%" : "0%" }}
+                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 md:w-12 md:h-12 rounded-full pointer-events-none"
               >
                 <div className="absolute inset-0 rounded-full bg-white/70 blur-md" />

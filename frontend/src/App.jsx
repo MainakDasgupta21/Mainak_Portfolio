@@ -71,16 +71,46 @@ const App = () => {
           <Header />
           <main>
             <Hero />
-            <Suspense fallback={<SectionSkeleton />}>
-              <LazySection id="about"><About /></LazySection>
-              <LazySection id="experience"><Experience /></LazySection>
-              <LazySection id="projects"><Projects /></LazySection>
-              <LazySection id="skills"><Skills /></LazySection>
-              <LazySection id="achievements"><Achievements /></LazySection>
-              <LazySection id="testimonials"><Testimonials /></LazySection>
-              <LazySection id="contact"><Contact /></LazySection>
-              <LazySection minHeight={200}><Footer /></LazySection>
-            </Suspense>
+            <LazySection>
+              <Suspense fallback={<SectionSkeleton />}>
+                <About />
+              </Suspense>
+            </LazySection>
+            <LazySection>
+              <Suspense fallback={<SectionSkeleton />}>
+                <Experience />
+              </Suspense>
+            </LazySection>
+            <LazySection>
+              <Suspense fallback={<SectionSkeleton />}>
+                <Projects />
+              </Suspense>
+            </LazySection>
+            <LazySection>
+              <Suspense fallback={<SectionSkeleton />}>
+                <Skills />
+              </Suspense>
+            </LazySection>
+            <LazySection>
+              <Suspense fallback={<SectionSkeleton />}>
+                <Achievements />
+              </Suspense>
+            </LazySection>
+            <LazySection>
+              <Suspense fallback={<SectionSkeleton />}>
+                <Testimonials />
+              </Suspense>
+            </LazySection>
+            <LazySection>
+              <Suspense fallback={<SectionSkeleton />}>
+                <Contact />
+              </Suspense>
+            </LazySection>
+            <LazySection minHeight={200}>
+              <Suspense fallback={<SectionSkeleton />}>
+                <Footer />
+              </Suspense>
+            </LazySection>
           </main>
         </div>
       </MotionConfig>

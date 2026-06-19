@@ -19,7 +19,7 @@ const Skills = memo(function Skills() {
   }, [activeCategory, categories, skillsByCategory])
 
   return (
-    <section className="py-20 md:py-32" ref={ref}>
+    <section id="skills" className="py-20 md:py-32" ref={ref}>
       <div className="container mx-auto px-4 sm:px-6">
         <m.div
           initial={{ opacity: 0, y: 50 }}

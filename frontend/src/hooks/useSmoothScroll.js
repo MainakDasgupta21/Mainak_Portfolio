@@ -1,6 +1,28 @@
 import { useEffect } from "react"
 import Lenis from "lenis"
 
+let lenisInstance = null
+let lenisLockCount = 0
+
+const syncLenisLockState = () => {
+  if (!lenisInstance) return
+  if (lenisLockCount > 0) {
+    lenisInstance.stop()
+  } else {
+    lenisInstance.start()
+  }
+}
+
+export const lockLenisScroll = () => {
+  lenisLockCount += 1
+  syncLenisLockState()
+}
+
+export const unlockLenisScroll = () => {
+  lenisLockCount = Math.max(0, lenisLockCount - 1)
+  syncLenisLockState()
+}
+
 /**
  * Page-wide buttery smooth scroll, powered by Lenis.
  * Identical configuration to the original src/hooks/useSmoothScroll.ts.
@@ -22,6 +44,8 @@ export function useSmoothScroll() {
       syncTouch: false,
       autoRaf: false,
     })
+    lenisInstance = lenis
+    syncLenisLockState()
 
     let rafId = 0
     const raf = (time) => {
@@ -64,6 +88,10 @@ export function useSmoothScroll() {
       document.removeEventListener("click", onAnchorClick)
       cancelAnimationFrame(rafId)
       lenis.destroy()
+      if (lenisInstance === lenis) {
+        lenisInstance = null
+        lenisLockCount = 0
+      }
     }
   }, [])
 }
