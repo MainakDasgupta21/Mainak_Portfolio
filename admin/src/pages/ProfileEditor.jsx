@@ -59,10 +59,10 @@ const empty = {
 }
 
 const Section = ({ title, description, children }) => (
-  <Card className="mb-4 p-5 sm:p-6">
-    <h2 className="text-base font-semibold text-text-main">{title}</h2>
-    {description ? <p className="mt-1 text-sm text-text-muted">{description}</p> : null}
-    <div className="mt-4">{children}</div>
+  <Card className="mb-3 p-4 sm:p-5">
+    <h2 className="text-sm font-medium text-text-main">{title}</h2>
+    {description ? <p className="mt-0.5 text-xs text-text-muted">{description}</p> : null}
+    <div className="mt-3">{children}</div>
   </Card>
 )
 
@@ -165,20 +165,20 @@ const ProfileEditor = ({ token }) => {
     <>
       <PageHeader
         title="Profile Settings"
-        description="This is a singleton editor for your portfolio's global profile content."
+        description="Manage global profile content."
         actions={
           <Link
             to="/media"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
           >
             Open media library
           </Link>
         }
       />
 
-      <form onSubmit={onSubmit} className="max-w-6xl">
+      <form onSubmit={onSubmit} className="max-w-5xl">
         <Section title="Personal" description="Core identity information shown across sections.">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextField {...bind("name", "text", "MAINAK DASGUPTA", "Name", true)} />
             <TextField {...bind("title", "text", "Software Developer", "Title", true)} />
             <TextField {...bind("tagline", "text", "", "Tagline")} />
@@ -197,10 +197,10 @@ const ProfileEditor = ({ token }) => {
         </Section>
 
         <Section title="Hero UI" description="Headline, badge, and call-to-action text for the homepage hero section.">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextField {...bind("heroUi.badge", "text", "", "Badge")} />
             <TextField {...bind("heroUi.introPrefix", "text", "", "Intro prefix")} />
-            <TextField {...bind("heroUi.role", "text", "", "Role")} />
+            <TextField {...bind("heroUi.role", "text", "", "Role (Home second line)")} />
             <TextField {...bind("heroUi.primaryCtaLabel", "text", "", "Primary CTA label")} />
             <TextField {...bind("heroUi.primaryCtaHref", "text", "", "Primary CTA href")} />
             <TextField {...bind("heroUi.secondaryCtaLabel", "text", "", "Secondary CTA label")} />
@@ -211,7 +211,7 @@ const ProfileEditor = ({ token }) => {
         </Section>
 
         <Section title="Media" description="Paste Cloudinary URLs from Media Library or local public paths.">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextField {...bind("media.heroVideoSrc", "text", "/back.mp4", "Hero video")} />
             <TextField {...bind("media.heroPosterSrc", "text", "/back-poster.jpg", "Hero poster")} />
             <TextField {...bind("media.heroProfileSrc", "text", "/me.png", "Hero profile image")} />
@@ -221,7 +221,7 @@ const ProfileEditor = ({ token }) => {
         </Section>
 
         <Section title="Social links" description="Public profile links rendered in footer and contact areas.">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextField {...bind("links.linkedin", "text", "", "LinkedIn")} />
             <TextField {...bind("links.github", "text", "", "GitHub")} />
             <TextField {...bind("links.leetcode", "text", "", "LeetCode")} />
@@ -232,7 +232,7 @@ const ProfileEditor = ({ token }) => {
         </Section>
 
         <Section title="Section subtitles" description="Subheading copy used in each public portfolio section.">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextField {...bind("sectionSubtitles.about", "text", "", "About")} />
             <TextField {...bind("sectionSubtitles.projects", "text", "", "Projects")} />
             <TextField {...bind("sectionSubtitles.experience", "text", "", "Experience")} />
@@ -255,11 +255,11 @@ const ProfileEditor = ({ token }) => {
           </Field>
         </Section>
 
-        <div className="mb-8 flex items-center gap-2">
-          <Button type="submit" disabled={saving}>
+        <div className="mb-6 flex items-center gap-2">
+          <Button type="submit" size="sm" disabled={saving}>
             {saving ? "Saving..." : "Save profile"}
           </Button>
-          <Button type="button" variant="ghost" onClick={load} disabled={saving}>
+          <Button type="button" variant="ghost" size="sm" onClick={load} disabled={saving}>
             Reset from server
           </Button>
         </div>

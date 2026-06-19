@@ -106,19 +106,19 @@ const AddSkill = ({ token }) => {
     <>
       <PageHeader
         title={isEditMode ? "Edit Skill" : "Add Skill"}
-        description="Configure category, proficiency, and display order."
+        description="Skill category, proficiency, and order."
         actions={
           <Link
             to="/skills"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
           >
             Back to skills
           </Link>
         }
       />
 
-      <Card className="max-w-xl p-5 sm:p-6">
-        <form onSubmit={onSubmit} className="space-y-4">
+      <Card className="max-w-xl p-4 sm:p-5">
+        <form onSubmit={onSubmit} className="space-y-3">
           <Field label="Category" htmlFor="skill-category" required>
             <Select
               id="skill-category"
@@ -165,10 +165,10 @@ const AddSkill = ({ token }) => {
           </Field>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" size="sm" disabled={saving}>
               {saving ? "Saving..." : isEditMode ? "Save changes" : "Add skill"}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => navigate("/skills")} disabled={saving}>
+            <Button type="button" variant="ghost" size="sm" onClick={() => navigate("/skills")} disabled={saving}>
               Cancel
             </Button>
           </div>

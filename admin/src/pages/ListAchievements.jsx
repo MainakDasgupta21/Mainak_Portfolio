@@ -3,12 +3,12 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import { Link } from "react-router-dom"
 import { backendUrl } from "../App"
-import Button from "../components/ui/Button"
 import ConfirmDialog from "../components/ui/ConfirmDialog"
 import DataTableCard from "../components/ui/DataTableCard"
 import EmptyState from "../components/ui/EmptyState"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
+import RowActions from "../components/ui/RowActions"
 
 const ListAchievements = ({ token }) => {
   const [list, setList] = useState([])
@@ -57,11 +57,11 @@ const ListAchievements = ({ token }) => {
     <>
       <PageHeader
         title="Achievements"
-        description="Display awards and recognitions with short descriptions."
+        description="Manage awards and recognitions."
         actions={
           <Link
             to="/achievements/add"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-brand bg-brand px-4 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand/90"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-brand bg-brand px-3.5 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand/90"
           >
             Add achievement
           </Link>
@@ -75,35 +75,22 @@ const ListAchievements = ({ token }) => {
 
       {!loading && list.length ? (
         <DataTableCard
-          headers={["Icon", "Title", "Description", "Actions"]}
-          gridClass="grid-cols-[100px_1.5fr_2.5fr_170px]"
+          headers={["Title", "Icon", "Summary", "Actions"]}
+          gridClass="grid-cols-[1.7fr_95px_2fr_130px]"
         >
           {list.map((item) => (
             <div
-              className="grid grid-cols-1 gap-3 px-4 py-3 text-sm md:grid-cols-[100px_1.5fr_2.5fr_170px] md:items-center"
+              className="grid grid-cols-1 gap-2 px-4 py-2.5 text-sm md:grid-cols-[1.7fr_95px_2fr_130px] md:items-center hover:bg-surface-soft/60"
               key={item._id}
             >
-              <span className="inline-flex w-fit rounded-full bg-surface-soft px-2.5 py-1 text-xs font-medium text-text-muted">
-                {item.icon}
-              </span>
               <p className="font-medium text-text-main">{item.title}</p>
-              <p className="text-text-muted">{item.description || "-"}</p>
-              <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
-                <Link
-                  to={`/achievements/${item._id}/edit`}
-                  className="inline-flex h-9 items-center justify-center rounded-xl border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
-                >
-                  Edit
-                </Link>
-                <Button
-                  variant="danger-soft"
-                  size="sm"
-                  onClick={() => setPendingDelete(item)}
-                  disabled={deletingId === item._id}
-                >
-                  Delete
-                </Button>
-              </div>
+              <span className="inline-flex w-fit rounded-md bg-surface-soft px-2 py-0.5 text-xs text-text-muted">{item.icon}</span>
+              <p className="text-xs text-text-muted truncate">{item.description || "No description"}</p>
+              <RowActions
+                editTo={`/achievements/${item._id}/edit`}
+                onDelete={() => setPendingDelete(item)}
+                busy={deletingId === item._id}
+              />
             </div>
           ))}
         </DataTableCard>

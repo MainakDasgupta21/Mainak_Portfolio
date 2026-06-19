@@ -4,7 +4,7 @@ const Input = React.forwardRef(function Input({ className = "", ...props }, ref)
   return (
     <input
       ref={ref}
-      className={`h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-text-main ${className}`}
+      className={`h-9 w-full rounded-md border border-border bg-surface px-3 text-sm text-text-main ${className}`}
       {...props}
     />
   )

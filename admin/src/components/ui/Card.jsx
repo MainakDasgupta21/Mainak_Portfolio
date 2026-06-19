@@ -1,6 +1,6 @@
 const Card = ({ className = "", children, ...props }) => {
   return (
-    <section className={`rounded-2xl border border-border bg-surface shadow-panel ${className}`} {...props}>
+    <section className={`rounded-lg border border-border/80 bg-surface ${className}`} {...props}>
       {children}
     </section>
   )

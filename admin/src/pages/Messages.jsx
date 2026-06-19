@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 import { backendUrl } from "../App"
-import { assets } from "../assets/assets"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import ConfirmDialog from "../components/ui/ConfirmDialog"
@@ -80,7 +79,7 @@ const Messages = ({ token }) => {
     <>
       <PageHeader
         title="Messages"
-        description="Review and manage contact form submissions."
+        description="Review contact submissions."
       />
 
       {loading ? <LoadingState label="Loading messages..." /> : null}
@@ -92,26 +91,25 @@ const Messages = ({ token }) => {
         ? list.map((message) => (
             <Card
               key={message._id}
-              className="mb-3 grid grid-cols-1 gap-4 p-4 text-sm sm:grid-cols-[52px_1.8fr_1fr_220px] sm:items-start"
+              className="mb-2 grid grid-cols-1 gap-3 p-3 text-sm sm:grid-cols-[1.9fr_130px_180px] sm:items-start"
             >
-              <img className="w-10" src={assets.parcel_icon} alt="" />
               <div>
-                <p className="text-base font-semibold text-text-main">{message.name}</p>
-                <p className="text-text-muted">{message.email}</p>
+                <p className="font-semibold text-text-main">{message.name}</p>
+                <p className="text-xs text-text-muted">{message.email}</p>
                 {message.subject ? (
-                  <p className="mt-2 text-sm text-text-main">
+                  <p className="mt-1 text-xs text-text-main">
                     <span className="font-medium">Subject:</span> {message.subject}
                   </p>
                 ) : null}
-                <p className="mt-2 whitespace-pre-wrap text-sm text-text-muted">{message.message}</p>
+                <p className="mt-1 whitespace-pre-wrap text-xs text-text-muted">{message.message}</p>
               </div>
               <div className="text-xs text-text-muted">
                 <p>Date: {new Date(message.date).toLocaleString()}</p>
                 <span
-                  className={`mt-2 inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                  className={`mt-1 inline-flex rounded-md px-2 py-0.5 text-xs ${
                     message.status === "new"
-                      ? "bg-brand-soft text-brand"
-                      : "bg-surface-soft text-text-muted"
+                      ? "bg-surface-soft text-text-main"
+                      : "text-text-muted"
                   }`}
                 >
                   {message.status}
@@ -122,6 +120,7 @@ const Messages = ({ token }) => {
                   <Button
                     variant="secondary"
                     size="sm"
+                    className="h-8 px-2.5"
                     onClick={() => setStatus(message._id, "read")}
                     disabled={busyId === message._id}
                   >
@@ -131,6 +130,7 @@ const Messages = ({ token }) => {
                   <Button
                     variant="ghost"
                     size="sm"
+                    className="h-8 px-2.5"
                     onClick={() => setStatus(message._id, "new")}
                     disabled={busyId === message._id}
                   >
@@ -140,6 +140,7 @@ const Messages = ({ token }) => {
                 <Button
                   variant="danger-soft"
                   size="sm"
+                  className="h-8 px-2.5"
                   onClick={() => setPendingDelete(message)}
                   disabled={busyId === message._id}
                 >

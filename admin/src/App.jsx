@@ -70,12 +70,12 @@ const App = () => {
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-      <header className="sticky top-0 z-30 border-b border-border bg-surface/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-surface">
         <Navbar setToken={setToken} onMenuToggle={() => setSidebarOpen((prev) => !prev)} />
       </header>
-      <div className="mx-auto flex w-full max-w-[1600px]">
+      <div className="mx-auto flex w-full max-w-[1480px]">
         <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main id="main-content" className="w-full flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <main id="main-content" className="w-full flex-1 px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
           <Suspense fallback={<LoadingState label="Loading admin section..." />}>
             <Routes>
               <Route path="/" element={<Navigate to="/profile" replace />} />

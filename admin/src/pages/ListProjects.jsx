@@ -3,12 +3,12 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import { Link } from "react-router-dom"
 import { backendUrl } from "../App"
-import Button from "../components/ui/Button"
 import ConfirmDialog from "../components/ui/ConfirmDialog"
 import DataTableCard from "../components/ui/DataTableCard"
 import EmptyState from "../components/ui/EmptyState"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
+import RowActions from "../components/ui/RowActions"
 
 const ListProjects = ({ token }) => {
   const [list, setList] = useState([])
@@ -59,11 +59,11 @@ const ListProjects = ({ token }) => {
     <>
       <PageHeader
         title="Projects"
-        description="Showcase portfolio projects with links, highlights, and visuals."
+        description="Manage portfolio projects."
         actions={
           <Link
             to="/projects/add"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-brand bg-brand px-4 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand/90"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-brand bg-brand px-3.5 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand/90"
           >
             Add project
           </Link>
@@ -78,50 +78,41 @@ const ListProjects = ({ token }) => {
 
       {!loading && list.length ? (
         <DataTableCard
-          headers={["Preview", "Project", "Technologies", "Featured", "Actions"]}
-          gridClass="grid-cols-[90px_1.5fr_2fr_110px_170px]"
+          headers={["Project", "Technologies", "Featured", "Actions"]}
+          gridClass="grid-cols-[2fr_1.3fr_95px_130px]"
         >
           {list.map((project) => (
             <div
-              className="grid grid-cols-1 gap-3 px-4 py-3 text-sm md:grid-cols-[90px_1.5fr_2fr_110px_170px] md:items-center"
+              className="grid grid-cols-1 gap-2 px-4 py-2.5 text-sm md:grid-cols-[2fr_1.3fr_95px_130px] md:items-center hover:bg-surface-soft/60"
               key={project._id}
             >
-              <img
-                className="h-14 w-14 rounded-xl border border-border object-cover"
-                src={(project.image && project.image[0]) || "https://placehold.co/56?text=+"}
-                alt={project.name || "Project preview"}
-                loading="lazy"
-              />
-              <div>
-                <p className="font-medium text-text-main">{project.name}</p>
-                <p className="mt-0.5 text-xs text-text-muted">{project.description || "No description"}</p>
+              <div className="flex items-center gap-2">
+                <img
+                  className="h-9 w-9 rounded-md border border-border object-cover"
+                  src={(project.image && project.image[0]) || "https://placehold.co/40?text=+"}
+                  alt={project.name || "Project preview"}
+                  loading="lazy"
+                />
+                <div>
+                  <p className="font-medium text-text-main">{project.name}</p>
+                  <p className="text-xs text-text-muted">{project.github ? "GitHub linked" : "No repository link"}</p>
+                </div>
               </div>
-              <p className="text-xs text-text-muted">{(project.technologies || []).join(", ") || "Not specified"}</p>
+              <p className="text-xs text-text-muted truncate">{(project.technologies || []).join(", ") || "Not specified"}</p>
               <span
-                className={`inline-flex w-fit items-center rounded-full px-2 py-1 text-xs font-medium ${
+                className={`inline-flex w-fit items-center rounded-md px-2 py-0.5 text-xs ${
                   project.featured
-                    ? "bg-brand-soft text-brand"
-                    : "bg-surface-soft text-text-muted"
+                    ? "bg-surface-soft text-text-main"
+                    : "text-text-muted"
                 }`}
               >
-                {project.featured ? "Featured" : "Standard"}
+                {project.featured ? "Yes" : "No"}
               </span>
-              <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
-                <Link
-                  to={`/projects/${project._id}/edit`}
-                  className="inline-flex h-9 items-center justify-center rounded-xl border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
-                >
-                  Edit
-                </Link>
-                <Button
-                  variant="danger-soft"
-                  size="sm"
-                  onClick={() => setPendingDelete(project)}
-                  disabled={deletingId === project._id}
-                >
-                  Delete
-                </Button>
-              </div>
+              <RowActions
+                editTo={`/projects/${project._id}/edit`}
+                onDelete={() => setPendingDelete(project)}
+                busy={deletingId === project._id}
+              />
             </div>
           ))}
         </DataTableCard>

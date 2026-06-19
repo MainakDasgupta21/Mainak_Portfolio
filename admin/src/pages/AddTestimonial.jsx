@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 import { Link, useNavigate, useParams } from "react-router-dom"
@@ -7,6 +7,7 @@ import { assets } from "../assets/assets"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Field from "../components/ui/Field"
+import FilePicker from "../components/ui/FilePicker"
 import Input from "../components/ui/Input"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
@@ -31,14 +32,6 @@ const AddTestimonial = ({ token }) => {
   const [existingImage, setExistingImage] = useState("")
   const [loading, setLoading] = useState(isEditMode)
   const [saving, setSaving] = useState(false)
-
-  const previewImage = useMemo(() => (image ? URL.createObjectURL(image) : ""), [image])
-
-  useEffect(() => {
-    return () => {
-      if (previewImage) URL.revokeObjectURL(previewImage)
-    }
-  }, [previewImage])
 
   useEffect(() => {
     if (!isEditMode) return
@@ -115,37 +108,31 @@ const AddTestimonial = ({ token }) => {
     <>
       <PageHeader
         title={isEditMode ? "Edit Testimonial" : "Add Testimonial"}
-        description="Manage social proof entries with optional profile photos."
+        description="Testimonial details."
         actions={
           <Link
             to="/testimonials"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
           >
             Back to testimonials
           </Link>
         }
       />
 
-      <Card className="max-w-3xl p-5 sm:p-6">
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <p className="mb-2 text-sm font-medium text-text-main">Photo (optional)</p>
-            <label htmlFor="testimonial-image" className="cursor-pointer">
-              <img
-                className="h-20 w-20 rounded-xl border border-border object-cover"
-                src={previewImage || existingImage || assets.upload_area}
-                alt=""
-              />
-              <input
-                id="testimonial-image"
-                type="file"
-                hidden
-                onChange={(e) => setImage(e.target.files?.[0] || null)}
-              />
-            </label>
-          </div>
+      <Card className="max-w-2xl p-4 sm:p-5">
+        <form onSubmit={onSubmit} className="space-y-3">
+          <Field label="Photo (optional)">
+            <FilePicker
+              id="testimonial-image"
+              file={image}
+              onChange={setImage}
+              currentUrl={existingImage}
+              fallbackSrc={assets.upload_area}
+              accept="image/*"
+            />
+          </Field>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Name" htmlFor="testimonial-name" required>
               <Input
                 id="testimonial-name"
@@ -198,10 +185,10 @@ const AddTestimonial = ({ token }) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" size="sm" disabled={saving}>
               {saving ? "Saving..." : isEditMode ? "Save changes" : "Add testimonial"}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => navigate("/testimonials")} disabled={saving}>
+            <Button type="button" variant="ghost" size="sm" onClick={() => navigate("/testimonials")} disabled={saving}>
               Cancel
             </Button>
           </div>

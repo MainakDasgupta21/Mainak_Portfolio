@@ -3,12 +3,12 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import { Link } from "react-router-dom"
 import { backendUrl } from "../App"
-import Button from "../components/ui/Button"
 import ConfirmDialog from "../components/ui/ConfirmDialog"
 import DataTableCard from "../components/ui/DataTableCard"
 import EmptyState from "../components/ui/EmptyState"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
+import RowActions from "../components/ui/RowActions"
 
 const ListExperience = ({ token }) => {
   const [list, setList] = useState([])
@@ -57,11 +57,11 @@ const ListExperience = ({ token }) => {
     <>
       <PageHeader
         title="Experience"
-        description="Manage roles, company links, and certificate references."
+        description="Manage experience entries."
         actions={
           <Link
             to="/experience/add"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-brand bg-brand px-4 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand/90"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-brand bg-brand px-3.5 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand/90"
           >
             Add experience
           </Link>
@@ -75,39 +75,30 @@ const ListExperience = ({ token }) => {
 
       {!loading && list.length ? (
         <DataTableCard
-          headers={["Logo", "Company", "Role", "Period", "Actions"]}
-          gridClass="grid-cols-[72px_1.6fr_1.6fr_1.2fr_170px]"
+          headers={["Company", "Role", "Period", "Actions"]}
+          gridClass="grid-cols-[2fr_1.6fr_1.1fr_130px]"
         >
           {list.map((item) => (
             <div
-              className="grid grid-cols-1 gap-3 px-4 py-3 text-sm md:grid-cols-[72px_1.6fr_1.6fr_1.2fr_170px] md:items-center"
+              className="grid grid-cols-1 gap-2 px-4 py-2.5 text-sm md:grid-cols-[2fr_1.6fr_1.1fr_130px] md:items-center hover:bg-surface-soft/60"
               key={item._id}
             >
-              <img
-                className="h-10 w-10 rounded-lg border border-border object-contain"
-                src={item.logo || "https://placehold.co/40?text=+"}
-                alt={item.company || "Company logo"}
-                loading="lazy"
-              />
-              <p className="font-medium text-text-main">{item.company}</p>
+              <div className="flex items-center gap-2">
+                <img
+                  className="h-9 w-9 rounded-md border border-border object-contain"
+                  src={item.logo || "https://placehold.co/40?text=+"}
+                  alt={item.company || "Company logo"}
+                  loading="lazy"
+                />
+                <p className="font-medium text-text-main">{item.company}</p>
+              </div>
               <p className="text-text-main">{item.role}</p>
               <p className="text-xs text-text-muted">{item.period || "-"}</p>
-              <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
-                <Link
-                  to={`/experience/${item._id}/edit`}
-                  className="inline-flex h-9 items-center justify-center rounded-xl border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
-                >
-                  Edit
-                </Link>
-                <Button
-                  variant="danger-soft"
-                  size="sm"
-                  onClick={() => setPendingDelete(item)}
-                  disabled={deletingId === item._id}
-                >
-                  Delete
-                </Button>
-              </div>
+              <RowActions
+                editTo={`/experience/${item._id}/edit`}
+                onDelete={() => setPendingDelete(item)}
+                busy={deletingId === item._id}
+              />
             </div>
           ))}
         </DataTableCard>

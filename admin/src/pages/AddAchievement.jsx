@@ -99,19 +99,19 @@ const AddAchievement = ({ token }) => {
     <>
       <PageHeader
         title={isEditMode ? "Edit Achievement" : "Add Achievement"}
-        description="Capture awards and recognitions with icon metadata."
+        description="Achievement details and icon."
         actions={
           <Link
             to="/achievements"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
           >
             Back to achievements
           </Link>
         }
       />
 
-      <Card className="max-w-xl p-5 sm:p-6">
-        <form onSubmit={onSubmit} className="space-y-4">
+      <Card className="max-w-xl p-4 sm:p-5">
+        <form onSubmit={onSubmit} className="space-y-3">
           <Field label="Title" htmlFor="achievement-title" required>
             <Input
               id="achievement-title"
@@ -130,7 +130,7 @@ const AddAchievement = ({ token }) => {
             />
           </Field>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Icon" htmlFor="achievement-icon">
               <Select
                 id="achievement-icon"
@@ -155,10 +155,10 @@ const AddAchievement = ({ token }) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" size="sm" disabled={saving}>
               {saving ? "Saving..." : isEditMode ? "Save changes" : "Add achievement"}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => navigate("/achievements")} disabled={saving}>
+            <Button type="button" variant="ghost" size="sm" onClick={() => navigate("/achievements")} disabled={saving}>
               Cancel
             </Button>
           </div>

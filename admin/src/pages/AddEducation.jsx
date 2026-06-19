@@ -106,20 +106,20 @@ const AddEducation = ({ token }) => {
     <>
       <PageHeader
         title={isEditMode ? "Edit Education" : "Add Education"}
-        description="Maintain degree records and progression status."
+        description="Education details."
         actions={
           <Link
             to="/education"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
           >
             Back to education
           </Link>
         }
       />
 
-      <Card className="max-w-3xl p-5 sm:p-6">
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <Card className="max-w-2xl p-4 sm:p-5">
+        <form onSubmit={onSubmit} className="space-y-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Degree" htmlFor="education-degree" required>
               <Input
                 id="education-degree"
@@ -177,10 +177,10 @@ const AddEducation = ({ token }) => {
             </Field>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" size="sm" disabled={saving}>
               {saving ? "Saving..." : isEditMode ? "Save changes" : "Add education"}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => navigate("/education")} disabled={saving}>
+            <Button type="button" variant="ghost" size="sm" onClick={() => navigate("/education")} disabled={saving}>
               Cancel
             </Button>
           </div>

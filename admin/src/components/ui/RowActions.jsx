@@ -3,16 +3,16 @@ import Button from "./Button"
 
 const RowActions = ({ editTo, onDelete, deleteLabel = "Delete", busy = false }) => {
   return (
-    <div className="flex items-center justify-end gap-2">
+    <div className="flex items-center justify-end gap-1.5">
       {editTo ? (
         <Link
           to={editTo}
-          className="inline-flex h-9 items-center justify-center rounded-xl border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+          className="inline-flex h-8 items-center justify-center rounded-md px-2 text-xs font-medium text-text-muted transition-colors hover:bg-surface-soft hover:text-text-main"
         >
           Edit
         </Link>
       ) : null}
-      <Button variant="danger-soft" size="sm" onClick={onDelete} disabled={busy}>
+      <Button variant="danger-soft" size="sm" className="h-8 px-2.5" onClick={onDelete} disabled={busy}>
         {deleteLabel}
       </Button>
     </div>

@@ -5,19 +5,19 @@
 
 @layer base {
   :root {
-    --ui-canvas: 255 35% 97%;
+    --ui-canvas: 220 20% 97%;
     --ui-surface: 0 0% 100%;
-    --ui-surface-soft: 255 50% 98%;
-    --ui-text: 238 29% 13%;
-    --ui-text-muted: 237 11% 44%;
-    --ui-border: 240 24% 89%;
-    --ui-brand: 258 90% 58%;
-    --ui-brand-soft: 259 100% 96%;
+    --ui-surface-soft: 220 14% 95%;
+    --ui-text: 225 20% 16%;
+    --ui-text-muted: 224 11% 42%;
+    --ui-border: 225 18% 86%;
+    --ui-brand: 222 46% 38%;
+    --ui-brand-soft: 220 18% 93%;
     --ui-brand-foreground: 0 0% 100%;
-    --ui-danger: 357 80% 56%;
-    --ui-danger-soft: 0 86% 97%;
+    --ui-danger: 358 68% 52%;
+    --ui-danger-soft: 0 72% 95%;
     --ui-danger-foreground: 0 0% 100%;
-    --ui-focus: 258 90% 58%;
+    --ui-focus: 222 46% 38%;
   }
 
   * {
@@ -53,7 +53,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid hsl(var(--ui-focus) / 0.85);
+    outline: 2px solid hsl(var(--ui-focus) / 0.7);
     outline-offset: 2px;
   }
 
@@ -63,8 +63,8 @@
     border: 1px solid hsl(var(--ui-border));
     background: hsl(var(--ui-surface));
     color: hsl(var(--ui-text));
-    border-radius: 0.75rem;
-    transition: border-color 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 0.5rem;
+    transition: border-color 140ms ease, box-shadow 140ms ease;
   }
 
   input::placeholder,
@@ -75,8 +75,8 @@
   input:focus,
   select:focus,
   textarea:focus {
-    border-color: hsl(var(--ui-brand) / 0.75);
-    box-shadow: 0 0 0 3px hsl(var(--ui-focus) / 0.2);
+    border-color: hsl(var(--ui-focus) / 0.7);
+    box-shadow: 0 0 0 2px hsl(var(--ui-focus) / 0.14);
   }
 }
 
@@ -86,10 +86,10 @@
     left: 0.75rem;
     top: -3rem;
     z-index: 60;
-    border-radius: 0.5rem;
-    background: hsl(var(--ui-brand));
+    border-radius: 0.4rem;
+    background: hsl(var(--ui-text));
     color: hsl(var(--ui-brand-foreground));
-    padding: 0.45rem 0.75rem;
+    padding: 0.35rem 0.65rem;
     font-size: 0.875rem;
     transition: top 160ms ease;
   }
@@ -99,9 +99,8 @@
   }
 
   .active {
-    background-color: hsl(var(--ui-brand-soft));
-    border-color: hsl(var(--ui-brand) / 0.35);
-    color: hsl(var(--ui-brand));
+    background-color: hsl(var(--ui-surface-soft));
+    color: hsl(var(--ui-text));
   }
 }
 

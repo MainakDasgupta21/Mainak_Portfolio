@@ -5,7 +5,7 @@ const Textarea = React.forwardRef(function Textarea({ className = "", rows = 4, 
     <textarea
       ref={ref}
       rows={rows}
-      className={`w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text-main ${className}`}
+      className={`w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-main ${className}`}
       {...props}
     />
   )

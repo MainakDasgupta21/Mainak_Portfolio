@@ -107,14 +107,14 @@ const Media = ({ token }) => {
     <>
       <PageHeader
         title="Media Library"
-        description="Upload and reuse Cloudinary assets for profile, projects, and testimonials."
+        description="Upload and reuse media assets."
       />
 
-      <Card className="mb-6 p-4">
+      <Card className="mb-4 p-3">
         <form onSubmit={onUpload} className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <label htmlFor="mediaFile" className="cursor-pointer">
             <img
-              className="h-16 w-16 rounded-xl border border-border object-cover"
+              className="h-14 w-14 rounded-md border border-border object-cover"
               src={previewUrl || assets.upload_area}
               alt="Selected upload preview"
             />
@@ -129,11 +129,9 @@ const Media = ({ token }) => {
             <p className="text-sm font-medium text-text-main">
               {file ? file.name : "Choose an image, video, or PDF"}
             </p>
-            <p className="text-xs text-text-muted">
-              Image / video / raw uploads are auto-detected from mime type.
-            </p>
+            <p className="text-xs text-text-muted">Uploads are auto-detected by file type.</p>
           </div>
-          <Button type="submit" disabled={uploading}>
+          <Button type="submit" size="sm" disabled={uploading}>
             {uploading ? "Uploading..." : "Upload"}
           </Button>
         </form>
@@ -145,22 +143,22 @@ const Media = ({ token }) => {
       ) : null}
 
       {!loading && list.length ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
           {list.map((item) => (
             <Card key={item._id} className="p-3">
               {item.type === "image" ? (
                 <img
                   src={item.url}
                   alt={item.originalName || "Uploaded media"}
-                  className="h-36 w-full rounded-xl border border-border object-cover"
+                  className="h-32 w-full rounded-md border border-border object-cover"
                   loading="lazy"
                 />
               ) : null}
               {item.type === "video" ? (
-                <video src={item.url} controls className="h-36 w-full rounded-xl border border-border object-cover" />
+                <video src={item.url} controls className="h-32 w-full rounded-md border border-border object-cover" />
               ) : null}
               {item.type === "raw" ? (
-                <div className="flex h-36 w-full items-center justify-center rounded-xl border border-border bg-surface-soft text-sm text-text-muted">
+                <div className="flex h-32 w-full items-center justify-center rounded-md border border-border bg-surface-soft text-sm text-text-muted">
                   Raw file
                 </div>
               ) : null}
@@ -169,13 +167,14 @@ const Media = ({ token }) => {
                 {item.originalName} - {Math.max(1, Math.round((item.bytes || 0) / 1024))} KB
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
-                <Button onClick={() => copy(item.url)} variant="secondary" size="sm">
+                <Button onClick={() => copy(item.url)} variant="secondary" size="sm" className="h-8 px-2.5">
                   Copy URL
                 </Button>
                 <Button
                   onClick={() => setPendingDelete(item)}
                   variant="danger-soft"
                   size="sm"
+                  className="h-8 px-2.5"
                   disabled={busyDeleteId === item._id}
                 >
                   Delete

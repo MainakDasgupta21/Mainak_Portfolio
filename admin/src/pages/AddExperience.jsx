@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 import { Link, useNavigate, useParams } from "react-router-dom"
@@ -7,6 +7,7 @@ import { assets } from "../assets/assets"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Field from "../components/ui/Field"
+import FilePicker from "../components/ui/FilePicker"
 import Input from "../components/ui/Input"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
@@ -32,14 +33,6 @@ const AddExperience = ({ token }) => {
   const [existingLogo, setExistingLogo] = useState("")
   const [loading, setLoading] = useState(isEditMode)
   const [saving, setSaving] = useState(false)
-
-  const previewLogo = useMemo(() => (logo ? URL.createObjectURL(logo) : ""), [logo])
-
-  useEffect(() => {
-    return () => {
-      if (previewLogo) URL.revokeObjectURL(previewLogo)
-    }
-  }, [previewLogo])
 
   useEffect(() => {
     if (!isEditMode) return
@@ -118,37 +111,31 @@ const AddExperience = ({ token }) => {
     <>
       <PageHeader
         title={isEditMode ? "Edit Experience" : "Add Experience"}
-        description="Manage company details, links, and key highlights."
+        description="Company details and highlights."
         actions={
           <Link
             to="/experience"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
           >
             Back to experience
           </Link>
         }
       />
 
-      <Card className="max-w-4xl p-5 sm:p-6">
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <p className="mb-2 text-sm font-medium text-text-main">Company logo</p>
-            <label htmlFor="logo" className="cursor-pointer">
-              <img
-                className="h-20 w-20 rounded-xl border border-border object-cover"
-                src={previewLogo || existingLogo || assets.upload_area}
-                alt=""
-              />
-              <input
-                id="logo"
-                type="file"
-                hidden
-                onChange={(e) => setLogo(e.target.files?.[0] || null)}
-              />
-            </label>
-          </div>
+      <Card className="max-w-3xl p-4 sm:p-5">
+        <form onSubmit={onSubmit} className="space-y-3">
+          <Field label="Company logo">
+            <FilePicker
+              id="logo"
+              file={logo}
+              onChange={setLogo}
+              currentUrl={existingLogo}
+              fallbackSrc={assets.upload_area}
+              accept="image/*"
+            />
+          </Field>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Company" htmlFor="experience-company" required>
               <Input
                 id="experience-company"
@@ -206,10 +193,10 @@ const AddExperience = ({ token }) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" size="sm" disabled={saving}>
               {saving ? "Saving..." : isEditMode ? "Save changes" : "Add experience"}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => navigate("/experience")} disabled={saving}>
+            <Button type="button" variant="ghost" size="sm" onClick={() => navigate("/experience")} disabled={saving}>
               Cancel
             </Button>
           </div>

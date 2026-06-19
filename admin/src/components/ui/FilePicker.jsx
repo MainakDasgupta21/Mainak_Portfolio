@@ -16,7 +16,7 @@ const FilePicker = ({ id, file, onChange, fallbackSrc, label, currentUrl = "", a
     <label htmlFor={id} className="flex cursor-pointer flex-col gap-2">
       {label ? <span className="text-xs font-medium text-text-muted">{label}</span> : null}
       <img
-        className="h-20 w-20 rounded-xl border border-border object-cover"
+        className="h-16 w-16 rounded-md border border-border object-cover"
         src={previewUrl || currentUrl || fallbackSrc}
         alt=""
       />

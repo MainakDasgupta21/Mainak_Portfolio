@@ -25,11 +25,11 @@ export default {
         },
       },
       boxShadow: {
-        panel: "0 10px 30px -14px hsl(250 30% 14% / 0.22)",
-        focus: "0 0 0 3px hsl(var(--ui-focus) / 0.35)",
+        panel: "0 1px 2px hsl(220 18% 30% / 0.04)",
+        focus: "0 0 0 2px hsl(var(--ui-focus) / 0.2)",
       },
       borderRadius: {
-        xl: "0.85rem",
+        xl: "0.5rem",
       },
       transitionTimingFunction: {
         out: "cubic-bezier(0.22, 1, 0.36, 1)",

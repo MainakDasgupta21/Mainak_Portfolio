@@ -3,12 +3,12 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import { Link } from "react-router-dom"
 import { backendUrl } from "../App"
-import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import ConfirmDialog from "../components/ui/ConfirmDialog"
 import EmptyState from "../components/ui/EmptyState"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
+import RowActions from "../components/ui/RowActions"
 
 const ListSkills = ({ token }) => {
   const [list, setList] = useState([])
@@ -66,11 +66,11 @@ const ListSkills = ({ token }) => {
     <>
       <PageHeader
         title="Skills"
-        description="Maintain grouped skills with proficiency and ordering."
+        description="Manage grouped skills."
         actions={
           <Link
             to="/skills/add"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-brand bg-brand px-4 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand/90"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-brand bg-brand px-3.5 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand/90"
           >
             Add skill
           </Link>
@@ -86,47 +86,25 @@ const ListSkills = ({ token }) => {
       {!loading
         ? Object.entries(grouped).map(([category, items]) => (
             <Card key={category} className="mb-4">
-              <div className="border-b border-border bg-surface-soft px-4 py-2.5">
-                <h2 className="text-sm font-semibold text-text-main">{category}</h2>
+              <div className="border-b border-border/70 px-4 py-2">
+                <h2 className="text-sm font-medium text-text-main">{category}</h2>
               </div>
               <div className="divide-y divide-border">
                 {items.map((skill) => (
                   <div
                     key={skill._id}
-                    className="grid grid-cols-1 items-center gap-3 px-4 py-3 text-sm md:grid-cols-[2fr_130px_170px]"
+                    className="grid grid-cols-1 items-center gap-2 px-4 py-2.5 text-sm md:grid-cols-[2fr_120px_130px] hover:bg-surface-soft/60"
                   >
                     <div>
                       <p className="font-medium text-text-main">{skill.name}</p>
-                      <p className="text-xs text-text-muted">Order: {skill.order ?? 0}</p>
+                      <p className="text-xs text-text-muted">Order {skill.order ?? 0}</p>
                     </div>
-                    <div className="text-xs text-text-muted">
-                      <div className="mb-1 flex items-center justify-between">
-                        <span>Proficiency</span>
-                        <span className="font-medium text-text-main">{skill.proficiency}%</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-surface-soft">
-                        <div
-                          className="h-2 rounded-full bg-brand"
-                          style={{ width: `${Math.min(100, Math.max(0, Number(skill.proficiency) || 0))}%` }}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
-                      <Link
-                        to={`/skills/${skill._id}/edit`}
-                        className="inline-flex h-9 items-center justify-center rounded-xl border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
-                      >
-                        Edit
-                      </Link>
-                      <Button
-                        variant="danger-soft"
-                        size="sm"
-                        onClick={() => setPendingDelete(skill)}
-                        disabled={deletingId === skill._id}
-                      >
-                        Delete
-                      </Button>
-                    </div>
+                    <p className="text-xs text-text-muted">{skill.proficiency}%</p>
+                    <RowActions
+                      editTo={`/skills/${skill._id}/edit`}
+                      onDelete={() => setPendingDelete(skill)}
+                      busy={deletingId === skill._id}
+                    />
                   </div>
                 ))}
               </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 import { Link, useNavigate, useParams } from "react-router-dom"
@@ -8,6 +8,7 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Checkbox from "../components/ui/Checkbox"
 import Field from "../components/ui/Field"
+import FilePicker from "../components/ui/FilePicker"
 import Input from "../components/ui/Input"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
@@ -34,20 +35,6 @@ const AddProject = ({ token }) => {
   const [saving, setSaving] = useState(false)
   const [images, setImages] = useState({ image1: null, image2: null, image3: null, image4: null })
   const [existingImages, setExistingImages] = useState([])
-
-  const previews = useMemo(() => {
-    return Object.fromEntries(
-      Object.entries(images).map(([key, file]) => [key, file ? URL.createObjectURL(file) : ""])
-    )
-  }, [images])
-
-  useEffect(() => {
-    return () => {
-      Object.values(previews).forEach((url) => {
-        if (url) URL.revokeObjectURL(url)
-      })
-    }
-  }, [previews])
 
   useEffect(() => {
     if (!isEditMode) return
@@ -138,41 +125,36 @@ const AddProject = ({ token }) => {
     <>
       <PageHeader
         title={isEditMode ? "Edit Project" : "Add Project"}
-        description="Manage project metadata, highlights, and media."
+        description="Project details and links."
         actions={
           <Link
             to="/projects"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-border bg-surface px-3 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
           >
             Back to projects
           </Link>
         }
       />
 
-      <Card className="max-w-4xl p-5 sm:p-6">
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <p className="mb-2 text-sm font-medium text-text-main">Upload images (up to 4)</p>
+      <Card className="max-w-3xl p-4 sm:p-5">
+        <form onSubmit={onSubmit} className="space-y-3">
+          <Field label="Project images (up to 4)">
             <div className="flex flex-wrap gap-2">
               {["image1", "image2", "image3", "image4"].map((field, index) => (
-                <label key={field} htmlFor={field} className="cursor-pointer">
-                  <img
-                    className="h-20 w-20 rounded-xl border border-border object-cover"
-                    src={previews[field] || existingImages[index] || assets.upload_area}
-                    alt=""
-                  />
-                  <input
-                    id={field}
-                    type="file"
-                    hidden
-                    onChange={(e) => setImage(field, e.target.files?.[0] || null)}
-                  />
-                </label>
+                <FilePicker
+                  key={field}
+                  id={field}
+                  file={images[field]}
+                  onChange={(file) => setImage(field, file)}
+                  currentUrl={existingImages[index] || ""}
+                  fallbackSrc={assets.upload_area}
+                  accept="image/*"
+                />
               ))}
             </div>
-          </div>
+          </Field>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Name" htmlFor="project-name" required className="sm:col-span-2">
               <Input
                 id="project-name"
@@ -233,7 +215,7 @@ const AddProject = ({ token }) => {
                 onChange={(e) => setField("order", Number(e.target.value))}
               />
             </Field>
-            <label className="flex items-center gap-2 self-end text-sm font-medium text-text-main">
+            <label className="flex items-center gap-2 self-end text-sm text-text-main">
               <Checkbox
                 checked={form.featured}
                 onChange={(e) => setField("featured", e.target.checked)}
@@ -243,12 +225,13 @@ const AddProject = ({ token }) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" size="sm" disabled={saving}>
               {saving ? "Saving..." : isEditMode ? "Save changes" : "Add project"}
             </Button>
             <Button
               type="button"
               variant="ghost"
+              size="sm"
               onClick={() => navigate("/projects")}
               disabled={saving}
             >

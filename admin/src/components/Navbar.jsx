@@ -8,24 +8,25 @@ const Navbar = ({ setToken, onMenuToggle }) => {
 
   return (
     <>
-      <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 w-full max-w-[1480px] items-center justify-between gap-3 px-3 sm:px-5 lg:px-6">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
+            size="sm"
             className="md:hidden"
             aria-label="Toggle sidebar menu"
             onClick={onMenuToggle}
           >
             Menu
           </Button>
-          <img className="h-9 w-auto" src={assets.logo} alt="Mainak admin logo" />
+          <img className="h-8 w-auto" src={assets.logo} alt="Mainak admin logo" />
         </div>
 
-        <div className="hidden items-center gap-2 sm:flex">
-          <p className="text-sm text-text-muted">Portfolio Content Studio</p>
+        <div className="hidden items-center gap-2 lg:flex">
+          <p className="text-xs text-text-muted">Content management</p>
         </div>
 
-        <Button variant="secondary" size="sm" onClick={() => setConfirmLogout(true)}>
+        <Button variant="ghost" size="sm" onClick={() => setConfirmLogout(true)}>
           Logout
         </Button>
       </div>
