@@ -159,12 +159,16 @@
   }
 
   .hover-glow {
-    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: box-shadow 0.24s cubic-bezier(0.4, 0, 0.2, 1), transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .hover-glow:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
+    box-shadow: 0 0 14px hsl(var(--ring) / 0.34), 0 0 28px hsl(var(--ring) / 0.16);
+    transform: translateY(-1px);
+  }
+
+  .hover-glow:active {
+    transform: translateY(0);
   }
 
   .cursive-brand {
@@ -251,13 +255,13 @@
   @keyframes pulse-glow {
     0%, 100% { box-shadow: 0 0 0px rgba(255, 255, 255, 0); }
     50% {
-      box-shadow: 0 0 25px hsl(var(--ring) / 0.5),
-        0 0 50px hsl(var(--ring) / 0.25);
+      box-shadow: 0 0 12px hsl(var(--ring) / 0.32),
+        0 0 26px hsl(var(--ring) / 0.16);
     }
   }
 
   .glow-button {
-    animation: pulse-glow 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    animation: pulse-glow 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
   .glow-delay-0 { animation-delay: 0s; }
@@ -266,7 +270,7 @@
   .glow-delay-4 { animation-delay: 4s; }
 
   .glow-button-strong {
-    animation: pulse-glow 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    animation: pulse-glow 4.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
   /* ========================= */

@@ -21,6 +21,10 @@ const Hero = () => {
   const heroPosterSrc = media.heroPosterSrc || "/back-poster.jpg"
   const heroProfileSrc = media.heroProfileSrc || "/me.png"
   const easeOutQuint = [0.22, 1, 0.36, 1]
+  const ctaBaseClass =
+    "group inline-flex h-12 w-full max-w-[14rem] sm:w-auto items-center justify-center gap-2 rounded-md px-5 text-sm font-medium transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/45"
+  const ctaPrimaryClass = `${ctaBaseClass} hover-glow glow-button glow-delay-0 border border-foreground/25 bg-foreground text-background hover:bg-foreground/92`
+  const ctaSecondaryClass = `${ctaBaseClass} hover-glow glow-delay-2 glass-card border border-input/50 text-foreground hover:bg-accent/80 hover:text-accent-foreground`
 
   const heroContainerVariants = {
     hidden: { opacity: 0 },
@@ -134,7 +138,7 @@ const Hero = () => {
         >
           <a
             href={heroUi.primaryCtaHref || "#contact"}
-            className="group w-full max-w-[17rem] sm:w-auto px-6 py-5 sm:px-10 sm:py-6 text-sm sm:text-base hover-glow glow-button glow-delay-0 inline-flex items-center justify-center gap-2 rounded-md border border-foreground/25 bg-foreground text-background hover:bg-foreground/90 transition-colors font-medium"
+            className={ctaPrimaryClass}
           >
             {heroUi.primaryCtaLabel || "Book a Free Call"}
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -142,7 +146,7 @@ const Hero = () => {
 
           <a
             href={heroUi.secondaryCtaHref || "#projects"}
-            className="group w-full max-w-[17rem] sm:w-auto px-6 py-5 sm:px-10 sm:py-6 text-sm sm:text-base hover-glow glow-delay-2 inline-flex items-center justify-center gap-2 rounded-md glass-card border border-input/60 text-foreground hover:bg-accent hover:text-accent-foreground transition-colors font-medium"
+            className={ctaSecondaryClass}
           >
             {heroUi.secondaryCtaLabel || "See Projects"}
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
