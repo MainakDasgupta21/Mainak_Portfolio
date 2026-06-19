@@ -13,21 +13,23 @@ const NAV_ITEMS = [
   { label: "Contact", href: "#contact" },
 ]
 
-function getBrandShortName(profile) {
+function getBrandShortName(profile, fallbackName) {
   if (profile.brandShortName?.trim()) return profile.brandShortName
-  const first = (profile.name || "").trim().split(/\s+/)[0]
+  const name = (profile.name?.trim() || fallbackName || "").trim()
+  const first = name.split(/\s+/)[0]
   return first ? `${first}.` : "Portfolio"
 }
-function getBrandMonogram(profile) {
+function getBrandMonogram(profile, fallbackName) {
   if (profile.brandMonogram?.trim()) return profile.brandMonogram
-  return (profile.name || "P").charAt(0).toUpperCase()
+  const name = profile.name?.trim() || fallbackName || "P"
+  return name.charAt(0).toUpperCase()
 }
 
 const Header = memo(function Header() {
   const { profile } = useContext(PortfolioContext)
-  const brandShortName = getBrandShortName(profile)
-  const brandMonogram = getBrandMonogram(profile)
   const displayName = profile.name || "Mainak Dasgupta"
+  const brandShortName = getBrandShortName(profile, displayName)
+  const brandMonogram = getBrandMonogram(profile, displayName)
 
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
