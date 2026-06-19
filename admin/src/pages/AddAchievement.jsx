@@ -1,49 +1,170 @@
-import React, { useState } from 'react'
-import axios from 'axios'
-import { toast } from 'react-toastify'
-import { backendUrl } from '../App'
+import { useEffect, useState } from "react"
+import axios from "axios"
+import { toast } from "react-toastify"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { backendUrl } from "../App"
+import Button from "../components/ui/Button"
+import Card from "../components/ui/Card"
+import Field from "../components/ui/Field"
+import Input from "../components/ui/Input"
+import LoadingState from "../components/ui/LoadingState"
+import PageHeader from "../components/ui/PageHeader"
+import Select from "../components/ui/Select"
+import Textarea from "../components/ui/Textarea"
 
-const ICONS = ['trophy', 'award', 'medal']
+const ICONS = ["trophy", "award", "medal"]
+
+const initialState = {
+  title: "",
+  description: "",
+  icon: "trophy",
+  order: 0,
+}
 
 const AddAchievement = ({ token }) => {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [icon, setIcon] = useState('trophy')
-  const [order, setOrder] = useState(0)
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const isEditMode = Boolean(id)
+
+  const [form, setForm] = useState(initialState)
+  const [loading, setLoading] = useState(isEditMode)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (!isEditMode) return
+
+    const loadAchievement = async () => {
+      setLoading(true)
+      try {
+        const res = await axios.get(backendUrl + "/api/achievement/list")
+        if (!res.data.success) {
+          toast.error(res.data.message)
+          navigate("/achievements")
+          return
+        }
+        const item = (res.data.achievements || []).find((entry) => entry._id === id)
+        if (!item) {
+          toast.error("Achievement not found")
+          navigate("/achievements")
+          return
+        }
+        setForm({
+          title: item.title || "",
+          description: item.description || "",
+          icon: item.icon || "trophy",
+          order: item.order ?? 0,
+        })
+      } catch (error) {
+        toast.error(error.message)
+        navigate("/achievements")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadAchievement()
+  }, [id, isEditMode, navigate])
+
+  const setField = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault()
+    setSaving(true)
     try {
-      const res = await axios.post(backendUrl + '/api/achievement/add', { title, description, icon, order }, { headers: { token } })
-      if (res.data.success) { toast.success(res.data.message); setTitle(''); setDescription(''); setIcon('trophy'); setOrder(0) }
-      else toast.error(res.data.message)
-    } catch (e) { toast.error(e.message) }
+      const payload = {
+        title: form.title,
+        description: form.description,
+        icon: form.icon,
+        order: Number(form.order) || 0,
+      }
+      if (isEditMode) payload.id = id
+      const endpoint = isEditMode ? "/api/achievement/update" : "/api/achievement/add"
+      const res = await axios.post(backendUrl + endpoint, payload, { headers: { token } })
+      if (res.data.success) {
+        toast.success(res.data.message || (isEditMode ? "Achievement updated" : "Achievement added"))
+        navigate("/achievements")
+      } else toast.error(res.data.message)
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setSaving(false)
+    }
   }
 
+  if (loading) return <LoadingState label="Loading achievement details..." />
+
   return (
-    <form onSubmit={onSubmit} className='flex flex-col gap-4 max-w-xl'>
-      <h2 className='text-xl font-semibold'>Add Achievement</h2>
+    <>
+      <PageHeader
+        title={isEditMode ? "Edit Achievement" : "Add Achievement"}
+        description="Capture awards and recognitions with icon metadata."
+        actions={
+          <Link
+            to="/achievements"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+          >
+            Back to achievements
+          </Link>
+        }
+      />
 
-      <label className='text-sm font-medium'>Title
-        <input value={title} onChange={(e) => setTitle(e.target.value)} required className='w-full px-3 py-2 mt-1 block' />
-      </label>
+      <Card className="max-w-xl p-5 sm:p-6">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <Field label="Title" htmlFor="achievement-title" required>
+            <Input
+              id="achievement-title"
+              value={form.title}
+              onChange={(e) => setField("title", e.target.value)}
+              required
+            />
+          </Field>
 
-      <label className='text-sm font-medium'>Description
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className='w-full px-3 py-2 mt-1 block min-h-[100px]' />
-      </label>
+          <Field label="Description" htmlFor="achievement-description">
+            <Textarea
+              id="achievement-description"
+              rows={4}
+              value={form.description}
+              onChange={(e) => setField("description", e.target.value)}
+            />
+          </Field>
 
-      <label className='text-sm font-medium'>Icon
-        <select value={icon} onChange={(e) => setIcon(e.target.value)} className='w-full px-3 py-2 mt-1 block'>
-          {ICONS.map((i) => <option key={i} value={i}>{i}</option>)}
-        </select>
-      </label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Icon" htmlFor="achievement-icon">
+              <Select
+                id="achievement-icon"
+                value={form.icon}
+                onChange={(e) => setField("icon", e.target.value)}
+              >
+                {ICONS.map((icon) => (
+                  <option key={icon} value={icon}>
+                    {icon}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label="Order" htmlFor="achievement-order">
+              <Input
+                id="achievement-order"
+                type="number"
+                value={form.order}
+                onChange={(e) => setField("order", e.target.value)}
+              />
+            </Field>
+          </div>
 
-      <label className='text-sm font-medium'>Order
-        <input type='number' value={order} onChange={(e) => setOrder(e.target.value)} className='w-full px-3 py-2 mt-1 block' />
-      </label>
-
-      <button type='submit' className='bg-black text-white px-6 py-2.5 rounded w-fit'>Add achievement</button>
-    </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving..." : isEditMode ? "Save changes" : "Add achievement"}
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => navigate("/achievements")} disabled={saving}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </>
   )
 }
 

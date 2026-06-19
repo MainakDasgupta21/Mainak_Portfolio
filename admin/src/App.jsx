@@ -1,80 +1,116 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from './components/Navbar'
-import Sidebar from './components/Sidebar'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Login from './components/Login'
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import React, { Suspense, lazy, useEffect, useState } from "react"
+import { Navigate, Route, Routes, useLocation } from "react-router-dom"
+import Login from "./components/Login"
+import Navbar from "./components/Navbar"
+import Sidebar from "./components/Sidebar"
+import LoadingState from "./components/ui/LoadingState"
+import ToastConfig from "./components/ui/ToastConfig"
 
-import ProfileEditor from './pages/ProfileEditor'
-import AddProject from './pages/AddProject'
-import ListProjects from './pages/ListProjects'
-import AddExperience from './pages/AddExperience'
-import ListExperience from './pages/ListExperience'
-import AddSkill from './pages/AddSkill'
-import ListSkills from './pages/ListSkills'
-import AddAchievement from './pages/AddAchievement'
-import ListAchievements from './pages/ListAchievements'
-import AddTestimonial from './pages/AddTestimonial'
-import ListTestimonials from './pages/ListTestimonials'
-import AddEducation from './pages/AddEducation'
-import ListEducation from './pages/ListEducation'
-import Media from './pages/Media'
-import Messages from './pages/Messages'
+const ProfileEditor = lazy(() => import("./pages/ProfileEditor"))
+const AddProject = lazy(() => import("./pages/AddProject"))
+const ListProjects = lazy(() => import("./pages/ListProjects"))
+const AddExperience = lazy(() => import("./pages/AddExperience"))
+const ListExperience = lazy(() => import("./pages/ListExperience"))
+const AddSkill = lazy(() => import("./pages/AddSkill"))
+const ListSkills = lazy(() => import("./pages/ListSkills"))
+const AddAchievement = lazy(() => import("./pages/AddAchievement"))
+const ListAchievements = lazy(() => import("./pages/ListAchievements"))
+const AddTestimonial = lazy(() => import("./pages/AddTestimonial"))
+const ListTestimonials = lazy(() => import("./pages/ListTestimonials"))
+const AddEducation = lazy(() => import("./pages/AddEducation"))
+const ListEducation = lazy(() => import("./pages/ListEducation"))
+const Media = lazy(() => import("./pages/Media"))
+const Messages = lazy(() => import("./pages/Messages"))
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 const App = () => {
-  const [token, setToken] = useState(
-    localStorage.getItem('token') ? localStorage.getItem('token') : ''
-  )
+  const location = useLocation()
+  const [token, setToken] = useState(localStorage.getItem("token") || "")
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem('token', token)
+    if (token) localStorage.setItem("token", token)
+    else localStorage.removeItem("token")
   }, [token])
 
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [location.pathname])
+
+  useEffect(() => {
+    const titles = {
+      "/profile": "Profile",
+      "/projects": "Projects",
+      "/experience": "Experience",
+      "/skills": "Skills",
+      "/achievements": "Achievements",
+      "/testimonials": "Testimonials",
+      "/education": "Education",
+      "/media": "Media",
+      "/messages": "Messages",
+    }
+    const matchedPrefix = Object.keys(titles).find((route) => location.pathname.startsWith(route))
+    const section = matchedPrefix ? titles[matchedPrefix] : "Admin"
+    document.title = `${section} - Portfolio Admin`
+  }, [location.pathname])
+
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-canvas">
+        <ToastConfig />
+        <Login setToken={setToken} />
+      </div>
+    )
+  }
+
   return (
-    <div className='bg-gray-50 min-h-screen'>
-      <ToastContainer />
-      {token === ''
-        ? <Login setToken={setToken} />
-        : (
-          <>
-            <Navbar setToken={setToken} />
-            <hr />
-            <div className='flex w-full'>
-              <Sidebar />
-              <div className='w-[80%] mx-auto ml-[max(2vw,20px)] my-8 text-gray-700 text-base'>
-                <Routes>
-                  <Route path='/' element={<Navigate to='/profile' replace />} />
-                  <Route path='/profile' element={<ProfileEditor token={token} />} />
+    <div className="min-h-screen bg-canvas text-text-main">
+      <ToastConfig />
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
+      <header className="sticky top-0 z-30 border-b border-border bg-surface/95 backdrop-blur">
+        <Navbar setToken={setToken} onMenuToggle={() => setSidebarOpen((prev) => !prev)} />
+      </header>
+      <div className="mx-auto flex w-full max-w-[1600px]">
+        <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <main id="main-content" className="w-full flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <Suspense fallback={<LoadingState label="Loading admin section..." />}>
+            <Routes>
+              <Route path="/" element={<Navigate to="/profile" replace />} />
+              <Route path="/profile" element={<ProfileEditor token={token} />} />
 
-                  <Route path='/projects' element={<ListProjects token={token} />} />
-                  <Route path='/projects/add' element={<AddProject token={token} />} />
+              <Route path="/projects" element={<ListProjects token={token} />} />
+              <Route path="/projects/add" element={<AddProject token={token} />} />
+              <Route path="/projects/:id/edit" element={<AddProject token={token} />} />
 
-                  <Route path='/experience' element={<ListExperience token={token} />} />
-                  <Route path='/experience/add' element={<AddExperience token={token} />} />
+              <Route path="/experience" element={<ListExperience token={token} />} />
+              <Route path="/experience/add" element={<AddExperience token={token} />} />
+              <Route path="/experience/:id/edit" element={<AddExperience token={token} />} />
 
-                  <Route path='/skills' element={<ListSkills token={token} />} />
-                  <Route path='/skills/add' element={<AddSkill token={token} />} />
+              <Route path="/skills" element={<ListSkills token={token} />} />
+              <Route path="/skills/add" element={<AddSkill token={token} />} />
+              <Route path="/skills/:id/edit" element={<AddSkill token={token} />} />
 
-                  <Route path='/achievements' element={<ListAchievements token={token} />} />
-                  <Route path='/achievements/add' element={<AddAchievement token={token} />} />
+              <Route path="/achievements" element={<ListAchievements token={token} />} />
+              <Route path="/achievements/add" element={<AddAchievement token={token} />} />
+              <Route path="/achievements/:id/edit" element={<AddAchievement token={token} />} />
 
-                  <Route path='/testimonials' element={<ListTestimonials token={token} />} />
-                  <Route path='/testimonials/add' element={<AddTestimonial token={token} />} />
+              <Route path="/testimonials" element={<ListTestimonials token={token} />} />
+              <Route path="/testimonials/add" element={<AddTestimonial token={token} />} />
+              <Route path="/testimonials/:id/edit" element={<AddTestimonial token={token} />} />
 
-                  <Route path='/education' element={<ListEducation token={token} />} />
-                  <Route path='/education/add' element={<AddEducation token={token} />} />
+              <Route path="/education" element={<ListEducation token={token} />} />
+              <Route path="/education/add" element={<AddEducation token={token} />} />
+              <Route path="/education/:id/edit" element={<AddEducation token={token} />} />
 
-                  <Route path='/media' element={<Media token={token} />} />
-                  <Route path='/messages' element={<Messages token={token} />} />
-                </Routes>
-              </div>
-            </div>
-          </>
-        )
-      }
+              <Route path="/media" element={<Media token={token} />} />
+              <Route path="/messages" element={<Messages token={token} />} />
+            </Routes>
+          </Suspense>
+        </main>
+      </div>
     </div>
   )
 }

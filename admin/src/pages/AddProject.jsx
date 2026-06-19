@@ -1,109 +1,263 @@
-import React, { useState } from 'react'
-import axios from 'axios'
-import { toast } from 'react-toastify'
-import { backendUrl } from '../App'
-import { assets } from '../assets/assets'
+import { useEffect, useMemo, useState } from "react"
+import axios from "axios"
+import { toast } from "react-toastify"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { backendUrl } from "../App"
+import { assets } from "../assets/assets"
+import Button from "../components/ui/Button"
+import Card from "../components/ui/Card"
+import Checkbox from "../components/ui/Checkbox"
+import Field from "../components/ui/Field"
+import Input from "../components/ui/Input"
+import LoadingState from "../components/ui/LoadingState"
+import PageHeader from "../components/ui/PageHeader"
+import Textarea from "../components/ui/Textarea"
+
+const initialState = {
+  name: "",
+  description: "",
+  technologies: "",
+  highlights: "",
+  github: "",
+  demo: "",
+  featured: true,
+  order: 0,
+}
 
 const AddProject = ({ token }) => {
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [technologies, setTechnologies] = useState('')
-  const [highlights, setHighlights] = useState('')
-  const [github, setGithub] = useState('')
-  const [demo, setDemo] = useState('')
-  const [featured, setFeatured] = useState(true)
-  const [order, setOrder] = useState(0)
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const isEditMode = Boolean(id)
 
-  const [image1, setImage1] = useState(false)
-  const [image2, setImage2] = useState(false)
-  const [image3, setImage3] = useState(false)
-  const [image4, setImage4] = useState(false)
+  const [form, setForm] = useState(initialState)
+  const [loading, setLoading] = useState(isEditMode)
+  const [saving, setSaving] = useState(false)
+  const [images, setImages] = useState({ image1: null, image2: null, image3: null, image4: null })
+  const [existingImages, setExistingImages] = useState([])
+
+  const previews = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(images).map(([key, file]) => [key, file ? URL.createObjectURL(file) : ""])
+    )
+  }, [images])
+
+  useEffect(() => {
+    return () => {
+      Object.values(previews).forEach((url) => {
+        if (url) URL.revokeObjectURL(url)
+      })
+    }
+  }, [previews])
+
+  useEffect(() => {
+    if (!isEditMode) return
+
+    const loadProject = async () => {
+      setLoading(true)
+      try {
+        const res = await axios.get(backendUrl + "/api/project/list")
+        if (!res.data.success) {
+          toast.error(res.data.message)
+          navigate("/projects")
+          return
+        }
+        const project = (res.data.projects || []).find((item) => item._id === id)
+        if (!project) {
+          toast.error("Project not found")
+          navigate("/projects")
+          return
+        }
+        setForm({
+          name: project.name || "",
+          description: project.description || "",
+          technologies: (project.technologies || []).join(", "),
+          highlights: (project.highlights || []).join("\n"),
+          github: project.github || "",
+          demo: project.demo || "",
+          featured: Boolean(project.featured),
+          order: project.order ?? 0,
+        })
+        setExistingImages(project.image || [])
+      } catch (error) {
+        toast.error(error.message)
+        navigate("/projects")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadProject()
+  }, [id, isEditMode, navigate])
+
+  const setField = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const setImage = (field, file) => {
+    setImages((prev) => ({ ...prev, [field]: file }))
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault()
+    setSaving(true)
     try {
       const fd = new FormData()
-      fd.append('name', name)
-      fd.append('description', description)
-      fd.append('technologies', JSON.stringify(technologies.split(',').map((s) => s.trim()).filter(Boolean)))
-      fd.append('highlights', JSON.stringify(highlights.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)))
-      fd.append('github', github)
-      fd.append('demo', demo)
-      fd.append('featured', featured)
-      fd.append('order', order)
-      image1 && fd.append('image1', image1)
-      image2 && fd.append('image2', image2)
-      image3 && fd.append('image3', image3)
-      image4 && fd.append('image4', image4)
+      if (isEditMode) fd.append("id", id)
+      fd.append("name", form.name)
+      fd.append("description", form.description)
+      fd.append("technologies", JSON.stringify(form.technologies.split(",").map((s) => s.trim()).filter(Boolean)))
+      fd.append("highlights", JSON.stringify(form.highlights.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)))
+      fd.append("github", form.github)
+      fd.append("demo", form.demo)
+      fd.append("featured", form.featured)
+      fd.append("order", form.order)
+      if (images.image1) fd.append("image1", images.image1)
+      if (images.image2) fd.append("image2", images.image2)
+      if (images.image3) fd.append("image3", images.image3)
+      if (images.image4) fd.append("image4", images.image4)
 
-      const res = await axios.post(backendUrl + '/api/project/add', fd, { headers: { token } })
+      const endpoint = isEditMode ? "/api/project/update" : "/api/project/add"
+      const res = await axios.post(backendUrl + endpoint, fd, { headers: { token } })
       if (res.data.success) {
-        toast.success(res.data.message)
-        setName(''); setDescription(''); setTechnologies(''); setHighlights('')
-        setGithub(''); setDemo(''); setFeatured(true); setOrder(0)
-        setImage1(false); setImage2(false); setImage3(false); setImage4(false)
+        toast.success(res.data.message || (isEditMode ? "Project updated" : "Project added"))
+        navigate("/projects")
       } else {
         toast.error(res.data.message)
       }
     } catch (err) {
-      console.log(err); toast.error(err.message)
+      console.log(err)
+      toast.error(err.message)
+    } finally {
+      setSaving(false)
     }
   }
 
+  if (loading) return <LoadingState label="Loading project details..." />
+
   return (
-    <form onSubmit={onSubmit} className='flex flex-col w-full items-start gap-4 max-w-3xl'>
-      <h2 className='text-xl font-semibold'>Add Project</h2>
+    <>
+      <PageHeader
+        title={isEditMode ? "Edit Project" : "Add Project"}
+        description="Manage project metadata, highlights, and media."
+        actions={
+          <Link
+            to="/projects"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+          >
+            Back to projects
+          </Link>
+        }
+      />
 
-      <div>
-        <p className='mb-2 text-sm font-medium'>Upload images (1–4)</p>
-        <div className='flex gap-2 flex-wrap'>
-          {[[image1, setImage1, 'image1'], [image2, setImage2, 'image2'], [image3, setImage3, 'image3'], [image4, setImage4, 'image4']].map(([img, setImg, id]) => (
-            <label key={id} htmlFor={id}>
-              <img className='w-20 h-20 object-cover border rounded cursor-pointer' src={!img ? assets.upload_area : URL.createObjectURL(img)} alt='' />
-              <input onChange={(e) => setImg(e.target.files[0])} type='file' id={id} hidden />
+      <Card className="max-w-4xl p-5 sm:p-6">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <p className="mb-2 text-sm font-medium text-text-main">Upload images (up to 4)</p>
+            <div className="flex flex-wrap gap-2">
+              {["image1", "image2", "image3", "image4"].map((field, index) => (
+                <label key={field} htmlFor={field} className="cursor-pointer">
+                  <img
+                    className="h-20 w-20 rounded-xl border border-border object-cover"
+                    src={previews[field] || existingImages[index] || assets.upload_area}
+                    alt=""
+                  />
+                  <input
+                    id={field}
+                    type="file"
+                    hidden
+                    onChange={(e) => setImage(field, e.target.files?.[0] || null)}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Name" htmlFor="project-name" required className="sm:col-span-2">
+              <Input
+                id="project-name"
+                value={form.name}
+                onChange={(e) => setField("name", e.target.value)}
+                required
+              />
+            </Field>
+
+            <Field label="Description" htmlFor="project-description" required className="sm:col-span-2">
+              <Textarea
+                id="project-description"
+                rows={4}
+                value={form.description}
+                onChange={(e) => setField("description", e.target.value)}
+                required
+              />
+            </Field>
+
+            <Field label="Technologies (comma-separated)" htmlFor="project-technologies" className="sm:col-span-2">
+              <Input
+                id="project-technologies"
+                value={form.technologies}
+                onChange={(e) => setField("technologies", e.target.value)}
+                placeholder="React, Node.js, MongoDB"
+              />
+            </Field>
+
+            <Field label="Highlights (one per line)" htmlFor="project-highlights" className="sm:col-span-2">
+              <Textarea
+                id="project-highlights"
+                rows={5}
+                value={form.highlights}
+                onChange={(e) => setField("highlights", e.target.value)}
+              />
+            </Field>
+
+            <Field label="GitHub URL" htmlFor="project-github">
+              <Input
+                id="project-github"
+                value={form.github}
+                onChange={(e) => setField("github", e.target.value)}
+              />
+            </Field>
+            <Field label="Demo URL" htmlFor="project-demo">
+              <Input
+                id="project-demo"
+                value={form.demo}
+                onChange={(e) => setField("demo", e.target.value)}
+              />
+            </Field>
+
+            <Field label="Order" htmlFor="project-order">
+              <Input
+                id="project-order"
+                type="number"
+                value={form.order}
+                onChange={(e) => setField("order", Number(e.target.value))}
+              />
+            </Field>
+            <label className="flex items-center gap-2 self-end text-sm font-medium text-text-main">
+              <Checkbox
+                checked={form.featured}
+                onChange={(e) => setField("featured", e.target.checked)}
+              />
+              Featured project
             </label>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      <label className='w-full text-sm font-medium'>Name
-        <input value={name} onChange={(e) => setName(e.target.value)} className='w-full max-w-[500px] px-3 py-2 mt-1 block' required />
-      </label>
-
-      <label className='w-full text-sm font-medium'>Description
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className='w-full max-w-[500px] px-3 py-2 mt-1 block' required />
-      </label>
-
-      <label className='w-full text-sm font-medium'>Technologies (comma-separated)
-        <input value={technologies} onChange={(e) => setTechnologies(e.target.value)} className='w-full max-w-[500px] px-3 py-2 mt-1 block' placeholder='React, Node.js, MongoDB' />
-      </label>
-
-      <label className='w-full text-sm font-medium'>Highlights (one per line)
-        <textarea value={highlights} onChange={(e) => setHighlights(e.target.value)} className='w-full max-w-[500px] px-3 py-2 mt-1 block min-h-[120px]' />
-      </label>
-
-      <div className='flex flex-col sm:flex-row gap-3 w-full'>
-        <label className='w-full text-sm font-medium'>GitHub URL
-          <input value={github} onChange={(e) => setGithub(e.target.value)} className='w-full px-3 py-2 mt-1 block' />
-        </label>
-        <label className='w-full text-sm font-medium'>Demo URL
-          <input value={demo} onChange={(e) => setDemo(e.target.value)} className='w-full px-3 py-2 mt-1 block' />
-        </label>
-      </div>
-
-      <div className='flex flex-wrap gap-6 items-center'>
-        <label className='text-sm font-medium flex items-center gap-2'>
-          <input type='checkbox' checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
-          Featured
-        </label>
-        <label className='text-sm font-medium flex items-center gap-2'>
-          Order
-          <input type='number' value={order} onChange={(e) => setOrder(e.target.value)} className='w-24 px-3 py-2' />
-        </label>
-      </div>
-
-      <button type='submit' className='bg-black text-white px-6 py-2.5 rounded'>Add project</button>
-    </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving..." : isEditMode ? "Save changes" : "Add project"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate("/projects")}
+              disabled={saving}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </>
   )
 }
 

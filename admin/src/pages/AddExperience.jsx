@@ -1,79 +1,221 @@
-import React, { useState } from 'react'
-import axios from 'axios'
-import { toast } from 'react-toastify'
-import { backendUrl } from '../App'
-import { assets } from '../assets/assets'
+import { useEffect, useMemo, useState } from "react"
+import axios from "axios"
+import { toast } from "react-toastify"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { backendUrl } from "../App"
+import { assets } from "../assets/assets"
+import Button from "../components/ui/Button"
+import Card from "../components/ui/Card"
+import Field from "../components/ui/Field"
+import Input from "../components/ui/Input"
+import LoadingState from "../components/ui/LoadingState"
+import PageHeader from "../components/ui/PageHeader"
+import Textarea from "../components/ui/Textarea"
+
+const initialState = {
+  company: "",
+  role: "",
+  period: "",
+  link: "",
+  certificate: "",
+  highlights: "",
+  order: 0,
+}
 
 const AddExperience = ({ token }) => {
-  const [company, setCompany] = useState('')
-  const [role, setRole] = useState('')
-  const [period, setPeriod] = useState('')
-  const [link, setLink] = useState('')
-  const [certificate, setCertificate] = useState('')
-  const [highlights, setHighlights] = useState('')
-  const [order, setOrder] = useState(0)
-  const [logo, setLogo] = useState(false)
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const isEditMode = Boolean(id)
+
+  const [form, setForm] = useState(initialState)
+  const [logo, setLogo] = useState(null)
+  const [existingLogo, setExistingLogo] = useState("")
+  const [loading, setLoading] = useState(isEditMode)
+  const [saving, setSaving] = useState(false)
+
+  const previewLogo = useMemo(() => (logo ? URL.createObjectURL(logo) : ""), [logo])
+
+  useEffect(() => {
+    return () => {
+      if (previewLogo) URL.revokeObjectURL(previewLogo)
+    }
+  }, [previewLogo])
+
+  useEffect(() => {
+    if (!isEditMode) return
+
+    const loadItem = async () => {
+      setLoading(true)
+      try {
+        const res = await axios.get(backendUrl + "/api/experience/list")
+        if (!res.data.success) {
+          toast.error(res.data.message)
+          navigate("/experience")
+          return
+        }
+        const item = (res.data.experience || []).find((entry) => entry._id === id)
+        if (!item) {
+          toast.error("Experience entry not found")
+          navigate("/experience")
+          return
+        }
+        setForm({
+          company: item.company || "",
+          role: item.role || "",
+          period: item.period || "",
+          link: item.link || "",
+          certificate: item.certificate || "",
+          highlights: (item.highlights || []).join("\n"),
+          order: item.order ?? 0,
+        })
+        setExistingLogo(item.logo || "")
+      } catch (error) {
+        toast.error(error.message)
+        navigate("/experience")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadItem()
+  }, [id, isEditMode, navigate])
+
+  const setField = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault()
+    setSaving(true)
     try {
       const fd = new FormData()
-      fd.append('company', company)
-      fd.append('role', role)
-      fd.append('period', period)
-      fd.append('link', link)
-      fd.append('certificate', certificate)
-      fd.append('highlights', JSON.stringify(highlights.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)))
-      fd.append('order', order)
-      logo && fd.append('logo', logo)
+      if (isEditMode) fd.append("id", id)
+      fd.append("company", form.company)
+      fd.append("role", form.role)
+      fd.append("period", form.period)
+      fd.append("link", form.link)
+      fd.append("certificate", form.certificate)
+      fd.append("highlights", JSON.stringify(form.highlights.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)))
+      fd.append("order", form.order)
+      if (logo) fd.append("logo", logo)
 
-      const res = await axios.post(backendUrl + '/api/experience/add', fd, { headers: { token } })
+      const endpoint = isEditMode ? "/api/experience/update" : "/api/experience/add"
+      const res = await axios.post(backendUrl + endpoint, fd, { headers: { token } })
       if (res.data.success) {
-        toast.success(res.data.message)
-        setCompany(''); setRole(''); setPeriod(''); setLink(''); setCertificate(''); setHighlights(''); setOrder(0); setLogo(false)
+        toast.success(res.data.message || (isEditMode ? "Experience updated" : "Experience added"))
+        navigate("/experience")
       } else toast.error(res.data.message)
-    } catch (e) { toast.error(e.message) }
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setSaving(false)
+    }
   }
 
+  if (loading) return <LoadingState label="Loading experience details..." />
+
   return (
-    <form onSubmit={onSubmit} className='flex flex-col w-full items-start gap-4 max-w-3xl'>
-      <h2 className='text-xl font-semibold'>Add Experience</h2>
+    <>
+      <PageHeader
+        title={isEditMode ? "Edit Experience" : "Add Experience"}
+        description="Manage company details, links, and key highlights."
+        actions={
+          <Link
+            to="/experience"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text-main transition-colors hover:bg-surface-soft"
+          >
+            Back to experience
+          </Link>
+        }
+      />
 
-      <div>
-        <p className='mb-2 text-sm font-medium'>Logo</p>
-        <label htmlFor='logo'>
-          <img className='w-20 h-20 object-cover border rounded cursor-pointer' src={!logo ? assets.upload_area : URL.createObjectURL(logo)} alt='' />
-          <input onChange={(e) => setLogo(e.target.files[0])} type='file' id='logo' hidden />
-        </label>
-      </div>
+      <Card className="max-w-4xl p-5 sm:p-6">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <p className="mb-2 text-sm font-medium text-text-main">Company logo</p>
+            <label htmlFor="logo" className="cursor-pointer">
+              <img
+                className="h-20 w-20 rounded-xl border border-border object-cover"
+                src={previewLogo || existingLogo || assets.upload_area}
+                alt=""
+              />
+              <input
+                id="logo"
+                type="file"
+                hidden
+                onChange={(e) => setLogo(e.target.files?.[0] || null)}
+              />
+            </label>
+          </div>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-[640px]'>
-        <label className='text-sm font-medium'>Company
-          <input value={company} onChange={(e) => setCompany(e.target.value)} className='w-full px-3 py-2 mt-1 block' required />
-        </label>
-        <label className='text-sm font-medium'>Role
-          <input value={role} onChange={(e) => setRole(e.target.value)} className='w-full px-3 py-2 mt-1 block' required />
-        </label>
-        <label className='text-sm font-medium'>Period
-          <input value={period} onChange={(e) => setPeriod(e.target.value)} className='w-full px-3 py-2 mt-1 block' placeholder='June 2025 – July 2025' />
-        </label>
-        <label className='text-sm font-medium'>Order
-          <input type='number' value={order} onChange={(e) => setOrder(e.target.value)} className='w-full px-3 py-2 mt-1 block' />
-        </label>
-        <label className='text-sm font-medium'>Company URL
-          <input value={link} onChange={(e) => setLink(e.target.value)} className='w-full px-3 py-2 mt-1 block' />
-        </label>
-        <label className='text-sm font-medium'>Certificate URL
-          <input value={certificate} onChange={(e) => setCertificate(e.target.value)} className='w-full px-3 py-2 mt-1 block' />
-        </label>
-      </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Company" htmlFor="experience-company" required>
+              <Input
+                id="experience-company"
+                value={form.company}
+                onChange={(e) => setField("company", e.target.value)}
+                required
+              />
+            </Field>
+            <Field label="Role" htmlFor="experience-role" required>
+              <Input
+                id="experience-role"
+                value={form.role}
+                onChange={(e) => setField("role", e.target.value)}
+                required
+              />
+            </Field>
+            <Field label="Period" htmlFor="experience-period">
+              <Input
+                id="experience-period"
+                value={form.period}
+                onChange={(e) => setField("period", e.target.value)}
+                placeholder="June 2025 - July 2025"
+              />
+            </Field>
+            <Field label="Order" htmlFor="experience-order">
+              <Input
+                id="experience-order"
+                type="number"
+                value={form.order}
+                onChange={(e) => setField("order", Number(e.target.value))}
+              />
+            </Field>
+            <Field label="Company URL" htmlFor="experience-link">
+              <Input
+                id="experience-link"
+                value={form.link}
+                onChange={(e) => setField("link", e.target.value)}
+              />
+            </Field>
+            <Field label="Certificate URL" htmlFor="experience-certificate">
+              <Input
+                id="experience-certificate"
+                value={form.certificate}
+                onChange={(e) => setField("certificate", e.target.value)}
+              />
+            </Field>
+            <Field label="Highlights (one per line)" htmlFor="experience-highlights" className="sm:col-span-2">
+              <Textarea
+                id="experience-highlights"
+                rows={5}
+                value={form.highlights}
+                onChange={(e) => setField("highlights", e.target.value)}
+              />
+            </Field>
+          </div>
 
-      <label className='w-full max-w-[640px] text-sm font-medium'>Highlights (one per line)
-        <textarea value={highlights} onChange={(e) => setHighlights(e.target.value)} className='w-full px-3 py-2 mt-1 block min-h-[140px]' />
-      </label>
-
-      <button type='submit' className='bg-black text-white px-6 py-2.5 rounded'>Add experience</button>
-    </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving..." : isEditMode ? "Save changes" : "Add experience"}
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => navigate("/experience")} disabled={saving}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </>
   )
 }
 

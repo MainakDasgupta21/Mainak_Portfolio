@@ -9,7 +9,8 @@ const Hero = () => {
   const heroUi = profile.heroUi || {}
   const media = profile.media || {}
   const displayName = profile.name || "Mainak Dasgupta"
-  const role = heroUi.role || profile.title || "Software Developer"
+  const heroRole = typeof heroUi.role === "string" ? heroUi.role.trim() : ""
+  const role = heroRole || "Software Developer"
   const introPrefix = heroUi.introPrefix || "Hi, I'm"
   const badgeText = heroUi.badge || "Crafting Unique Solutions"
   const tagline = profile.tagline || "Building scalable systems and intelligent solutions"

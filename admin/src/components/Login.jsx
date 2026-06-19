@@ -1,60 +1,68 @@
-import axios from 'axios'
-import React, { useState } from 'react'
-import { backendUrl } from '../App'
-import { toast } from 'react-toastify'
+import axios from "axios"
+import { useState } from "react"
+import { toast } from "react-toastify"
+import { backendUrl } from "../App"
+import Button from "./ui/Button"
+import Card from "./ui/Card"
+import Field from "./ui/Field"
+import Input from "./ui/Input"
 
 const Login = ({ setToken }) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [submitting, setSubmitting] = useState(false)
 
   const onSubmitHandler = async (e) => {
+    e.preventDefault()
+    setSubmitting(true)
     try {
-      e.preventDefault()
-      const response = await axios.post(backendUrl + '/api/user/admin', { email, password })
+      const response = await axios.post(backendUrl + "/api/user/admin", { email, password })
       if (response.data.success) {
         setToken(response.data.token)
       } else {
-        toast.error(response.data.message)
+        toast.error(response.data.message || "Unable to sign in")
       }
     } catch (error) {
       console.log(error)
-      toast.error(error.message)
+      toast.error(error?.response?.data?.message || error.message)
+    } finally {
+      setSubmitting(false)
     }
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center w-full px-4'>
-      <div className='bg-white shadow-md rounded-lg px-8 py-6 max-w-md w-full'>
-        <h1 className='text-2xl font-bold mb-1'>Admin Panel</h1>
-        <p className='text-sm text-gray-500 mb-4'>Mainak Dasgupta — Portfolio CMS</p>
-        <form onSubmit={onSubmitHandler}>
-          <div className='mb-3 min-w-72'>
-            <p className='text-sm font-medium text-gray-700 mb-2'>Email Address</p>
-            <input
-              onChange={(e) => setEmail(e.target.value)}
+    <div className="flex min-h-screen w-full items-center justify-center px-4">
+      <Card className="w-full max-w-md p-7 sm:p-8">
+        <h1 className="text-2xl font-bold text-text-main">Admin Panel</h1>
+        <p className="mt-1 text-sm text-text-muted">Mainak Dasgupta - Portfolio CMS</p>
+        <form onSubmit={onSubmitHandler} className="mt-5 space-y-4" noValidate>
+          <Field label="Email address" htmlFor="admin-email" required>
+            <Input
+              id="admin-email"
+              type="email"
               value={email}
-              className='rounded-md w-full px-3 py-2 border border-gray-300 outline-none'
-              type='email'
-              placeholder='admin@mainak.dev'
+              autoComplete="username"
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@mainak.dev"
               required
             />
-          </div>
-          <div className='mb-3 min-w-72'>
-            <p className='text-sm font-medium text-gray-700 mb-2'>Password</p>
-            <input
-              onChange={(e) => setPassword(e.target.value)}
+          </Field>
+          <Field label="Password" htmlFor="admin-password" required>
+            <Input
+              id="admin-password"
+              type="password"
               value={password}
-              className='rounded-md w-full px-3 py-2 border border-gray-300 outline-none'
-              type='password'
-              placeholder='Enter your password'
+              autoComplete="current-password"
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
               required
             />
-          </div>
-          <button className='mt-2 w-full py-2 px-4 rounded-md text-white bg-black hover:bg-gray-800' type='submit'>
-            Login
-          </button>
+          </Field>
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? "Signing in..." : "Login"}
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   )
 }
