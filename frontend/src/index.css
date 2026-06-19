@@ -172,6 +172,34 @@
     letter-spacing: 0.05em;
   }
 
+  .text-shadow-hero {
+    text-shadow: 0 2px 20px hsl(0 0% 0% / 0.45);
+  }
+
+  @keyframes spin-slow {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+  }
+
+  @keyframes profile-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 25px hsl(var(--ring) / 0.22), 0 0 60px hsl(var(--ring) / 0.1);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(var(--ring) / 0.42), 0 0 90px hsl(var(--ring) / 0.2);
+    }
+  }
+
+  .profile-halo {
+    animation: profile-glow 4s ease-in-out infinite;
+  }
+
   /* ========================= */
   /* Background Animations */
   /* ========================= */
@@ -271,7 +299,9 @@
     .animate-gradient-shift,
     .animate-float-slow,
     .animate-float-slow-reverse,
-    .animate-float-particle {
+    .animate-float-particle,
+    .animate-spin-slow,
+    .profile-halo {
       animation: none !important;
     }
   }
