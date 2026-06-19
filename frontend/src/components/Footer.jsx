@@ -2,16 +2,18 @@ import { motion } from "framer-motion"
 import { memo, useContext } from "react"
 import { Download } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
+import { getProfileDisplayName } from "../utils/profileDisplay"
 
 function getBrandShortName(profile) {
   if (profile.brandShortName?.trim()) return profile.brandShortName
-  const first = (profile.name || "").trim().split(/\s+/)[0]
+  const first = getProfileDisplayName(profile, "").split(/\s+/)[0]
   return first ? `${first}.` : "Portfolio"
 }
 
 const Footer = memo(function Footer() {
   const currentYear = new Date().getFullYear()
   const { profile } = useContext(PortfolioContext)
+  const displayName = getProfileDisplayName(profile, "")
   const brandName = getBrandShortName(profile)
   const resumeUrl = profile.media?.resumePdf
 
@@ -77,7 +79,7 @@ const Footer = memo(function Footer() {
 
         <div className="pt-6 md:pt-8 border-t border-primary-foreground/10 text-center">
           <p className="text-xs md:text-sm opacity-80">
-            © {currentYear} {profile.name}. All rights reserved.
+            © {currentYear} {displayName || brandName}. All rights reserved.
           </p>
         </div>
       </div>

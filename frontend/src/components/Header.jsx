@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { memo, useContext, useEffect, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
+import { getProfileDisplayName } from "../utils/profileDisplay"
 
 const NAV_ITEMS = [
   { label: "Home", href: "#home" },
@@ -15,21 +16,22 @@ const NAV_ITEMS = [
 
 function getBrandShortName(profile, fallbackName) {
   if (profile.brandShortName?.trim()) return profile.brandShortName
-  const name = (profile.name?.trim() || fallbackName || "").trim()
+  const name = (fallbackName || "").trim()
   const first = name.split(/\s+/)[0]
   return first ? `${first}.` : ""
 }
 function getBrandMonogram(profile, fallbackName) {
   if (profile.brandMonogram?.trim()) return profile.brandMonogram
-  const name = (profile.name?.trim() || fallbackName || "").trim()
+  const name = (fallbackName || "").trim()
   return name ? name.charAt(0).toUpperCase() : ""
 }
 
 const Header = memo(function Header() {
   const { loading, profile } = useContext(PortfolioContext)
-  const displayName = profile.name?.trim() || (loading ? "" : "Mainak Dasgupta")
+  const displayName = getProfileDisplayName(profile, loading ? "" : "Mainak Dasgupta")
   const brandShortName = getBrandShortName(profile, displayName)
   const brandMonogram = getBrandMonogram(profile, displayName)
+  const ariaDisplayName = displayName || brandShortName || "Portfolio"
 
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -135,7 +137,7 @@ const Header = memo(function Header() {
             href="#home"
             className="text-2xl md:text-3xl font-bold cursive-brand leading-none flex items-center gap-3"
             whileHover={{ scale: 1.03 }}
-            aria-label={`${displayName} - Home`}
+            aria-label={`${ariaDisplayName} - Home`}
           >
             <span
               className="inline-block w-9 h-9 rounded-md bg-gradient-to-br from-foreground/90 to-accent flex items-center justify-center text-black font-bold"

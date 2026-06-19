@@ -2,6 +2,7 @@ import { motion, useInView } from "framer-motion"
 import { useContext, useEffect, useRef, useState } from "react"
 import { Check, Clock } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
+import { getProfileDisplayName } from "../utils/profileDisplay"
 
 function getAboutParagraphs(profile) {
   if (!profile.bio) return []
@@ -17,7 +18,7 @@ const About = () => {
   const { profile, education } = useContext(PortfolioContext)
 
   const aboutParagraphs = getAboutParagraphs(profile)
-  const displayName = profile.name || ""
+  const displayName = getProfileDisplayName(profile, "")
   const aboutProfileSrc = profile.media?.aboutProfileSrc || "/my-picture-informal-1.jpg"
 
   const itemRefs = useRef([])
@@ -101,7 +102,7 @@ const About = () => {
             <div className="w-full max-w-[260px] sm:max-w-none sm:w-[280px] mx-auto sm:mx-0 md:w-[380px] h-[320px] sm:h-[360px] md:h-[420px] rounded-2xl overflow-hidden shadow-xl border-4 border-white flex-shrink-0">
               <img
                 src={aboutProfileSrc}
-                alt={profile.name || "Profile"}
+                alt={displayName || "Profile"}
                 className="w-full h-full object-cover object-[center_20%] transition-transform duration-500 ease-out hover:scale-105"
                 loading="lazy"
                 decoding="async"
@@ -117,12 +118,16 @@ const About = () => {
                   }`}
                 >
                   {index === 0 ? (
-                    <>
-                      <span className="font-semibold text-foreground">
-                        {displayName}
-                      </span>{" "}
-                      - {paragraph}
-                    </>
+                    displayName ? (
+                      <>
+                        <span className="font-semibold text-foreground">
+                          {displayName}
+                        </span>{" "}
+                        - {paragraph}
+                      </>
+                    ) : (
+                      paragraph
+                    )
                   ) : (
                     paragraph
                   )}

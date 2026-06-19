@@ -2,13 +2,14 @@ import { motion, useReducedMotion } from "framer-motion"
 import { ArrowDown, ArrowRight } from "lucide-react"
 import { useContext } from "react"
 import { PortfolioContext } from "../context/PortfolioContext"
+import { getProfileDisplayName } from "../utils/profileDisplay"
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion()
   const { loading, profile } = useContext(PortfolioContext)
   const heroUi = profile.heroUi || {}
   const media = profile.media || {}
-  const displayName = profile.name?.trim() || (loading ? "" : "Mainak Dasgupta")
+  const displayName = getProfileDisplayName(profile, loading ? "" : "Mainak Dasgupta")
   const heroRole = typeof heroUi.role === "string" ? heroUi.role.trim() : ""
   const role = heroRole || (loading ? "" : "Software Developer")
   const introPrefix = heroUi.introPrefix || (loading ? "" : "Hi, I'm")
