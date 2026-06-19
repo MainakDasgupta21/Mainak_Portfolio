@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#skills" },
   { label: "Achievements", href: "#achievements" },
+  { label: "Testimonials", href: "#testimonials" },
 ]
 const PRIMARY_CTA = { label: "Let's Talk", href: "#contact" }
 
