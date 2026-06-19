@@ -3,9 +3,11 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import { Link } from "react-router-dom"
 import { backendUrl } from "../App"
+import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import ConfirmDialog from "../components/ui/ConfirmDialog"
 import EmptyState from "../components/ui/EmptyState"
+import Input from "../components/ui/Input"
 import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
 import RowActions from "../components/ui/RowActions"
@@ -15,6 +17,9 @@ const ListSkills = ({ token }) => {
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState("")
   const [pendingDelete, setPendingDelete] = useState(null)
+  const [quickAddOpen, setQuickAddOpen] = useState({})
+  const [quickAddNames, setQuickAddNames] = useState({})
+  const [addingCategory, setAddingCategory] = useState("")
 
   const load = async () => {
     setLoading(true)
@@ -62,6 +67,42 @@ const ListSkills = ({ token }) => {
     return map
   }, [list])
 
+  const addQuickSkill = async (category) => {
+    if (addingCategory) return
+
+    const name = (quickAddNames[category] || "").trim()
+    if (!name) {
+      toast.error("Skill name is required")
+      return
+    }
+
+    const items = grouped[category] || []
+    const maxOrder = items.reduce((max, skill) => {
+      const order = Number(skill.order)
+      return Number.isFinite(order) ? Math.max(max, order) : max
+    }, -1)
+    const nextOrder = maxOrder + 1
+
+    setAddingCategory(category)
+    try {
+      const res = await axios.post(
+        backendUrl + "/api/skill/add",
+        { category, name, proficiency: 80, order: nextOrder },
+        { headers: { token } }
+      )
+      if (res.data.success) {
+        toast.success(res.data.message || "Skill Added")
+        setQuickAddNames((prev) => ({ ...prev, [category]: "" }))
+        setQuickAddOpen((prev) => ({ ...prev, [category]: false }))
+        await load()
+      } else toast.error(res.data.message)
+    } catch (e) {
+      toast.error(e.message)
+    } finally {
+      setAddingCategory("")
+    }
+  }
+
   return (
     <>
       <PageHeader
@@ -87,8 +128,60 @@ const ListSkills = ({ token }) => {
         ? Object.entries(grouped).map(([category, items]) => (
             <Card key={category} className="mb-4">
               <div className="border-b border-border/70 px-4 py-2">
-                <h2 className="text-sm font-medium text-text-main">{category}</h2>
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-sm font-medium text-text-main">{category}</h2>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="h-7 px-2.5 text-xs"
+                    onClick={() => setQuickAddOpen((prev) => ({ ...prev, [category]: !prev[category] }))}
+                    disabled={addingCategory === category}
+                  >
+                    Add
+                  </Button>
+                </div>
               </div>
+              {quickAddOpen[category] ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    addQuickSkill(category)
+                  }}
+                  className="border-b border-border/70 px-4 py-2.5"
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <Input
+                      id={`quick-skill-${category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                      value={quickAddNames[category] || ""}
+                      onChange={(e) =>
+                        setQuickAddNames((prev) => ({
+                          ...prev,
+                          [category]: e.target.value,
+                        }))
+                      }
+                      placeholder={`Add skill to ${category}`}
+                      className="h-8"
+                      disabled={addingCategory === category}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button type="submit" size="sm" className="h-8 px-3" disabled={addingCategory === category}>
+                        {addingCategory === category ? "Adding..." : "Add"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-3"
+                        onClick={() => setQuickAddOpen((prev) => ({ ...prev, [category]: false }))}
+                        disabled={addingCategory === category}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              ) : null}
               <div className="divide-y divide-border">
                 {items.map((skill) => (
                   <div
