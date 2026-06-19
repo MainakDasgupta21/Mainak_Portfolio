@@ -1,12 +1,12 @@
-import { m, useInView } from "framer-motion"
-import { memo, useContext, useRef, useState } from "react"
+import { m, useInView, useReducedMotion } from "framer-motion"
+import { memo, useContext, useRef } from "react"
 import { FileText, Globe } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 
 const Experience = memo(function Experience() {
   const sectionRef = useRef(null)
-  const timelineInView = useInView(sectionRef, { once: true, margin: "-20% 0px -20% 0px" })
-  const [hoveredIndex, setHoveredIndex] = useState(null)
+  const timelineInView = useInView(sectionRef, { once: true, margin: "-15% 0px -15% 0px" })
+  const shouldReduceMotion = useReducedMotion()
   const { experience, profile } = useContext(PortfolioContext)
   const hasExperience = experience.length > 0
   const subtitle =
@@ -17,9 +17,9 @@ const Experience = memo(function Experience() {
     <section id="experience" className="py-20 md:py-32 bg-muted/30" ref={sectionRef}>
       <div className="container mx-auto px-4 sm:px-6">
         <m.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
           viewport={{ once: true, margin: "-100px" }}
           className="text-center mb-12 md:mb-20"
         >
@@ -34,194 +34,151 @@ const Experience = memo(function Experience() {
 
         <div className="max-w-6xl mx-auto">
           <div className="relative">
-            <div className="absolute top-0 bottom-0 left-4 md:left-1/2 md:-translate-x-1/2">
-              <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[6px] bg-gradient-to-b from-white/5 via-white/10 to-white/5 rounded-full" />
-
+            <div className="pointer-events-none absolute inset-y-0 left-4 md:left-1/2 md:-translate-x-1/2">
+              <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full bg-border/45" />
               <m.div
-                className="absolute left-1/2 -translate-x-1/2 top-0 w-[8px] rounded-full overflow-hidden"
+                className="absolute left-1/2 top-0 -translate-x-1/2 w-[2px] rounded-full bg-gradient-to-b from-accent via-accent/55 to-accent/15"
                 initial={{ height: "0%" }}
                 animate={{ height: timelineInView ? "100%" : "0%" }}
-                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="w-full h-full relative bg-gradient-to-b from-white/10 via-white/60 to-white/10" />
-              </m.div>
-
-              <m.div
-                initial={{ top: "0%" }}
-                animate={{ top: timelineInView ? "100%" : "0%" }}
-                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 md:w-12 md:h-12 rounded-full pointer-events-none"
-              >
-                <div className="absolute inset-0 rounded-full bg-white/70 blur-md" />
-                <div className="absolute inset-2.5 md:inset-3 rounded-full bg-white" />
-              </m.div>
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
+              />
             </div>
 
             {!hasExperience ? (
-              <div className="ml-10 md:ml-0 glass-card rounded-lg p-6 text-center text-muted-foreground">
-                Experience entries will appear here once they are published.
+              <div className="pl-12 md:pl-0">
+                <div className="glass-card rounded-2xl border border-border/35 p-6 md:p-8 text-center text-muted-foreground max-w-3xl md:mx-auto">
+                  Experience entries will appear here once they are published.
+                </div>
               </div>
             ) : (
-              <div className="space-y-10 md:space-y-24">
+              <div className="space-y-8 md:space-y-12">
                 {experience.map((exp, index) => {
                   const isLeft = index % 2 === 0
-                  return (
-                    <m.div
-                      key={index}
-                      initial={{ opacity: 0, y: 50 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.2 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      onHoverStart={() => setHoveredIndex(index)}
-                      onHoverEnd={() => setHoveredIndex(null)}
-                      className={`relative md:flex md:items-center ${
-                        isLeft ? "md:flex-row" : "md:flex-row-reverse"
-                      }`}
-                    >
-                    {/* Mobile logo */}
-                    <div className="md:hidden absolute left-4 -translate-x-1/2 top-5 z-10">
-                      <m.div
-                        animate={{ scale: hoveredIndex === index ? 1.1 : 1 }}
-                        className="w-10 h-10 rounded-full border-2 border-white/10 bg-card/80 flex items-center justify-center shadow-2xl"
-                      >
-                        {exp.logo ? (
-                          <img
-                            src={exp.logo}
-                            alt={`${exp.company} logo`}
-                            className="w-5 h-5 object-contain"
-                          />
-                        ) : (
-                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                            <span className="text-white font-bold text-[10px]">
-                              {exp.company.charAt(0)}
-                            </span>
-                          </div>
-                        )}
-                      </m.div>
-                    </div>
+                  const companyName = (exp.company || "Company unavailable").trim()
+                  const roleName = (exp.role || "Role not specified").trim()
+                  const highlights = Array.isArray(exp.highlights) ? exp.highlights : []
+                  const periodLabel = (exp.period || "Timeline unavailable").trim()
+                  const connectorClass = isLeft
+                    ? "hidden md:block absolute top-9 right-1/2 mr-2 h-px w-12 bg-gradient-to-l from-border/70 to-transparent"
+                    : "hidden md:block absolute top-9 left-1/2 ml-2 h-px w-12 bg-gradient-to-r from-border/70 to-transparent"
+                  const cardDockClass = isLeft
+                    ? "md:mr-auto md:pr-14"
+                    : "md:ml-auto md:pl-14"
 
-                    <div className={`pl-10 sm:pl-12 md:pl-0 md:w-[45%] ${isLeft ? "md:pr-12" : "md:pl-12"}`}>
+                  return (
+                    <m.article
+                      key={exp._id || `${companyName}-${index}`}
+                      initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={
+                        shouldReduceMotion
+                          ? { duration: 0 }
+                          : { duration: 0.52, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }
+                      }
+                      viewport={{ once: true, amount: 0.28 }}
+                      className="relative pl-12 md:pl-0"
+                    >
+                      <span className="absolute z-20 top-8 left-4 -translate-x-1/2 md:left-1/2 md:-translate-x-1/2">
+                        <span className="absolute inset-0 rounded-full bg-accent/30 blur-md" />
+                        <span className="relative block h-3 w-3 rounded-full border border-background bg-accent" />
+                      </span>
+
+                      <span className={connectorClass} aria-hidden />
+
                       <m.div
-                        whileHover={{ scale: 1.02, y: -5 }}
-                        className={`glass-card p-4 sm:p-5 md:p-10 rounded-2xl border border-border/20 shadow-elegant hover:shadow-glow transition-all duration-500 ${
-                          hoveredIndex !== null && hoveredIndex !== index
-                            ? "md:opacity-60"
-                            : "opacity-100"
-                        }`}
+                        whileHover={shouldReduceMotion ? undefined : { y: -4, scale: 1.005 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                        className={`glass-card rounded-2xl border border-border/35 p-4 sm:p-5 md:p-7 shadow-elegant hover:shadow-glow md:w-[calc(50%-1.5rem)] ${cardDockClass}`}
                       >
-                        <div className={`flex items-center gap-3 mb-4 md:mb-6 justify-start ${isLeft ? "md:justify-start" : "md:justify-end"}`}>
-                          <span className="text-xs md:text-sm font-semibold text-accent bg-accent/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-accent/20 break-words">
-                            {exp.period}
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <span className="inline-flex items-center rounded-full border border-accent/25 bg-accent/10 px-3 py-1.5 text-[11px] font-semibold tracking-wide text-accent sm:text-xs">
+                            {periodLabel}
+                          </span>
+                          <span className="hidden sm:inline-flex rounded-full border border-border/50 px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground">
+                            Experience {index + 1}
                           </span>
                         </div>
 
-                        <div className="mb-4 md:mb-6">
-                          <h3 className="text-base sm:text-xl md:text-2xl font-bold text-foreground mb-2 leading-snug break-words">
-                            {exp.role}
-                          </h3>
-                          <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-3 mb-3 md:mb-4">
-                            <p className="text-sm sm:text-base md:text-lg font-bold text-accent bg-accent/5 px-3 py-1.5 md:px-4 md:py-2 rounded-lg break-words w-full sm:flex-1 sm:min-w-0">
-                              {exp.company}
+                        <div className="mt-4 flex items-start gap-3 sm:gap-4">
+                          <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border/40 bg-background/70 shadow-sm">
+                            {exp.logo ? (
+                              <img
+                                src={exp.logo}
+                                alt={`${companyName} logo`}
+                                className="h-6 w-6 object-contain"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            ) : (
+                              <span className="text-sm font-bold text-foreground">
+                                {companyName.charAt(0).toUpperCase() || "W"}
+                              </span>
+                            )}
+                          </span>
+
+                          <div className="min-w-0">
+                            <h3 className="text-lg sm:text-xl md:text-[1.45rem] font-semibold leading-tight text-foreground break-words">
+                              {roleName}
+                            </h3>
+                            <p className="mt-1 text-sm sm:text-base font-medium text-muted-foreground break-words">
+                              {companyName}
                             </p>
-
-                            <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
-                              {exp.link && (
-                                <m.a
-                                  href={exp.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  whileHover={{ scale: 1.1 }}
-                                  className="p-2 bg-primary/10 hover:bg-accent/20 rounded-lg border border-border/30 transition-all duration-300"
-                                  title="Company Website"
-                                >
-                                  <Globe className="w-4 h-4 text-muted-foreground hover:text-accent" />
-                                </m.a>
-                              )}
-                              {exp.certificate && (
-                                <m.a
-                                  href={exp.certificate}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  whileHover={{ scale: 1.1 }}
-                                  className="p-2 bg-green-500/10 hover:bg-green-500/20 rounded-lg border border-green-500/30 transition-all duration-300"
-                                  title="View Certificate"
-                                >
-                                  <FileText className="w-4 h-4 text-green-500 hover:text-green-400" />
-                                </m.a>
-                              )}
-                            </div>
                           </div>
                         </div>
 
-                        <div className="space-y-3 md:space-y-4">
-                          {(exp.highlights || []).map((highlight, hIndex) => (
-                            <m.div
-                              key={hIndex}
-                              initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
-                              whileInView={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.2 + hIndex * 0.1 }}
-                              className="flex items-start gap-3 p-3 md:p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-all duration-300"
+                        <ul className="mt-5 space-y-2.5">
+                          {highlights.length > 0 ? (
+                            highlights.map((highlight, hIndex) => (
+                              <li
+                                key={`${hIndex}-${String(highlight).slice(0, 18)}`}
+                                className="flex items-start gap-3 rounded-xl border border-border/30 bg-muted/20 px-3 py-3"
+                              >
+                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                                <span className="text-sm md:text-[0.94rem] leading-relaxed text-muted-foreground break-words">
+                                  {highlight}
+                                </span>
+                              </li>
+                            ))
+                          ) : (
+                            <li className="rounded-xl border border-border/30 bg-muted/20 px-3 py-3 text-sm text-muted-foreground">
+                              Details will be updated soon.
+                            </li>
+                          )}
+                        </ul>
+
+                        <div className="mt-5 flex flex-wrap gap-2.5">
+                          {exp.link && (
+                            <m.a
+                              href={exp.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              whileHover={shouldReduceMotion ? undefined : { y: -1 }}
+                              className="inline-flex h-9 items-center gap-2 rounded-md border border-border/45 bg-background/65 px-3 text-sm text-foreground hover:bg-accent/25 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                              aria-label={`Open ${companyName} website`}
+                              title="Company website"
                             >
-                              <div className="w-2 h-2 rounded-full bg-accent mt-2 flex-shrink-0" />
-                              <p className="text-[0.92rem] md:text-base text-muted-foreground leading-relaxed break-words">
-                                {highlight}
-                              </p>
-                            </m.div>
-                          ))}
+                              <Globe className="h-4 w-4 text-accent" />
+                              <span>Website</span>
+                            </m.a>
+                          )}
+
+                          {exp.certificate && (
+                            <m.a
+                              href={exp.certificate}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              whileHover={shouldReduceMotion ? undefined : { y: -1 }}
+                              className="inline-flex h-9 items-center gap-2 rounded-md border border-green-500/35 bg-green-500/10 px-3 text-sm text-green-400 hover:bg-green-500/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                              aria-label={`View ${companyName} certificate`}
+                              title="Internship certificate"
+                            >
+                              <FileText className="h-4 w-4" />
+                              <span>Certificate</span>
+                            </m.a>
+                          )}
                         </div>
-
-                        <m.div
-                          className={`absolute bottom-0 h-1 bg-gradient-to-r from-accent to-primary rounded-full ${isLeft ? "left-0" : "right-0"}`}
-                          initial={{ width: 0 }}
-                          whileHover={{ width: "100%" }}
-                          transition={{ duration: 0.5 }}
-                        />
                       </m.div>
-                    </div>
-
-                    {/* Desktop center logo */}
-                    <div className="hidden md:flex flex-1 justify-center relative z-10">
-                      <div
-                        className={`absolute top-1/2 h-0.5 bg-gradient-to-r from-border/50 to-border/30 ${
-                          isLeft ? "left-0 right-1/2" : "left-1/2 right-0"
-                        }`}
-                      />
-
-                      <m.div
-                        animate={{
-                          scale: hoveredIndex === index ? 1.1 : 1,
-                          borderColor:
-                            hoveredIndex === index
-                              ? "hsl(var(--accent))"
-                              : "rgba(255,255,255,0.1)",
-                        }}
-                        className="w-16 h-16 rounded-full border-2 bg-card/80 flex items-center justify-center shadow-2xl relative transition-all duration-300"
-                      >
-                        {exp.logo ? (
-                          <img
-                            src={exp.logo}
-                            alt={`${exp.company} logo`}
-                            className="w-8 h-8 object-contain"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">
-                              {exp.company.charAt(0)}
-                            </span>
-                          </div>
-                        )}
-
-                        <m.div
-                          className="absolute inset-0 rounded-full bg-accent/40 blur-md"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: hoveredIndex === index ? 0.6 : 0 }}
-                          transition={{ duration: 0.3 }}
-                        />
-                      </m.div>
-                    </div>
-
-                    <div className="hidden md:block md:w-[45%]" />
-                    </m.div>
+                    </m.article>
                   )
                 })}
               </div>
