@@ -1,8 +1,10 @@
-import { motion, useInView } from "framer-motion"
+import { m, useInView } from "framer-motion"
 import { useContext, useEffect, useRef, useState } from "react"
 import { Check, Clock } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { getProfileDisplayName } from "../utils/profileDisplay"
+import assets from "../assets/assets"
+import ResponsiveImage from "./ResponsiveImage"
 
 function getAboutParagraphs(profile) {
   if (!profile.bio) return []
@@ -19,7 +21,13 @@ const About = () => {
 
   const aboutParagraphs = getAboutParagraphs(profile)
   const displayName = getProfileDisplayName(profile, "")
-  const aboutProfileSrc = profile.media?.aboutProfileSrc || "/my-picture-informal-1.jpg"
+  const aboutProfileSrc = profile.media?.aboutProfileSrc || assets.aboutProfile
+  const aboutProfileAvifSrc =
+    profile.media?.aboutProfileAvifSrc ||
+    (aboutProfileSrc === assets.aboutProfile ? assets.aboutProfileAvif : undefined)
+  const aboutProfileWebpSrc =
+    profile.media?.aboutProfileWebpSrc ||
+    (aboutProfileSrc === assets.aboutProfile ? assets.aboutProfileWebp : undefined)
 
   const itemRefs = useRef([])
   const [visibleMap, setVisibleMap] = useState(() => new Array(education.length).fill(false))
@@ -80,7 +88,7 @@ const About = () => {
   return (
     <section className="py-20 md:py-32 bg-muted/30" ref={ref}>
       <div className="container mx-auto px-4 sm:px-6">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -90,22 +98,27 @@ const About = () => {
             About Me
           </h2>
           <div className="w-16 md:w-20 h-1.5 bg-accent rounded-full mx-auto mb-6 md:mb-8" />
-        </motion.div>
+        </m.div>
 
         <div className="max-w-6xl mx-auto">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
             className="flex flex-col md:flex-row items-start gap-8 md:gap-12 mb-12"
           >
             <div className="w-full max-w-[260px] sm:max-w-none sm:w-[280px] mx-auto sm:mx-0 md:w-[380px] h-[320px] sm:h-[360px] md:h-[420px] rounded-2xl overflow-hidden shadow-xl border-4 border-white flex-shrink-0">
-              <img
+              <ResponsiveImage
                 src={aboutProfileSrc}
+                avifSrc={aboutProfileAvifSrc}
+                webpSrc={aboutProfileWebpSrc}
                 alt={displayName || "Profile"}
                 className="w-full h-full object-cover object-[center_20%] transition-transform duration-500 ease-out hover:scale-105"
                 loading="lazy"
                 decoding="async"
+                width={760}
+                height={840}
+                sizes="(min-width: 1024px) 380px, (min-width: 768px) 280px, 260px"
               />
             </div>
 
@@ -134,7 +147,7 @@ const About = () => {
                 </p>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Education Timeline */}
           <div className="relative mt-8">
@@ -143,7 +156,7 @@ const About = () => {
                 <div className="relative flex justify-center h-full">
                   <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[4px] bg-gradient-to-b from-white/10 via-white/20 to-white/10 rounded-full" />
 
-                  <motion.div
+                  <m.div
                     initial={{ height: 0 }}
                     animate={{ height: `${Math.max(progress, 0.02) * 100}%` }}
                     transition={{
@@ -154,16 +167,8 @@ const About = () => {
                     }}
                     className="absolute left-1/2 -translate-x-1/2 top-0 w-[8px] rounded-full overflow-hidden"
                   >
-                    <div
-                      className="w-full h-full relative"
-                      style={{
-                        background:
-                          "linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.8) 55%, rgba(255,255,255,0.3) 80%, rgba(255,255,255,0.1) 100%)",
-                        boxShadow:
-                          "0 0 40px 12px rgba(255,255,255,0.7), 0 0 80px 25px rgba(255,255,255,0.4)",
-                      }}
-                    >
-                      <motion.div
+                    <div className="w-full h-full relative bg-gradient-to-b from-white/10 via-white/60 to-white/10">
+                      <m.div
                         initial={{ top: "0%" }}
                         animate={{ top: `${Math.max(progress, 0.02) * 100}%` }}
                         transition={{
@@ -171,17 +176,13 @@ const About = () => {
                           stiffness: 120,
                           damping: 20,
                         }}
-                        className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 md:w-10 md:h-10 rounded-full bg-white"
-                        style={{
-                          boxShadow:
-                            "0 0 30px 15px rgba(255,255,255,0.9), 0 0 60px 30px rgba(255,255,255,0.6), 0 0 100px 50px rgba(255,255,255,0.3)",
-                          filter: "blur(1px)",
-                        }}
+                        className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 md:w-10 md:h-10 rounded-full pointer-events-none"
                       >
-                        <div className="absolute inset-0 m-auto w-3 h-3 md:w-4 md:h-4 rounded-full bg-white shadow-[0_0_25px_10px_rgba(255,255,255,1)]" />
-                      </motion.div>
+                        <div className="absolute inset-0 rounded-full bg-white/70 blur-md" />
+                        <div className="absolute inset-2 md:inset-2.5 rounded-full bg-white" />
+                      </m.div>
                     </div>
-                  </motion.div>
+                  </m.div>
                 </div>
               </div>
 
@@ -192,7 +193,7 @@ const About = () => {
 
                 <div className="space-y-6 md:space-y-8 relative">
                   {education.map((ed, i) => (
-                    <motion.div
+                    <m.div
                       key={`${ed.institution}-${i}`}
                       ref={(el) => setItemRef(el, i)}
                       custom={i}
@@ -203,14 +204,14 @@ const About = () => {
                     >
                       <div className="hidden md:block absolute -left-[52px] top-8 z-10">
                         <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-white border-2 md:border-4 border-accent shadow-[0_0_20px_8px_rgba(255,255,255,0.6)] flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-accent motion-safe:animate-pulse" />
                         </div>
                       </div>
 
                       <div className="relative">
                         <div className="absolute -inset-1 bg-gradient-to-r from-accent/20 to-primary/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                        <div className="relative bg-card/60 backdrop-blur-xl p-4 sm:p-6 md:p-8 rounded-xl border border-border/20 shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:bg-card/80 group-hover:border-border/40 group-hover:scale-[1.02]">
+                        <div className="relative bg-card/60 backdrop-blur-sm p-4 sm:p-6 md:p-8 rounded-xl border border-border/20 shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:bg-card/80 group-hover:border-border/40 group-hover:scale-[1.02]">
                           <div className="md:absolute md:top-6 md:right-6 mb-3 md:mb-0">
                             {ed.status === "Completed" ? (
                               <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-500 px-2.5 py-1 rounded-full border border-green-500/30">
@@ -220,7 +221,7 @@ const About = () => {
                                 </span>
                               </div>
                             ) : (
-                              <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/30 animate-pulse">
+                              <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/30 motion-safe:animate-pulse">
                                 <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                 <span className="text-[11px] md:text-sm font-semibold">
                                   Pursuing
@@ -252,7 +253,7 @@ const About = () => {
                           <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-accent to-primary rounded-full transition-all duration-500 group-hover:w-full" />
                         </div>
                       </div>
-                    </motion.div>
+                    </m.div>
                   ))}
                 </div>
               </div>

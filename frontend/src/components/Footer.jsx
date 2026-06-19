@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { memo, useContext } from "react"
 import { Download } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
@@ -41,14 +41,14 @@ const Footer = memo(function Footer() {
             <h4 className="font-semibold mb-3 md:mb-4">Quick Links</h4>
             <nav className="grid grid-cols-2 gap-2">
               {navLinks.map((link) => (
-                <motion.a
+                <m.a
                   key={link.href}
                   href={link.href}
                   whileHover={{ x: 4 }}
                   className="text-sm opacity-80 hover:opacity-100 transition-opacity"
                 >
                   {link.label}
-                </motion.a>
+                </m.a>
               ))}
             </nav>
           </div>

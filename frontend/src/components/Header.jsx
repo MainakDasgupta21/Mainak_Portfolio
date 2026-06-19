@@ -1,11 +1,11 @@
 import {
   AnimatePresence,
-  motion,
+  m,
   useReducedMotion,
   useScroll,
   useSpring,
 } from "framer-motion"
-import { memo, useContext, useEffect, useRef, useState } from "react"
+import { memo, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { getProfileDisplayName } from "../utils/profileDisplay"
@@ -190,37 +190,43 @@ const Header = memo(function Header() {
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
   const shellClassName = scrolled || mobileOpen
     ? "glass-card border border-border/35 shadow-elegant"
-    : "border border-white/10 bg-black/25 backdrop-blur-md md:border-transparent md:bg-transparent md:backdrop-blur-0"
-  const mobileMenuVariants = {
-    hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.98 },
-    visible: shouldReduceMotion
-      ? { opacity: 1, transition: { duration: 0.16 } }
-      : {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          transition: {
-            duration: 0.24,
-            ease: [0.22, 1, 0.36, 1],
-            when: "beforeChildren",
-            staggerChildren: 0.045,
+    : "border border-white/10 bg-black/25 backdrop-blur-sm md:border-transparent md:bg-transparent md:backdrop-blur-0"
+  const mobileMenuVariants = useMemo(
+    () => ({
+      hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.98 },
+      visible: shouldReduceMotion
+        ? { opacity: 1, transition: { duration: 0.16 } }
+        : {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: {
+              duration: 0.24,
+              ease: [0.22, 1, 0.36, 1],
+              when: "beforeChildren",
+              staggerChildren: 0.045,
+            },
           },
-        },
-    exit: shouldReduceMotion
-      ? { opacity: 0, transition: { duration: 0.12 } }
-      : {
-          opacity: 0,
-          y: -8,
-          scale: 0.98,
-          transition: { duration: 0.18, ease: "easeOut" },
-        },
-  }
-  const mobileItemVariants = {
-    hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 },
-    visible: shouldReduceMotion
-      ? { opacity: 1, transition: { duration: 0.12 } }
-      : { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
-  }
+      exit: shouldReduceMotion
+        ? { opacity: 0, transition: { duration: 0.12 } }
+        : {
+            opacity: 0,
+            y: -8,
+            scale: 0.98,
+            transition: { duration: 0.18, ease: "easeOut" },
+          },
+    }),
+    [shouldReduceMotion]
+  )
+  const mobileItemVariants = useMemo(
+    () => ({
+      hidden: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 },
+      visible: shouldReduceMotion
+        ? { opacity: 1, transition: { duration: 0.12 } }
+        : { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
+    }),
+    [shouldReduceMotion]
+  )
   const lockActiveItem = (href) => {
     activeLockRef.current = href
     activeLockUntilRef.current = performance.now() + 1400
@@ -228,7 +234,7 @@ const Header = memo(function Header() {
   }
 
   return (
-    <motion.header
+    <m.header
       initial={shouldReduceMotion ? false : { y: -18, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
@@ -238,7 +244,7 @@ const Header = memo(function Header() {
       className="fixed inset-x-0 top-0 z-50 pointer-events-none"
     >
       {!shouldReduceMotion && (
-        <motion.div
+        <m.div
           aria-hidden
           className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/95 to-transparent origin-left"
           style={{ scaleX: progressScaleX }}
@@ -246,12 +252,12 @@ const Header = memo(function Header() {
       )}
 
       <nav className="container pointer-events-auto mx-auto px-4 sm:px-6 pt-3 md:pt-4" aria-label="Primary">
-        <motion.div
+        <m.div
           className={`rounded-2xl md:rounded-[999px] transition-all duration-300 ${shellClassName}`}
           animate={shouldReduceMotion ? undefined : { y: scrolled ? 0 : -2 }}
         >
           <div className="flex items-center justify-between gap-3 px-3 sm:px-4 md:px-5 py-2.5">
-            <motion.a
+            <m.a
               href="#home"
               aria-label={`${ariaDisplayName} - Home`}
               onClick={() => {
@@ -270,14 +276,14 @@ const Header = memo(function Header() {
               <span className="text-xl md:text-2xl font-bold cursive-brand leading-none">
                 {brandShortName || "Portfolio"}
               </span>
-            </motion.a>
+            </m.a>
 
             <div className="hidden md:flex items-center gap-3">
-              <div className="relative flex items-center gap-1 rounded-full border border-border/35 bg-background/30 p-1 backdrop-blur-md">
+              <div className="relative flex items-center gap-1 rounded-full border border-border/35 bg-background/30 p-1 backdrop-blur-sm">
                 {NAV_ITEMS.map((item, idx) => {
                   const isActive = active === item.href
                   return (
-                    <motion.a
+                    <m.a
                       key={item.href}
                       href={item.href}
                       onClick={() => lockActiveItem(item.href)}
@@ -293,7 +299,7 @@ const Header = memo(function Header() {
                       style={{ WebkitTapHighlightColor: "transparent" }}
                     >
                       {isActive && (
-                        <motion.span
+                        <m.span
                           layoutId="navActivePill"
                           aria-hidden
                           className="absolute inset-0 rounded-full border border-foreground/20 bg-foreground/10"
@@ -301,7 +307,7 @@ const Header = memo(function Header() {
                         />
                       )}
                       <span className="relative z-10">{item.label}</span>
-                    </motion.a>
+                    </m.a>
                   )
                 })}
               </div>
@@ -328,7 +334,7 @@ const Header = memo(function Header() {
                 ) : (
                   <AnimatePresence mode="wait" initial={false}>
                     {mobileOpen ? (
-                      <motion.span
+                      <m.span
                         key="close"
                         initial={{ opacity: 0, rotate: -45 }}
                         animate={{ opacity: 1, rotate: 0 }}
@@ -337,9 +343,9 @@ const Header = memo(function Header() {
                         className="inline-flex"
                       >
                         <X className="h-5 w-5" />
-                      </motion.span>
+                      </m.span>
                     ) : (
-                      <motion.span
+                      <m.span
                         key="open"
                         initial={{ opacity: 0, rotate: 45 }}
                         animate={{ opacity: 1, rotate: 0 }}
@@ -348,31 +354,31 @@ const Header = memo(function Header() {
                         className="inline-flex"
                       >
                         <Menu className="h-5 w-5" />
-                      </motion.span>
+                      </m.span>
                     )}
                   </AnimatePresence>
                 )}
               </button>
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         <AnimatePresence>
           {mobileOpen && (
-            <motion.div
+            <m.div
               ref={menuRef}
               variants={mobileMenuVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
               data-lenis-prevent
-              className="mt-2 md:hidden rounded-2xl border border-border/30 bg-card/85 p-3 backdrop-blur-xl shadow-elegant max-h-[70vh] overflow-y-auto"
+              className="mt-2 md:hidden rounded-2xl border border-border/30 bg-card/85 p-3 backdrop-blur-sm shadow-elegant max-h-[70vh] overflow-y-auto"
             >
               <div className="flex flex-col gap-1">
                 {NAV_ITEMS.map((item) => {
                   const isActive = active === item.href
                   return (
-                    <motion.a
+                    <m.a
                       key={item.href}
                       href={item.href}
                       variants={mobileItemVariants}
@@ -388,12 +394,12 @@ const Header = memo(function Header() {
                       }`}
                     >
                       {item.label}
-                    </motion.a>
+                    </m.a>
                   )
                 })}
               </div>
 
-              <motion.a
+              <m.a
                 href={PRIMARY_CTA.href}
                 variants={mobileItemVariants}
                 onClick={() => {
@@ -403,12 +409,12 @@ const Header = memo(function Header() {
                 className={`mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl border border-foreground/30 bg-foreground px-4 text-sm font-semibold text-background hover:bg-foreground/90 transition-colors ${focusRingClass}`}
               >
                 {PRIMARY_CTA.label}
-              </motion.a>
-            </motion.div>
+              </m.a>
+            </m.div>
           )}
         </AnimatePresence>
       </nav>
-    </motion.header>
+    </m.header>
   )
 })
 

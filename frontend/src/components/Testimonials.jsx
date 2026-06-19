@@ -1,5 +1,5 @@
-import { motion, AnimatePresence, useInView } from "framer-motion"
-import { memo, useCallback, useContext, useEffect, useRef, useState } from "react"
+import { m, AnimatePresence, useInView } from "framer-motion"
+import { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { Star, ChevronLeft, ChevronRight } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 
@@ -37,18 +37,21 @@ const Testimonials = memo(function Testimonials() {
     return () => clearTimeout(ref.id)
   }, [isHovered, testimonials.length])
 
-  const slideVariants = {
-    enter: (direction) => ({ x: direction > 0 ? 220 : -220, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (direction) => ({ x: direction < 0 ? 220 : -220, opacity: 0 }),
-  }
+  const slideVariants = useMemo(
+    () => ({
+      enter: (direction) => ({ x: direction > 0 ? 220 : -220, opacity: 0 }),
+      center: { x: 0, opacity: 1 },
+      exit: (direction) => ({ x: direction < 0 ? 220 : -220, opacity: 0 }),
+    }),
+    []
+  )
 
   const hasTestimonials = testimonials.length > 0
 
   return (
     <section className="py-20 md:py-32 bg-muted/30" ref={ref}>
       <div className="container mx-auto px-4 sm:px-6">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
@@ -57,7 +60,7 @@ const Testimonials = memo(function Testimonials() {
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6">Testimonials</h2>
           <div className="w-16 md:w-20 h-1 bg-accent mx-auto mb-6 md:mb-8" />
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">{subtitle}</p>
-        </motion.div>
+        </m.div>
 
         {!hasTestimonials ? (
           <div className="max-w-4xl mx-auto glass-card rounded-lg p-6 text-center text-muted-foreground">
@@ -67,7 +70,7 @@ const Testimonials = memo(function Testimonials() {
           <div className="max-w-4xl mx-auto">
             <div className="relative">
               <AnimatePresence initial={false} custom={direction} mode="wait">
-                <motion.div
+                <m.div
                   key={currentIndex}
                   custom={direction}
                   variants={slideVariants}
@@ -81,9 +84,8 @@ const Testimonials = memo(function Testimonials() {
                   onHoverStart={() => setIsHovered(true)}
                   onHoverEnd={() => setIsHovered(false)}
                   whileHover={{
-                    boxShadow:
-                      "0 0 40px rgba(255,255,255,0.6), 0 0 80px rgba(255,255,255,0.4), 0 0 120px rgba(255,255,255,0.2)",
-                    scale: 1.02,
+                    scale: 1.01,
+                    y: -2,
                     transition: { duration: 0.4, ease: "easeInOut" },
                   }}
                   className="glass-card p-6 md:p-12 rounded-lg shadow-elegant transition-all duration-500"
@@ -119,7 +121,7 @@ const Testimonials = memo(function Testimonials() {
                       &quot;{testimonials[currentIndex].quote}&quot;
                     </blockquote>
                   </div>
-                </motion.div>
+                </m.div>
               </AnimatePresence>
             </div>
 

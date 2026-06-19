@@ -1,4 +1,4 @@
-import { motion, useInView } from "framer-motion"
+import { m, useInView } from "framer-motion"
 import { memo, useContext, useRef, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
@@ -24,6 +24,11 @@ const Contact = memo(function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!backendUrl) {
+      toast.error("Contact service is unavailable right now.")
+      return
+    }
+
     setIsSubmitting(true)
     const fd = new FormData(e.currentTarget)
     const data = {
@@ -41,8 +46,7 @@ const Contact = memo(function Contact() {
         toast.error(res.data.message || "Failed to send")
       }
     } catch (err) {
-      console.log(err)
-      toast.error(err.message)
+      toast.error(err?.response?.data?.message || err?.message || "Failed to send")
     } finally {
       setIsSubmitting(false)
     }
@@ -51,7 +55,7 @@ const Contact = memo(function Contact() {
   return (
     <section className="py-20 md:py-32 bg-muted/30" ref={ref}>
       <div className="container mx-auto px-4 sm:px-6">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
@@ -60,10 +64,10 @@ const Contact = memo(function Contact() {
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6">Get in Touch</h2>
           <div className="w-16 md:w-20 h-1 bg-accent mx-auto mb-6 md:mb-8" />
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">{subtitle}</p>
-        </motion.div>
+        </m.div>
 
         <div className="grid md:grid-cols-2 gap-10 md:gap-12 max-w-6xl mx-auto">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -119,9 +123,9 @@ const Contact = memo(function Contact() {
                 {isSubmitting ? "Sending..." : "Send Message"}
               </button>
             </form>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -169,7 +173,7 @@ const Contact = memo(function Contact() {
                   .map(([platform, url]) => {
                     const Icon = socialIcons[platform] || Code2
                     return (
-                      <motion.a
+                      <m.a
                         key={platform}
                         href={url}
                         target="_blank"
@@ -179,12 +183,12 @@ const Contact = memo(function Contact() {
                       >
                         <Icon className="w-5 h-5 md:w-6 md:h-6 text-accent" />
                         <span className="text-[11px] md:text-xs capitalize text-center">{platform}</span>
-                      </motion.a>
+                      </m.a>
                     )
                   })}
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>

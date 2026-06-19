@@ -6,6 +6,7 @@
 export const assets = {
     favicon: '/favicon.svg',
     heroVideo: '/back.mp4',
+    heroVideoWebm: '/back.webm',
     heroPoster: '/back-poster.jpg',
     heroProfile: '/me.png',
     heroProfileAvif: '/me.avif',

@@ -7,12 +7,12 @@ const AppLoader = memo(function AppLoader() {
         role="status"
         aria-live="polite"
         aria-label="Loading portfolio content"
-        className="w-full max-w-md rounded-2xl border border-border/30 bg-card/55 p-6 shadow-elegant backdrop-blur-xl"
+        className="w-full max-w-md rounded-2xl border border-border/30 bg-card/55 p-6 shadow-elegant backdrop-blur-sm"
       >
         <div className="flex items-center gap-4">
           <div className="relative h-12 w-12 shrink-0">
             <div className="absolute inset-0 rounded-full border-2 border-foreground/15" />
-            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-foreground border-r-foreground/65 animate-spin" />
+            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-foreground border-r-foreground/65 motion-safe:animate-spin" />
             <div className="absolute inset-2 rounded-full bg-background/45" />
           </div>
           <div className="min-w-0">

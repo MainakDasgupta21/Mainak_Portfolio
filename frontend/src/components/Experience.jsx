@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from "framer-motion"
+import { m, useScroll, useTransform } from "framer-motion"
 import { memo, useContext, useRef, useState } from "react"
 import { FileText, Globe } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
@@ -7,6 +7,7 @@ const Experience = memo(function Experience() {
   const sectionRef = useRef(null)
   const [hoveredIndex, setHoveredIndex] = useState(null)
   const { experience, profile } = useContext(PortfolioContext)
+  const hasExperience = experience.length > 0
   const subtitle =
     profile.sectionSubtitles?.experience ||
     "Professional journey building impactful solutions"
@@ -21,7 +22,7 @@ const Experience = memo(function Experience() {
   return (
     <section className="py-20 md:py-32 bg-muted/30" ref={sectionRef}>
       <div className="container mx-auto px-4 sm:px-6">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -35,65 +36,55 @@ const Experience = memo(function Experience() {
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
             {subtitle}
           </p>
-        </motion.div>
+        </m.div>
 
         <div className="max-w-6xl mx-auto">
           <div className="relative">
             <div className="absolute top-0 bottom-0 left-4 md:left-1/2 md:-translate-x-1/2">
-              <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[6px] bg-gradient-to-b from-white/5 via-white/10 to-white/5 rounded-full blur-[1px]" />
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[6px] bg-gradient-to-b from-white/5 via-white/10 to-white/5 rounded-full" />
 
-              <motion.div
+              <m.div
                 className="absolute left-1/2 -translate-x-1/2 top-0 w-[8px] rounded-full overflow-hidden"
                 style={{ height: timelineHeight }}
               >
-                <div
-                  className="w-full h-full relative"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.8) 55%, rgba(255,255,255,0.3) 80%, rgba(255,255,255,0.1) 100%)",
-                    boxShadow:
-                      "0 0 25px 6px rgba(255,255,255,0.4), 0 0 50px 12px rgba(255,255,255,0.2)",
-                  }}
-                />
-              </motion.div>
+                <div className="w-full h-full relative bg-gradient-to-b from-white/10 via-white/60 to-white/10" />
+              </m.div>
 
-              <motion.div
+              <m.div
                 style={{ top: timelineHeight }}
-                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 md:w-12 md:h-12 rounded-full bg-white pointer-events-none"
+                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 md:w-12 md:h-12 rounded-full pointer-events-none"
               >
-                <div
-                  className="absolute inset-0 rounded-full bg-white"
-                  style={{
-                    boxShadow:
-                      "0 0 20px 8px rgba(255,255,255,0.7), 0 0 40px 16px rgba(255,255,255,0.4), 0 0 60px 24px rgba(255,255,255,0.2)",
-                    filter: "blur(1px)",
-                  }}
-                />
-                <div className="absolute inset-0 m-auto w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-white shadow-[0_0_15px_6px_rgba(255,255,255,0.8)]" />
-              </motion.div>
+                <div className="absolute inset-0 rounded-full bg-white/70 blur-md" />
+                <div className="absolute inset-2.5 md:inset-3 rounded-full bg-white" />
+              </m.div>
             </div>
 
-            <div className="space-y-10 md:space-y-24">
-              {experience.map((exp, index) => {
-                const isLeft = index % 2 === 0
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.2 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    onHoverStart={() => setHoveredIndex(index)}
-                    onHoverEnd={() => setHoveredIndex(null)}
-                    className={`relative md:flex md:items-center ${
-                      isLeft ? "md:flex-row" : "md:flex-row-reverse"
-                    }`}
-                  >
+            {!hasExperience ? (
+              <div className="ml-10 md:ml-0 glass-card rounded-lg p-6 text-center text-muted-foreground">
+                Experience entries will appear here once they are published.
+              </div>
+            ) : (
+              <div className="space-y-10 md:space-y-24">
+                {experience.map((exp, index) => {
+                  const isLeft = index % 2 === 0
+                  return (
+                    <m.div
+                      key={index}
+                      initial={{ opacity: 0, y: 50 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.2 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      onHoverStart={() => setHoveredIndex(index)}
+                      onHoverEnd={() => setHoveredIndex(null)}
+                      className={`relative md:flex md:items-center ${
+                        isLeft ? "md:flex-row" : "md:flex-row-reverse"
+                      }`}
+                    >
                     {/* Mobile logo */}
                     <div className="md:hidden absolute left-4 -translate-x-1/2 top-5 z-10">
-                      <motion.div
+                      <m.div
                         animate={{ scale: hoveredIndex === index ? 1.1 : 1 }}
-                        className="w-10 h-10 rounded-full border-2 border-white/10 bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-2xl"
+                        className="w-10 h-10 rounded-full border-2 border-white/10 bg-card/80 flex items-center justify-center shadow-2xl"
                       >
                         {exp.logo ? (
                           <img
@@ -108,16 +99,16 @@ const Experience = memo(function Experience() {
                             </span>
                           </div>
                         )}
-                      </motion.div>
+                      </m.div>
                     </div>
 
                     <div className={`pl-10 sm:pl-12 md:pl-0 md:w-[45%] ${isLeft ? "md:pr-12" : "md:pl-12"}`}>
-                      <motion.div
+                      <m.div
                         whileHover={{ scale: 1.02, y: -5 }}
-                        className={`glass-card p-4 sm:p-5 md:p-10 rounded-2xl border border-border/20 backdrop-blur-xl shadow-elegant hover:shadow-glow transition-all duration-500 ${
+                        className={`glass-card p-4 sm:p-5 md:p-10 rounded-2xl border border-border/20 shadow-elegant hover:shadow-glow transition-all duration-500 ${
                           hoveredIndex !== null && hoveredIndex !== index
-                            ? "md:opacity-50 md:blur-[1px]"
-                            : "opacity-100 blur-0"
+                            ? "md:opacity-60"
+                            : "opacity-100"
                         }`}
                       >
                         <div className={`flex items-center gap-3 mb-4 md:mb-6 justify-start ${isLeft ? "md:justify-start" : "md:justify-end"}`}>
@@ -137,7 +128,7 @@ const Experience = memo(function Experience() {
 
                             <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                               {exp.link && (
-                                <motion.a
+                                <m.a
                                   href={exp.link}
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -146,10 +137,10 @@ const Experience = memo(function Experience() {
                                   title="Company Website"
                                 >
                                   <Globe className="w-4 h-4 text-muted-foreground hover:text-accent" />
-                                </motion.a>
+                                </m.a>
                               )}
                               {exp.certificate && (
-                                <motion.a
+                                <m.a
                                   href={exp.certificate}
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -158,7 +149,7 @@ const Experience = memo(function Experience() {
                                   title="View Certificate"
                                 >
                                   <FileText className="w-4 h-4 text-green-500 hover:text-green-400" />
-                                </motion.a>
+                                </m.a>
                               )}
                             </div>
                           </div>
@@ -166,7 +157,7 @@ const Experience = memo(function Experience() {
 
                         <div className="space-y-3 md:space-y-4">
                           {(exp.highlights || []).map((highlight, hIndex) => (
-                            <motion.div
+                            <m.div
                               key={hIndex}
                               initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
                               whileInView={{ opacity: 1, x: 0 }}
@@ -177,17 +168,17 @@ const Experience = memo(function Experience() {
                               <p className="text-[0.92rem] md:text-base text-muted-foreground leading-relaxed break-words">
                                 {highlight}
                               </p>
-                            </motion.div>
+                            </m.div>
                           ))}
                         </div>
 
-                        <motion.div
+                        <m.div
                           className={`absolute bottom-0 h-1 bg-gradient-to-r from-accent to-primary rounded-full ${isLeft ? "left-0" : "right-0"}`}
                           initial={{ width: 0 }}
                           whileHover={{ width: "100%" }}
                           transition={{ duration: 0.5 }}
                         />
-                      </motion.div>
+                      </m.div>
                     </div>
 
                     {/* Desktop center logo */}
@@ -198,7 +189,7 @@ const Experience = memo(function Experience() {
                         }`}
                       />
 
-                      <motion.div
+                      <m.div
                         animate={{
                           scale: hoveredIndex === index ? 1.1 : 1,
                           borderColor:
@@ -206,7 +197,7 @@ const Experience = memo(function Experience() {
                               ? "hsl(var(--accent))"
                               : "rgba(255,255,255,0.1)",
                         }}
-                        className="w-16 h-16 rounded-full border-2 bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-2xl relative transition-all duration-300"
+                        className="w-16 h-16 rounded-full border-2 bg-card/80 flex items-center justify-center shadow-2xl relative transition-all duration-300"
                       >
                         {exp.logo ? (
                           <img
@@ -222,21 +213,21 @@ const Experience = memo(function Experience() {
                           </div>
                         )}
 
-                        <motion.div
-                          className="absolute inset-0 rounded-full"
+                        <m.div
+                          className="absolute inset-0 rounded-full bg-accent/40 blur-md"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: hoveredIndex === index ? 0.6 : 0 }}
-                          style={{ boxShadow: "0 0 20px 8px hsl(var(--accent))" }}
                           transition={{ duration: 0.3 }}
                         />
-                      </motion.div>
+                      </m.div>
                     </div>
 
                     <div className="hidden md:block md:w-[45%]" />
-                  </motion.div>
-                )
-              })}
-            </div>
+                    </m.div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

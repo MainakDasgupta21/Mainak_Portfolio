@@ -1,8 +1,12 @@
-import { motion, useReducedMotion } from "framer-motion"
+import { m, useReducedMotion } from "framer-motion"
 import { ArrowDown, ArrowRight } from "lucide-react"
-import { useContext } from "react"
+import { useContext, useMemo } from "react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { getProfileDisplayName } from "../utils/profileDisplay"
+import assets from "../assets/assets"
+import ResponsiveImage from "./ResponsiveImage"
+
+const EASE_OUT_QUINT = [0.22, 1, 0.36, 1]
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -17,38 +21,50 @@ const Hero = () => {
   const tagline = profile.tagline || (loading ? "" : "Building scalable systems and intelligent solutions")
   const scrollHintTop = heroUi.scrollHintTop || (loading ? "" : "Scroll down")
   const scrollHintBottom = heroUi.scrollHintBottom || (loading ? "" : "to see projects")
-  const heroVideoSrc = media.heroVideoSrc || "/back.mp4"
-  const heroPosterSrc = media.heroPosterSrc || "/back-poster.jpg"
-  const heroProfileSrc = media.heroProfileSrc || "/me.png"
-  const easeOutQuint = [0.22, 1, 0.36, 1]
+  const heroVideoSrc = media.heroVideoSrc || assets.heroVideo
+  const heroVideoWebmSrc = media.heroVideoWebmSrc || assets.heroVideoWebm
+  const heroPosterSrc = media.heroPosterSrc || assets.heroPoster
+  const heroProfileSrc = media.heroProfileSrc || assets.heroProfile
+  const heroProfileAvifSrc =
+    media.heroProfileAvifSrc ||
+    (heroProfileSrc === assets.heroProfile ? assets.heroProfileAvif : undefined)
+  const heroProfileWebpSrc =
+    media.heroProfileWebpSrc ||
+    (heroProfileSrc === assets.heroProfile ? assets.heroProfileWebp : undefined)
   const ctaBaseClass =
     "group inline-flex h-12 w-full max-w-[14rem] sm:w-auto items-center justify-center gap-2 rounded-md px-5 text-sm font-medium transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/45"
   const ctaPrimaryClass = `${ctaBaseClass} hover-glow glow-button glow-delay-0 border border-foreground/25 bg-foreground text-background hover:bg-foreground/92`
   const ctaSecondaryClass = `${ctaBaseClass} hover-glow glow-delay-2 glass-card border border-input/50 text-foreground hover:bg-accent/80 hover:text-accent-foreground`
 
-  const heroContainerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: shouldReduceMotion
-        ? { duration: 0 }
-        : { delayChildren: 0.08, staggerChildren: 0.12 },
-    },
-  }
+  const heroContainerVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0 },
+      show: {
+        opacity: 1,
+        transition: shouldReduceMotion
+          ? { duration: 0 }
+          : { delayChildren: 0.08, staggerChildren: 0.12 },
+      },
+    }),
+    [shouldReduceMotion]
+  )
 
-  const heroItemVariants = {
-    hidden: shouldReduceMotion
-      ? { opacity: 1, y: 0, filter: "blur(0px)" }
-      : { opacity: 0, y: 20, filter: "blur(8px)" },
-    show: {
-      opacity: 1,
-      y: 0,
-      filter: "blur(0px)",
-      transition: shouldReduceMotion
-        ? { duration: 0 }
-        : { duration: 0.72, ease: easeOutQuint },
-    },
-  }
+  const heroItemVariants = useMemo(
+    () => ({
+      hidden: shouldReduceMotion
+        ? { opacity: 1, y: 0, filter: "blur(0px)" }
+        : { opacity: 0, y: 20, filter: "blur(8px)" },
+      show: {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        transition: shouldReduceMotion
+          ? { duration: 0 }
+          : { duration: 0.72, ease: EASE_OUT_QUINT },
+      },
+    }),
+    [shouldReduceMotion]
+  )
 
   return (
     <section
@@ -61,23 +77,24 @@ const Hero = () => {
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         poster={heroPosterSrc}
         aria-hidden="true"
       >
+        <source src={heroVideoWebmSrc} type="video/webm" />
         <source src={heroVideoSrc} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
-      <div className="absolute inset-0 z-10 bg-black/40 backdrop-blur-[1px]" />
+      <div className="absolute inset-0 z-10 bg-black/45" />
 
-      <motion.div
+      <m.div
         className="container mx-auto max-w-5xl px-4 sm:px-6 text-center relative z-20"
         variants={heroContainerVariants}
         initial={shouldReduceMotion ? false : "hidden"}
         animate="show"
       >
-        <motion.div
+        <m.div
           variants={heroItemVariants}
           className="flex justify-center mb-5 md:mb-8"
         >
@@ -90,28 +107,34 @@ const Hero = () => {
               }}
               aria-hidden
             />
-            <div className="relative z-10 w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 rounded-full overflow-hidden shadow-2xl border-4 border-white/95 backdrop-blur-sm bg-black">
-              <img
+            <div className="relative z-10 w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 rounded-full overflow-hidden shadow-2xl border-4 border-white/95 bg-black">
+              <ResponsiveImage
                 src={heroProfileSrc}
+                avifSrc={heroProfileAvifSrc}
+                webpSrc={heroProfileWebpSrc}
                 alt={displayName}
                 className="w-full h-full object-cover"
-                loading="lazy"
+                loading="eager"
                 decoding="async"
+                fetchPriority="high"
+                width={192}
+                height={192}
+                sizes="(min-width: 768px) 12rem, (min-width: 640px) 9rem, 7rem"
               />
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           variants={heroItemVariants}
           className="inline-block mb-5 md:mb-8"
         >
           <span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full glass-card text-[11px] md:text-sm text-shadow-hero">
-            <span className="blink-dot">•</span> {badgeText}
+            <span className="blink-dot" aria-hidden /> {badgeText}
           </span>
-        </motion.div>
+        </m.div>
 
-        <motion.h1
+        <m.h1
           variants={heroItemVariants}
           className="text-[2.05rem] sm:text-5xl md:text-7xl font-bold mb-3 md:mb-4 leading-tight text-shadow-hero"
         >
@@ -123,16 +146,16 @@ const Hero = () => {
           <span className="block mt-1.5 sm:mt-0 text-[1.95rem] sm:text-4xl md:text-6xl text-muted-foreground">
             {role}
           </span>
-        </motion.h1>
+        </m.h1>
 
-        <motion.p
+        <m.p
           variants={heroItemVariants}
           className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-7 md:mb-10 px-2 text-shadow-hero"
         >
           {tagline}
-        </motion.p>
+        </m.p>
 
-        <motion.div
+        <m.div
           variants={heroItemVariants}
           className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center"
         >
@@ -151,9 +174,9 @@ const Hero = () => {
             {heroUi.secondaryCtaLabel || "See Projects"}
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           variants={heroItemVariants}
           className="mt-8 md:mt-14"
         >
@@ -165,15 +188,15 @@ const Hero = () => {
               <ArrowDown className="mx-auto w-5 h-5 md:w-6 md:h-6" />
             </div>
           ) : (
-            <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
+            <m.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
               <ArrowDown className="mx-auto w-5 h-5 md:w-6 md:h-6" />
-            </motion.div>
+            </m.div>
           )}
           <p className="text-xs md:text-sm text-muted-foreground mt-3 md:mt-4">
             {scrollHintBottom}
           </p>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </section>
   )
 }

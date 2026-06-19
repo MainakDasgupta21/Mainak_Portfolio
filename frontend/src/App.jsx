@@ -1,4 +1,5 @@
 import { lazy, Suspense, useContext, useEffect, useState } from "react"
+import { LazyMotion, MotionConfig, domAnimation } from "framer-motion"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
@@ -37,45 +38,53 @@ const App = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen relative">
-        <ToastContainer position="bottom-right" theme="dark" />
-        <div className="fixed inset-0 -z-10">
-          {bgReady && (
-            <Suspense fallback={null}>
-              <AnimatedBackground />
-            </Suspense>
-          )}
-        </div>
-        <AppLoader />
-      </div>
+      <LazyMotion features={domAnimation}>
+        <MotionConfig reducedMotion="user">
+          <div className="min-h-screen relative">
+            <ToastContainer position="bottom-right" theme="dark" />
+            <div className="fixed inset-0 -z-10">
+              {bgReady && (
+                <Suspense fallback={null}>
+                  <AnimatedBackground />
+                </Suspense>
+              )}
+            </div>
+            <AppLoader />
+          </div>
+        </MotionConfig>
+      </LazyMotion>
     )
   }
 
   return (
-    <div className="min-h-screen relative">
-      <ToastContainer position="bottom-right" theme="dark" />
-      <div className="fixed inset-0 -z-10">
-        {bgReady && (
-          <Suspense fallback={null}>
-            <AnimatedBackground />
-          </Suspense>
-        )}
-      </div>
-      <Header />
-      <main>
-        <Hero />
-        <Suspense fallback={<SectionSkeleton />}>
-          <LazySection id="about"><About /></LazySection>
-          <LazySection id="experience"><Experience /></LazySection>
-          <LazySection id="projects"><Projects /></LazySection>
-          <LazySection id="skills"><Skills /></LazySection>
-          <LazySection id="achievements"><Achievements /></LazySection>
-          <LazySection id="testimonials"><Testimonials /></LazySection>
-          <LazySection id="contact"><Contact /></LazySection>
-          <LazySection minHeight={200}><Footer /></LazySection>
-        </Suspense>
-      </main>
-    </div>
+    <LazyMotion features={domAnimation}>
+      <MotionConfig reducedMotion="user">
+        <div className="min-h-screen relative">
+          <ToastContainer position="bottom-right" theme="dark" />
+          <div className="fixed inset-0 -z-10">
+            {bgReady && (
+              <Suspense fallback={null}>
+                <AnimatedBackground />
+              </Suspense>
+            )}
+          </div>
+          <Header />
+          <main>
+            <Hero />
+            <Suspense fallback={<SectionSkeleton />}>
+              <LazySection id="about"><About /></LazySection>
+              <LazySection id="experience"><Experience /></LazySection>
+              <LazySection id="projects"><Projects /></LazySection>
+              <LazySection id="skills"><Skills /></LazySection>
+              <LazySection id="achievements"><Achievements /></LazySection>
+              <LazySection id="testimonials"><Testimonials /></LazySection>
+              <LazySection id="contact"><Contact /></LazySection>
+              <LazySection minHeight={200}><Footer /></LazySection>
+            </Suspense>
+          </main>
+        </div>
+      </MotionConfig>
+    </LazyMotion>
   )
 }
 

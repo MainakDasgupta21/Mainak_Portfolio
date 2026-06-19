@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useEffect, useMemo, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
@@ -116,7 +117,6 @@ const PortfolioContextProvider = (props) => {
         if (testimonialsRes.data?.success) setTestimonials(testimonialsRes.data.testimonials || [])
         if (educationRes.data?.success) setEducation(educationRes.data.education || [])
       } catch (err) {
-        console.log(err)
         toast.error("Failed to load portfolio content")
       } finally {
         if (!cancelled) setLoading(false)
