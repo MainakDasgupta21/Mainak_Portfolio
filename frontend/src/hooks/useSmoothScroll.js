@@ -113,6 +113,10 @@ const scrollToTarget = (target, { hash, instant = false, updateHistory = true } 
       duration: instant ? 0 : LENIS_SCROLL_DURATION,
       easing: (t) => 1 - Math.pow(1 - t, 3),
       immediate: instant,
+      // Run the whole slide in one shot: ignore stray wheel/touch events so the
+      // animation reaches the section directly instead of stopping partway.
+      lock: !instant,
+      force: true,
     })
   } else {
     const top = target.getBoundingClientRect().top + window.scrollY - marginTop

@@ -6,18 +6,17 @@ import "react-toastify/dist/ReactToastify.css"
 import Header from "./components/Header"
 import Hero from "./components/Hero"
 import AppLoader from "./components/AppLoader"
-import SectionSkeleton from "./components/SectionSkeleton"
+import About from "./components/About"
+import Experience from "./components/Experience"
+import Projects from "./components/Projects"
+import Skills from "./components/Skills"
+import Achievements from "./components/Achievements"
+import Testimonials from "./components/Testimonials"
+import Contact from "./components/Contact"
+import Footer from "./components/Footer"
 import { PortfolioContext } from "./context/PortfolioContext"
 import useSmoothScroll from "./hooks/useSmoothScroll"
 
-const About = lazy(() => import("./components/About"))
-const Experience = lazy(() => import("./components/Experience"))
-const Projects = lazy(() => import("./components/Projects"))
-const Skills = lazy(() => import("./components/Skills"))
-const Achievements = lazy(() => import("./components/Achievements"))
-const Testimonials = lazy(() => import("./components/Testimonials"))
-const Contact = lazy(() => import("./components/Contact"))
-const Footer = lazy(() => import("./components/Footer"))
 const AnimatedBackground = lazy(() => import("./components/AnimatedBackground"))
 
 const App = () => {
@@ -70,30 +69,14 @@ const App = () => {
           <Header />
           <main>
             <Hero />
-            <Suspense fallback={<SectionSkeleton />}>
-              <About />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <Experience />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <Projects />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <Skills />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <Achievements />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <Testimonials />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <Contact />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <Footer />
-            </Suspense>
+            <About />
+            <Experience />
+            <Projects />
+            <Skills />
+            <Achievements />
+            <Testimonials />
+            <Contact />
+            <Footer />
           </main>
         </div>
       </MotionConfig>
