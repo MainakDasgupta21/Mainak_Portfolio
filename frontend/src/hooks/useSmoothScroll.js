@@ -58,14 +58,21 @@ const unlockBodyScroll = () => {
 }
 
 const syncScrollLockState = () => {
+  // When Lenis is running it already blocks background scrolling via the
+  // `.lenis-stopped { overflow: clip }` rule, so stopping/starting it is enough.
+  // Toggling `position: fixed` on the body here would additionally force a
+  // `window.scrollTo` on unlock, which fights Lenis' own `scrollTo` and makes
+  // nav links that close the mobile menu appear to do nothing.
   if (lenisInstance) {
     if (lenisLockCount > 0) {
       lenisInstance.stop()
     } else {
       lenisInstance.start()
     }
+    return
   }
 
+  // Fallback for when Lenis is absent (e.g. prefers-reduced-motion).
   if (lenisLockCount > 0) {
     lockBodyScroll()
   } else {
@@ -165,7 +172,10 @@ export function useSmoothScroll() {
       const startedAt = performance.now()
       const attemptScroll = () => {
         const target = resolveHashTarget(hash)
-        if (target && (!lenisInstance || lenisLockCount === 0)) {
+        // Wait until any active scroll lock (open mobile menu / modal) is
+        // released so the target's position is measured against the real,
+        // unlocked layout in both the Lenis and reduced-motion code paths.
+        if (target && lenisLockCount === 0) {
           pendingAnchorRafId = 0
           scrollToTarget(target, { hash, instant, updateHistory })
           return
