@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "cleanup:testimonials": "node scripts/remove-testimonials.js"
   },
   "author": "Mainak Dasgupta",
   "license": "ISC",

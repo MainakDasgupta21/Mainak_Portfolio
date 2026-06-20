@@ -35,7 +35,6 @@
     "experience": "Professional journey building impactful solutions",
     "skills": "Technical expertise across multiple domains",
     "achievements": "Recognition and milestones that define excellence",
-    "testimonials": "What colleagues and mentors say",
     "contact": "Let's discuss your next project"
   },
   "education": [
@@ -261,31 +260,5 @@
     "codeforces": "https://codeforces.com/profile/MAINAK_DASGUPTA",
     "geekforgeeks": "https://www.geeksforgeeks.org/user/mainakdasgupta1234567890/",
     "twitter": "https://x.com/MainakDG33"
-  },
-  "testimonials": [
-    {
-      "name": "Dr. Priya Sharma",
-      "role": "Senior Data Scientist at NIC",
-      "company": "National Informatics Centre",
-      "image": "",
-      "quote": "Mainak's ability to build scalable data pipelines is exceptional. His OCR synthesis system for regional languages showcased both technical excellence and creative problem-solving. A dedicated professional who consistently delivers high-quality work.",
-      "rating": 5
-    },
-    {
-      "name": "Rajesh Kumar",
-      "role": "Chief Engineer, Analytics Division",
-      "company": "ONGC",
-      "image": "",
-      "quote": "Working with Mainak was a seamless experience. His visual analytics dashboard transformed how we analyze reservoir pressure data across hundreds of wells. The tool's intuitive interface and powerful insights have become indispensable for our team.",
-      "rating": 5
-    },
-    {
-      "name": "Prof. Ananya Chatterjee",
-      "role": "Associate Professor, CSE Department",
-      "company": "NIT Agartala",
-      "image": "",
-      "quote": "Mainak stands out for his strong foundation in algorithms and data structures, combined with practical application skills. His projects demonstrate a rare blend of theoretical knowledge and hands-on implementation expertise.",
-      "rating": 5
-    }
-  ]
+  }
 }

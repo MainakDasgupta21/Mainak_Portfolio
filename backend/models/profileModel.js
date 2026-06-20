@@ -51,7 +51,6 @@ const profileSchema = new mongoose.Schema({
         experience: { type: String, default: "Professional journey building impactful solutions" },
         skills: { type: String, default: "Technical expertise across multiple domains" },
         achievements: { type: String, default: "Recognition and milestones that define excellence" },
-        testimonials: { type: String, default: "What colleagues and mentors say" },
         contact: { type: String, default: "Let's discuss your next project" },
     },
 

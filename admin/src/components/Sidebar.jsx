@@ -6,7 +6,6 @@ const contentItems = [
   { to: "/experience", label: "Experience" },
   { to: "/skills", label: "Skills" },
   { to: "/achievements", label: "Achievements" },
-  { to: "/testimonials", label: "Testimonials" },
   { to: "/education", label: "Education" },
 ]
 

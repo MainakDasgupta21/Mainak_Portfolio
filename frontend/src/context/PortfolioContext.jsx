@@ -40,7 +40,6 @@ const DEFAULTS = {
       experience: "Professional journey building impactful solutions",
       skills: "Technical expertise across multiple domains",
       achievements: "Recognition and milestones that define excellence",
-      testimonials: "What colleagues and mentors say",
       contact: "Let's discuss your next project",
     },
     coursework: [],
@@ -49,7 +48,6 @@ const DEFAULTS = {
   experience: [],
   skills: [],
   achievements: [],
-  testimonials: [],
   education: [],
 }
 
@@ -61,7 +59,6 @@ const PortfolioContextProvider = (props) => {
   const [experience, setExperience] = useState(DEFAULTS.experience)
   const [skills, setSkills] = useState(DEFAULTS.skills)
   const [achievements, setAchievements] = useState(DEFAULTS.achievements)
-  const [testimonials, setTestimonials] = useState(DEFAULTS.testimonials)
   const [education, setEducation] = useState(DEFAULTS.education)
   // `loading` tracks the initial content hydration window.
   const [loading, setLoading] = useState(true)
@@ -80,7 +77,6 @@ const PortfolioContextProvider = (props) => {
           experienceRes,
           skillsRes,
           achievementsRes,
-          testimonialsRes,
           educationRes,
         ] = await Promise.all([
           axios.get(backendUrl + "/api/profile"),
@@ -88,7 +84,6 @@ const PortfolioContextProvider = (props) => {
           axios.get(backendUrl + "/api/experience/list"),
           axios.get(backendUrl + "/api/skill/list"),
           axios.get(backendUrl + "/api/achievement/list"),
-          axios.get(backendUrl + "/api/testimonial/list"),
           axios.get(backendUrl + "/api/education/list"),
         ])
 
@@ -114,7 +109,6 @@ const PortfolioContextProvider = (props) => {
         if (experienceRes.data?.success) setExperience(experienceRes.data.experience || [])
         if (skillsRes.data?.success) setSkills(skillsRes.data.skills || [])
         if (achievementsRes.data?.success) setAchievements(achievementsRes.data.achievements || [])
-        if (testimonialsRes.data?.success) setTestimonials(testimonialsRes.data.testimonials || [])
         if (educationRes.data?.success) setEducation(educationRes.data.education || [])
       } catch (err) {
         toast.error("Failed to load portfolio content")
@@ -147,7 +141,6 @@ const PortfolioContextProvider = (props) => {
     skills,
     skillsByCategory,
     achievements,
-    testimonials,
     education,
   }
 

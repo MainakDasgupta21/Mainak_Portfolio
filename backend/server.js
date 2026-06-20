@@ -10,7 +10,6 @@ import projectRouter from './routes/projectRoute.js'
 import experienceRouter from './routes/experienceRoute.js'
 import skillRouter from './routes/skillRoute.js'
 import achievementRouter from './routes/achievementRoute.js'
-import testimonialRouter from './routes/testimonialRoute.js'
 import educationRouter from './routes/educationRoute.js'
 import contactRouter from './routes/contactRoute.js'
 import mediaRouter from './routes/mediaRoute.js'
@@ -32,7 +31,6 @@ app.use('/api/project', projectRouter)
 app.use('/api/experience', experienceRouter)
 app.use('/api/skill', skillRouter)
 app.use('/api/achievement', achievementRouter)
-app.use('/api/testimonial', testimonialRouter)
 app.use('/api/education', educationRouter)
 app.use('/api/contact', contactRouter)
 app.use('/api/media', mediaRouter)

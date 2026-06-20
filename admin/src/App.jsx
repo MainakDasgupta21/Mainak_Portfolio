@@ -15,8 +15,6 @@ const AddSkill = lazy(() => import("./pages/AddSkill"))
 const ListSkills = lazy(() => import("./pages/ListSkills"))
 const AddAchievement = lazy(() => import("./pages/AddAchievement"))
 const ListAchievements = lazy(() => import("./pages/ListAchievements"))
-const AddTestimonial = lazy(() => import("./pages/AddTestimonial"))
-const ListTestimonials = lazy(() => import("./pages/ListTestimonials"))
 const AddEducation = lazy(() => import("./pages/AddEducation"))
 const ListEducation = lazy(() => import("./pages/ListEducation"))
 const Media = lazy(() => import("./pages/Media"))
@@ -45,7 +43,6 @@ const App = () => {
       "/experience": "Experience",
       "/skills": "Skills",
       "/achievements": "Achievements",
-      "/testimonials": "Testimonials",
       "/education": "Education",
       "/media": "Media",
       "/messages": "Messages",
@@ -96,10 +93,6 @@ const App = () => {
               <Route path="/achievements" element={<ListAchievements token={token} />} />
               <Route path="/achievements/add" element={<AddAchievement token={token} />} />
               <Route path="/achievements/:id/edit" element={<AddAchievement token={token} />} />
-
-              <Route path="/testimonials" element={<ListTestimonials token={token} />} />
-              <Route path="/testimonials/add" element={<AddTestimonial token={token} />} />
-              <Route path="/testimonials/:id/edit" element={<AddTestimonial token={token} />} />
 
               <Route path="/education" element={<ListEducation token={token} />} />
               <Route path="/education/add" element={<AddEducation token={token} />} />

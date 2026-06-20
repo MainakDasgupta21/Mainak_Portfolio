@@ -35,14 +35,13 @@ This document is the **deep reference** for the project. Every folder, every fil
 
 This project replaces a static, hand-edited portfolio with a small **content-managed portfolio platform**:
 
-- A visitor lands on the public portfolio (`/`), watches the hero video, scrolls through the About, Experience, Projects, Skills, Achievements, Testimonials, and Contact sections — all rendered from data fetched from the backend.
+- A visitor lands on the public portfolio (`/`), watches the hero video, scrolls through the About, Experience, Projects, Skills, Achievements, and Contact sections — all rendered from data fetched from the backend.
 - The owner (Mainak) signs into a separate **admin panel** with a single admin account, and can:
   - edit the singleton **Profile** (name, title, bio, contact info, hero copy, hero media URLs, social links, coursework, section subtitles),
   - CRUD **Projects** (with up to 4 images uploaded to Cloudinary),
   - CRUD **Experience** entries (with an optional logo),
   - CRUD **Skills** (grouped by category),
   - CRUD **Achievements** (icon = `trophy` / `award` / `medal`),
-  - CRUD **Testimonials** (with an optional avatar image),
   - CRUD **Education** entries (with `Completed` / `Pursuing` status),
   - upload arbitrary assets (images / videos / PDFs) to Cloudinary via a **Media** page and copy their URLs into the profile editor,
   - read and delete **Contact Messages** submitted via the public form.
@@ -106,8 +105,8 @@ The spec forbids these — none of them appear inside `portfolio-website/`:
         ┌──────────────────────────────────────────────────────┐
         │           Express REST API  (Node :4000)             │
         │  /api/user  /api/profile  /api/project  /api/skill   │
-        │  /api/experience  /api/achievement  /api/testimonial │
-        │  /api/education  /api/contact  /api/media            │
+        │  /api/experience  /api/achievement  /api/education   │
+        │  /api/contact  /api/media                            │
         └────────┬───────────────────┬──────────────┬──────────┘
                  │                   │              │
         ┌────────▼──────┐ ┌──────────▼──────┐ ┌─────▼────────┐
@@ -150,7 +149,6 @@ portfolio-website/
 │   │   ├── experienceModel.js    # CRUD
 │   │   ├── skillModel.js         # CRUD (one doc per skill, grouped by category)
 │   │   ├── achievementModel.js   # CRUD
-│   │   ├── testimonialModel.js   # CRUD
 │   │   ├── educationModel.js     # CRUD
 │   │   ├── contactModel.js       # public submit → admin read/delete
 │   │   └── mediaModel.js         # optional registry of uploaded Cloudinary assets
@@ -161,7 +159,6 @@ portfolio-website/
 │   │   ├── experienceController.js
 │   │   ├── skillController.js
 │   │   ├── achievementController.js
-│   │   ├── testimonialController.js
 │   │   ├── educationController.js
 │   │   ├── mediaController.js    # upload (multer.single) → Cloudinary → registry
 │   │   └── contactController.js  # public submit + admin list/delete/status
@@ -172,7 +169,6 @@ portfolio-website/
 │   │   ├── experienceRoute.js
 │   │   ├── skillRoute.js
 │   │   ├── achievementRoute.js
-│   │   ├── testimonialRoute.js
 │   │   ├── educationRoute.js
 │   │   ├── contactRoute.js
 │   │   └── mediaRoute.js
@@ -208,7 +204,6 @@ portfolio-website/
 │           ├── Projects.jsx      # grid + framer-motion modal (no Radix)
 │           ├── Skills.jsx        # category tabs + animated proficiency bars
 │           ├── Achievements.jsx  # 3-card grid with particle background
-│           ├── Testimonials.jsx  # auto-advancing carousel
 │           ├── Contact.jsx       # form → /api/contact/submit + social grid
 │           ├── Footer.jsx        # 3-column footer (brand / quick links / resume)
 │           ├── AnimatedBackground.jsx
@@ -246,7 +241,6 @@ portfolio-website/
             ├── AddExperience.jsx + ListExperience.jsx
             ├── AddSkill.jsx + ListSkills.jsx
             ├── AddAchievement.jsx + ListAchievements.jsx
-            ├── AddTestimonial.jsx + ListTestimonials.jsx
             ├── AddEducation.jsx + ListEducation.jsx
             ├── Media.jsx
             └── Messages.jsx
@@ -276,7 +270,6 @@ app.use('/api/project',     projectRouter)
 app.use('/api/experience',  experienceRouter)
 app.use('/api/skill',       skillRouter)
 app.use('/api/achievement', achievementRouter)
-app.use('/api/testimonial', testimonialRouter)
 app.use('/api/education',   educationRouter)
 app.use('/api/contact',     contactRouter)
 app.use('/api/media',       mediaRouter)
@@ -318,7 +311,7 @@ projectRouter.post('/remove', adminAuth,             removeProject);
 ### `backend/scripts/seed.js`
 Reads `backend/seed-data/resume.json` (same JSON shape as the original `src/data/resume.json`), then:
 - `findByIdAndUpdate("profile", { ... }, { upsert: true })` — singleton.
-- `deleteMany({}) → insertMany([...])` for every other collection (projects, experience, skills, achievements, testimonials, education).
+- `deleteMany({}) → insertMany([...])` for every other collection (projects, experience, skills, achievements, education).
 - Skills are flattened — a `{ "Programming Languages": [{ name, proficiency }] }` map becomes one row per skill with a `category` column.
 - `contacts` and `media` are NEVER wiped by the seed.
 
@@ -360,10 +353,10 @@ Maps every HSL CSS variable (`--background`, `--foreground`, `--accent`, `--mute
 ### `frontend/src/context/PortfolioContext.jsx`
 Mirrors Forever's `ShopContext` pattern:
 
-- One `useEffect` does `Promise.all` for `/api/profile`, `/api/project/list`, `/api/experience/list`, `/api/skill/list`, `/api/achievement/list`, `/api/testimonial/list`, `/api/education/list`.
+- One `useEffect` does `Promise.all` for `/api/profile`, `/api/project/list`, `/api/experience/list`, `/api/skill/list`, `/api/achievement/list`, `/api/education/list`.
 - The flat `skills` array (one doc per skill) is `useMemo`-grouped into `skillsByCategory` so the Skills component can iterate categories.
 - Every response is merged with a default object so a missing nested key never crashes a section.
-- Exports `{ backendUrl, loading, profile, projects, experience, skills, skillsByCategory, achievements, testimonials, education }`.
+- Exports `{ backendUrl, loading, profile, projects, experience, skills, skillsByCategory, achievements, education }`.
 
 ### `frontend/src/hooks/useSmoothScroll.js`
 1:1 port of the TypeScript original — Lenis with `lerp: 0.1`, `wheelMultiplier: 1`, `touchMultiplier: 1.2`, `smoothWheel: true`, `syncTouch: false`, `autoRaf: false`. The anchor-click interceptor honors `scroll-margin-top` so the fixed header never covers the destination heading.
@@ -406,10 +399,6 @@ Mirrors Forever's `ShopContext` pattern:
 - Icon map `{ trophy: Trophy, award: Award, medal: Medal }` from `lucide-react`.
 - Floating orbs and particle field in the background.
 
-### `frontend/src/components/Testimonials.jsx`
-- Auto-advancing carousel via chained `setTimeout` (pauses on hover).
-- 5-star rating row, optional avatar with letter fallback.
-
 ### `frontend/src/components/Contact.jsx`
 - Form posts to `${backendUrl}/api/contact/submit`.
 - On success → `react-toastify` toast and `form.reset()`.
@@ -435,7 +424,6 @@ Standard SPA rewrite — every path is served `index.html` so the React router c
   - `/experience` + `/experience/add`
   - `/skills` + `/skills/add`
   - `/achievements` + `/achievements/add`
-  - `/testimonials` + `/testimonials/add`
   - `/education` + `/education/add`
   - `/media`
   - `/messages`
@@ -448,7 +436,7 @@ Standard SPA rewrite — every path is served `index.html` so the React router c
 Logo + "Logout" button (`setToken('')` clears the token both in state and `localStorage`).
 
 ### `admin/src/components/Sidebar.jsx`
-Nine `NavLink`s, one per resource. The active link styling is driven by the `.active` class defined in `admin/src/index.css`.
+Eight `NavLink`s, one per resource. The active link styling is driven by the `.active` class defined in `admin/src/index.css`.
 
 ### `admin/src/pages/ProfileEditor.jsx`
 A single long form that loads `GET /api/profile`, lets you edit every field of the singleton (including all nested `heroUi`, `media`, `links`, `sectionSubtitles` keys and the multiline `coursework` list), then `POST /api/profile/update` to upsert the document.
@@ -529,14 +517,6 @@ Lists every `contactModel` document (newest first), shows parcel icon + name/ema
 | `POST` | `/api/achievement/update`     | admin | same + `id` |
 | `POST` | `/api/achievement/remove`     | admin | `{ id }` |
 
-### Testimonials
-| Method | Path                          | Auth  | Body |
-|--------|-------------------------------|-------|------|
-| `GET`  | `/api/testimonial/list`       | —     | — |
-| `POST` | `/api/testimonial/add`        | admin | `multipart/form-data`: `image`, `name`, `role`, `company`, `quote`, `rating`, `order` |
-| `POST` | `/api/testimonial/update`     | admin | same + `id` |
-| `POST` | `/api/testimonial/remove`     | admin | `{ id }` |
-
 ### Education
 | Method | Path                       | Auth  | Body |
 |--------|----------------------------|-------|------|
@@ -578,7 +558,7 @@ Lists every `contactModel` document (newest first), shows parcel icon + name/ema
   },
   media: { heroVideoSrc, heroPosterSrc, heroProfileSrc, aboutProfileSrc, resumePdf },
   links: { linkedin, github, leetcode, codeforces, geekforgeeks, twitter },
-  sectionSubtitles: { about, projects, experience, skills, achievements, testimonials, contact },
+  sectionSubtitles: { about, projects, experience, skills, achievements, contact },
   coursework: [String],
 }
 ```
@@ -602,11 +582,6 @@ Lists every `contactModel` document (newest first), shows parcel icon + name/ema
 ### `achievementModel`
 ```js
 { title, description, icon: "trophy" | "award" | "medal", order: Number }
-```
-
-### `testimonialModel`
-```js
-{ name, role, company, image, quote, rating: 1–5, order: Number }
 ```
 
 ### `educationModel`
@@ -633,7 +608,7 @@ Lists every `contactModel` document (newest first), shows parcel icon + name/ema
 2. Vite ships a JS bundle that mounts `<App />` inside `<PortfolioContextProvider>`.
 3. Provider's `useEffect` `Promise.all`s 7 endpoints (`/api/profile` + 6 `/list` endpoints).
 4. While the promises resolve, the eager `<Header />` + `<Hero />` render with default values; below-the-fold sections show a `<SectionSkeleton />` placeholder.
-5. As the visitor scrolls, `IntersectionObserver` mounts each section's lazy chunk; framer-motion plays its enter animation; the proficiency bars / education timeline / testimonial carousel animate as their refs enter the viewport.
+5. As the visitor scrolls, `IntersectionObserver` mounts each section's lazy chunk; framer-motion plays its enter animation; the proficiency bars and education timeline animate as their refs enter the viewport.
 6. When the visitor submits the Contact form → `axios.post('/api/contact/submit')` → server inserts a `contactModel` row → success toast.
 
 ### Admin edit flow

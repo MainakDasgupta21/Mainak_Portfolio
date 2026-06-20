@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#skills" },
   { label: "Achievements", href: "#achievements" },
-  { label: "Testimonials", href: "#testimonials" },
 ]
 const PRIMARY_CTA = { label: "Let's Talk", href: "#contact" }
 const OBSERVED_SECTION_HASHES = [...new Set([...NAV_ITEMS.map((item) => item.href), PRIMARY_CTA.href])]

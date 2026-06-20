@@ -52,7 +52,6 @@ const empty = {
     experience: "",
     skills: "",
     achievements: "",
-    testimonials: "",
     contact: "",
   },
   coursework: [],
@@ -238,7 +237,6 @@ const ProfileEditor = ({ token }) => {
             <TextField {...bind("sectionSubtitles.experience", "text", "", "Experience")} />
             <TextField {...bind("sectionSubtitles.skills", "text", "", "Skills")} />
             <TextField {...bind("sectionSubtitles.achievements", "text", "", "Achievements")} />
-            <TextField {...bind("sectionSubtitles.testimonials", "text", "", "Testimonials")} />
             <TextField {...bind("sectionSubtitles.contact", "text", "", "Contact")} />
           </div>
         </Section>

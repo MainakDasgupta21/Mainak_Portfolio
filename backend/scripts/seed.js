@@ -22,7 +22,6 @@ import projectModel from '../models/projectModel.js'
 import experienceModel from '../models/experienceModel.js'
 import skillModel from '../models/skillModel.js'
 import achievementModel from '../models/achievementModel.js'
-import testimonialModel from '../models/testimonialModel.js'
 import educationModel from '../models/educationModel.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -132,20 +131,6 @@ async function main() {
     }))
     if (achievementDocs.length) await achievementModel.insertMany(achievementDocs)
     console.log(`  achievements (${achievementDocs.length})  ✓`)
-
-    // ---- Testimonials ----
-    await testimonialModel.deleteMany({})
-    const testimonialDocs = (data.testimonials || []).map((t, i) => ({
-        name: t.name,
-        role: t.role || '',
-        company: t.company || '',
-        image: t.image || '',
-        quote: t.quote,
-        rating: typeof t.rating === 'number' ? t.rating : 5,
-        order: typeof t.order === 'number' ? t.order : i,
-    }))
-    if (testimonialDocs.length) await testimonialModel.insertMany(testimonialDocs)
-    console.log(`  testimonials (${testimonialDocs.length})  ✓`)
 
     // ---- Education ----
     await educationModel.deleteMany({})

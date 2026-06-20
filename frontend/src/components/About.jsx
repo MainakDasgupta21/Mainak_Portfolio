@@ -1,10 +1,13 @@
-import { m, useInView } from "framer-motion"
-import { useContext, useEffect, useRef, useState } from "react"
-import { Check, Clock } from "lucide-react"
+import { m, useInView, useReducedMotion } from "framer-motion"
+import { useContext, useRef } from "react"
+import { Check, Clock, GraduationCap, School } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { getProfileDisplayName } from "../utils/profileDisplay"
 import assets from "../assets/assets"
 import ResponsiveImage from "./ResponsiveImage"
+
+const GRADE_RING_RADIUS = 38
+const GRADE_RING_CIRCUMFERENCE = 2 * Math.PI * GRADE_RING_RADIUS
 
 function getAboutParagraphs(profile) {
   if (!profile.bio) return []
@@ -14,9 +17,91 @@ function getAboutParagraphs(profile) {
     .filter(Boolean)
 }
 
+function parseGrade(grade) {
+  if (!grade) return null
+
+  const rawGrade = String(grade).trim()
+  if (!rawGrade) return null
+
+  const numeric = parseFloat(rawGrade.replace(/[^0-9.]/g, ""))
+  if (!Number.isFinite(numeric)) return null
+
+  const isCgpa = /cgpa|cpi|gpa/i.test(rawGrade)
+  const pct = isCgpa ? (numeric / 10) * 100 : numeric
+  const boundedPct = Math.max(0, Math.min(100, pct))
+  const rounded = Number.isInteger(numeric)
+    ? String(numeric)
+    : numeric
+      .toFixed(isCgpa ? 2 : 1)
+      .replace(/\.0+$/, "")
+      .replace(/(\.\d*[1-9])0+$/, "$1")
+
+  return {
+    pct: boundedPct,
+    label: isCgpa ? rounded : `${rounded}%`,
+    unit: isCgpa ? "CGPA" : "Score",
+  }
+}
+
+function getEducationIcon(degree) {
+  const normalized = String(degree || "").toLowerCase()
+  if (/(bachelor|b\.?tech|b\.?e|engineering|technology|university)/.test(normalized)) {
+    return GraduationCap
+  }
+  return School
+}
+
+function GradeRing({ gradeData, shouldReduceMotion }) {
+  const progress = Math.max(0, Math.min(100, gradeData.pct))
+  const dashOffset = GRADE_RING_CIRCUMFERENCE - (progress / 100) * GRADE_RING_CIRCUMFERENCE
+
+  return (
+    <div className="relative mx-auto h-24 w-24 shrink-0 md:mx-0">
+      <svg
+        viewBox="0 0 96 96"
+        className="-rotate-90 h-full w-full"
+        role="img"
+        aria-label={`Grade ${gradeData.label}`}
+      >
+        <circle
+          cx="48"
+          cy="48"
+          r={GRADE_RING_RADIUS}
+          fill="transparent"
+          stroke="currentColor"
+          strokeWidth="6"
+          className="text-border/80"
+        />
+        <m.circle
+          cx="48"
+          cy="48"
+          r={GRADE_RING_RADIUS}
+          fill="transparent"
+          stroke="currentColor"
+          strokeWidth="6"
+          strokeLinecap="round"
+          strokeDasharray={GRADE_RING_CIRCUMFERENCE}
+          className="text-accent"
+          initial={{ strokeDashoffset: shouldReduceMotion ? dashOffset : GRADE_RING_CIRCUMFERENCE }}
+          whileInView={{ strokeDashoffset: dashOffset }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <span className="text-sm font-bold leading-none text-foreground">{gradeData.label}</span>
+        <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          {gradeData.unit}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 const About = () => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const shouldReduceMotion = useReducedMotion()
   const { profile, education } = useContext(PortfolioContext)
 
   const aboutParagraphs = getAboutParagraphs(profile)
@@ -28,62 +113,7 @@ const About = () => {
   const aboutProfileWebpSrc =
     profile.media?.aboutProfileWebpSrc ||
     (aboutProfileSrc === assets.aboutProfile ? assets.aboutProfileWebp : undefined)
-
-  const itemRefs = useRef([])
-  const [visibleMap, setVisibleMap] = useState(() => new Array(education.length).fill(false))
-
-  const setItemRef = (el, i) => { itemRefs.current[i] = el }
-
-  useEffect(() => {
-    setVisibleMap(new Array(education.length).fill(false))
-  }, [education.length])
-
-  useEffect(() => {
-    if (!education.length) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        setVisibleMap((prev) => {
-          const next = prev.slice()
-          let changed = false
-          entries.forEach((entry) => {
-            const idx = itemRefs.current.findIndex((el) => el === entry.target)
-            if (idx >= 0) {
-              const isVisible = entry.intersectionRatio >= 0.25
-              if (next[idx] !== isVisible) {
-                next[idx] = isVisible
-                changed = true
-              }
-            }
-          })
-          return changed ? next : prev
-        })
-      },
-      {
-        root: null,
-        rootMargin: "0px 0px -30% 0px",
-        threshold: [0.25],
-      }
-    )
-    itemRefs.current.forEach((el) => { if (el) observer.observe(el) })
-    return () => observer.disconnect()
-  }, [education.length])
-
-  const maxVisibleIndex = visibleMap.reduce((acc, v, i) => (v ? i : acc), -1)
-  const progress = education.length
-    ? maxVisibleIndex >= 0
-      ? (maxVisibleIndex + 1) / education.length
-      : 0
-    : 0
-
-  const itemMotion = {
-    hidden: { opacity: 0, x: 20, y: 10 },
-    visible: (i) => ({
-      opacity: 1,
-      x: 0,
-      y: 0,
-      transition: { duration: 0.5, delay: i * 0.06, ease: [0.2, 0.8, 0.2, 1] },
-    }),
-  }
+  const hasEducation = education.length > 0
 
   return (
     <section id="about" className="py-20 md:py-32 bg-muted/30" ref={ref}>
@@ -150,114 +180,143 @@ const About = () => {
           </m.div>
 
           {/* Education Timeline */}
-          <div className="relative mt-8">
-            <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-              <div className="hidden md:flex w-16 justify-center flex-shrink-0">
-                <div className="relative flex justify-center h-full">
-                  <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[4px] bg-gradient-to-b from-white/10 via-white/20 to-white/10 rounded-full" />
+          <div className="relative mt-10 md:mt-12">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 md:mb-8">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                Education
+              </h3>
+              {hasEducation && (
+                <span className="inline-flex rounded-full border border-border/45 bg-background/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  {education.length} Milestones
+                </span>
+              )}
+            </div>
 
-                  <m.div
-                    initial={{ scaleY: 0 }}
-                    animate={{ scaleY: Math.max(progress, 0.02) }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 80,
-                      damping: 15,
-                      duration: 1.2,
-                    }}
-                    className="absolute left-1/2 -translate-x-1/2 top-0 h-full w-[8px] rounded-full overflow-hidden origin-top"
-                  >
-                    <div className="w-full h-full relative bg-gradient-to-b from-white/10 via-white/60 to-white/10">
-                      <m.div
-                        initial={{ top: "0%" }}
-                        animate={{ top: `${Math.max(progress, 0.02) * 100}%` }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 120,
-                          damping: 20,
-                        }}
-                        className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 md:w-10 md:h-10 rounded-full pointer-events-none"
-                      >
-                        <div className="absolute inset-0 rounded-full bg-white/70 blur-md" />
-                        <div className="absolute inset-2 md:inset-2.5 rounded-full bg-white" />
-                      </m.div>
-                    </div>
-                  </m.div>
-                </div>
+            {!hasEducation ? (
+              <div className="surface-card rounded-2xl p-6 md:p-8 text-center text-muted-foreground">
+                Education entries will appear here once they are published.
               </div>
+            ) : (
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-4 md:left-8">
+                  <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full bg-border/45" />
+                  <m.div
+                    className="absolute left-1/2 top-0 h-full origin-top -translate-x-1/2 w-[2px] rounded-full bg-gradient-to-b from-accent via-accent/55 to-accent/10"
+                    initial={shouldReduceMotion ? { scaleY: 1 } : { scaleY: 0 }}
+                    whileInView={{ scaleY: 1 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                </div>
 
-              <div className="flex-1 min-w-0">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-5 md:mb-8 text-foreground bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                  Education
-                </h3>
+                <div className="space-y-6 md:space-y-8">
+                  {education.map((ed, index) => {
+                    const degreeLabel = (ed.degree || "Education milestone").trim()
+                    const fieldLabel = (ed.field || "").trim()
+                    const institutionLabel = (ed.institution || "Institution unavailable").trim()
+                    const yearLabel = (ed.year || "").trim()
+                    const gradeLabel = (ed.grade || "").trim()
+                    const gradeData = parseGrade(gradeLabel)
+                    const isCompleted = String(ed.status || "").toLowerCase() === "completed"
+                    const statusLabel = isCompleted ? "Completed" : "Pursuing"
+                    const Icon = getEducationIcon(degreeLabel)
 
-                <div className="space-y-6 md:space-y-8 relative">
-                  {education.map((ed, i) => (
-                    <m.div
-                      key={`${ed.institution}-${i}`}
-                      ref={(el) => setItemRef(el, i)}
-                      custom={i}
-                      initial="hidden"
-                      animate={visibleMap[i] ? "visible" : "hidden"}
-                      variants={itemMotion}
-                      className="group relative"
-                    >
-                      <div className="hidden md:block absolute -left-[52px] top-8 z-10">
-                        <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-white border-2 md:border-4 border-accent shadow-[0_0_20px_8px_rgba(255,255,255,0.6)] flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 rounded-full bg-accent motion-safe:animate-pulse" />
-                        </div>
-                      </div>
+                    return (
+                      <m.article
+                        key={ed._id || `${institutionLabel}-${index}`}
+                        initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={
+                          shouldReduceMotion
+                            ? { duration: 0 }
+                            : { duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }
+                        }
+                        viewport={{ once: true, amount: 0.3 }}
+                        className="group relative pl-12 md:pl-24"
+                      >
+                        <span className="absolute left-4 top-8 z-20 -translate-x-1/2 md:left-8" aria-hidden>
+                          <span className="absolute inset-0 rounded-full bg-accent/35 blur-md" />
+                          <span className="relative block h-4 w-4 rounded-full border border-background bg-accent">
+                            <span className="absolute inset-1.5 rounded-full bg-background motion-safe:animate-pulse" />
+                          </span>
+                        </span>
 
-                      <div className="relative">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-accent/20 to-primary/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        {yearLabel && (
+                          <span className="absolute left-7 top-4 z-20 inline-flex rounded-full border border-accent/30 bg-background/75 px-2 py-0.5 text-[10px] font-semibold tracking-[0.08em] text-accent md:left-12">
+                            {yearLabel}
+                          </span>
+                        )}
 
-                        <div className="relative bg-card/60 backdrop-blur-sm p-4 sm:p-6 md:p-8 rounded-xl border border-border/20 shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:bg-card/80 group-hover:border-border/40 group-hover:scale-[1.02]">
-                          <div className="md:absolute md:top-6 md:right-6 mb-3 md:mb-0">
-                            {ed.status === "Completed" ? (
-                              <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-500 px-2.5 py-1 rounded-full border border-green-500/30">
-                                <Check className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                <span className="text-[11px] md:text-sm font-semibold">
-                                  Completed
+                        <m.div
+                          whileHover={shouldReduceMotion ? undefined : { y: -4, scale: 1.005 }}
+                          transition={{ duration: 0.24, ease: "easeOut" }}
+                          className="relative overflow-hidden rounded-2xl border border-border/35 bg-card/75 p-4 sm:p-6 md:p-7 shadow-elegant backdrop-blur-sm transition-colors duration-300 group-hover:border-accent/35 group-hover:bg-card/85"
+                        >
+                          <span className="pointer-events-none absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-accent/20 via-foreground/5 to-primary/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                          <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-all duration-700 group-hover:translate-x-full group-hover:opacity-100" />
+
+                          <div className="relative flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className="mb-4 flex flex-wrap items-center gap-2.5">
+                                <span
+                                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                                    isCompleted
+                                      ? "border-green-500/35 bg-green-500/12 text-green-400"
+                                      : "border-blue-500/35 bg-blue-500/12 text-blue-400"
+                                  }`}
+                                >
+                                  {isCompleted ? (
+                                    <Check className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <Clock className="h-3.5 w-3.5 motion-safe:animate-pulse" />
+                                  )}
+                                  {statusLabel}
                                 </span>
                               </div>
-                            ) : (
-                              <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/30 motion-safe:animate-pulse">
-                                <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                <span className="text-[11px] md:text-sm font-semibold">
-                                  Pursuing
+
+                              <div className="flex items-start gap-3 sm:gap-4">
+                                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-accent/25 bg-accent/10 text-accent shadow-[0_0_24px_hsl(var(--ring)_/_0.16)]">
+                                  <Icon className="h-5 w-5" />
                                 </span>
+
+                                <div className="min-w-0">
+                                  <h4 className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-wide break-words">
+                                    {degreeLabel}
+                                  </h4>
+                                  {fieldLabel && (
+                                    <p className="mt-1 text-sm md:text-base font-medium text-muted-foreground break-words">
+                                      in {fieldLabel}
+                                    </p>
+                                  )}
+                                  <p className="mt-2 inline-flex max-w-full rounded-full border border-accent/20 bg-accent/10 px-3 py-1 text-sm md:text-base font-semibold text-accent break-words">
+                                    {institutionLabel}
+                                  </p>
+                                </div>
                               </div>
+
+                              {!gradeData && gradeLabel && (
+                                <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-border/40 bg-muted/35 px-3 py-1.5">
+                                  <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                                    Grade
+                                  </span>
+                                  <span className="text-sm font-bold text-foreground">{gradeLabel}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {gradeData && (
+                              <GradeRing gradeData={gradeData} shouldReduceMotion={shouldReduceMotion} />
                             )}
                           </div>
 
-                          <h4 className="text-base sm:text-lg md:text-xl font-bold text-foreground mb-3 tracking-wide md:pr-32 break-words">
-                            {ed.degree} {ed.field ? `in ${ed.field}` : ""}
-                          </h4>
-
-                          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-4">
-                            <span className="text-sm md:text-lg font-semibold text-accent bg-accent/10 px-2.5 py-1 md:px-3 rounded-full break-words">
-                              {ed.institution}
-                            </span>
-                            <span className="text-xs md:text-sm text-muted-foreground font-medium bg-muted/50 px-2.5 py-1 md:px-3 rounded-full">
-                              {ed.year}
-                            </span>
-                          </div>
-
-                          {ed.grade && (
-                            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-muted/60 to-muted/40 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-border/30">
-                              <span className="text-xs md:text-sm font-semibold text-foreground">Grade:</span>
-                              <span className="text-xs md:text-sm font-bold text-accent">{ed.grade}</span>
-                            </div>
-                          )}
-
-                          <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-accent to-primary rounded-full transition-all duration-500 group-hover:w-full" />
-                        </div>
-                      </div>
-                    </m.div>
-                  ))}
+                          <div className="mt-5 h-1 w-0 rounded-full bg-gradient-to-r from-accent to-primary transition-all duration-500 group-hover:w-full" />
+                        </m.div>
+                      </m.article>
+                    )
+                  })}
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
