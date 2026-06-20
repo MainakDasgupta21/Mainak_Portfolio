@@ -1,6 +1,6 @@
 import { m, useReducedMotion } from "framer-motion"
 import { ArrowDown, ArrowRight } from "lucide-react"
-import { useContext, useMemo } from "react"
+import { useContext, useEffect, useMemo, useRef } from "react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { getProfileDisplayName } from "../utils/profileDisplay"
 import assets from "../assets/assets"
@@ -11,6 +11,8 @@ const EASE_OUT_QUINT = [0.22, 1, 0.36, 1]
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion()
   const { loading, profile } = useContext(PortfolioContext)
+  const sectionRef = useRef(null)
+  const videoRef = useRef(null)
   const heroUi = profile.heroUi || {}
   const media = profile.media || {}
   const displayName = getProfileDisplayName(profile, loading ? "" : "Mainak Dasgupta")
@@ -66,12 +68,60 @@ const Hero = () => {
     [shouldReduceMotion]
   )
 
+  useEffect(() => {
+    const section = sectionRef.current
+    const video = videoRef.current
+    if (!(section instanceof HTMLElement) || !(video instanceof HTMLVideoElement)) return
+
+    let sectionIsVisible = true
+    let pageIsVisible = document.visibilityState === "visible"
+
+    const syncVideoPlayback = () => {
+      if (sectionIsVisible && pageIsVisible) {
+        if (video.paused) {
+          const playPromise = video.play()
+          if (playPromise && typeof playPromise.catch === "function") {
+            playPromise.catch(() => {})
+          }
+        }
+        return
+      }
+
+      if (!video.paused) {
+        video.pause()
+      }
+    }
+
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        sectionIsVisible = Boolean(entry?.isIntersecting)
+        syncVideoPlayback()
+      },
+      { threshold: 0.15 }
+    )
+    visibilityObserver.observe(section)
+
+    const onVisibilityChange = () => {
+      pageIsVisible = document.visibilityState === "visible"
+      syncVideoPlayback()
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange)
+    syncVideoPlayback()
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange)
+      visibilityObserver.disconnect()
+    }
+  }, [])
+
   return (
     <section
       id="home"
+      ref={sectionRef}
       className="min-h-[100svh] flex flex-col items-center justify-center relative overflow-hidden pt-16 md:pt-24"
     >
       <video
+        ref={videoRef}
         className="absolute inset-0 z-0 w-full h-full object-cover"
         autoPlay
         muted

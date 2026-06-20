@@ -3,6 +3,8 @@ import { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } f
 import { Star, ChevronLeft, ChevronRight } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 
+const AUTO_ADVANCE_DELAY_MS = 5000
+
 const Testimonials = memo(function Testimonials() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -31,11 +33,11 @@ const Testimonials = memo(function Testimonials() {
     const tick = () => {
       setDirection(1)
       setCurrentIndex((prev) => (prev + 1) % testimonials.length)
-      ref.id = setTimeout(tick, 5000)
+      ref.id = setTimeout(tick, AUTO_ADVANCE_DELAY_MS)
     }
-    ref.id = setTimeout(tick, 5000)
+    ref.id = setTimeout(tick, AUTO_ADVANCE_DELAY_MS)
     return () => clearTimeout(ref.id)
-  }, [isHovered, testimonials.length])
+  }, [currentIndex, isHovered, testimonials.length])
 
   const slideVariants = useMemo(
     () => ({

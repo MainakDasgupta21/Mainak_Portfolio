@@ -83,6 +83,7 @@ const Header = memo(function Header() {
     let rafId = 0
     let observedSections = []
     const ratios = new Map()
+    const totalObservedTargets = OBSERVED_SECTION_HASHES.length
 
     const recompute = () => {
       let bestId = "#home"
@@ -121,6 +122,15 @@ const Header = memo(function Header() {
       )
 
       if (!sections.length) return false
+      const hasAllTargets = sections.length === totalObservedTargets
+
+      const sectionsUnchanged =
+        sections.length === observedSections.length &&
+        sections.every((section, index) => section === observedSections[index])
+      if (sectionsUnchanged) {
+        scheduleRecompute()
+        return hasAllTargets
+      }
 
       io?.disconnect()
       ratios.clear()
@@ -141,17 +151,17 @@ const Header = memo(function Header() {
       )
       sections.forEach((section) => io.observe(section))
       scheduleRecompute()
-      return true
-    }
-
-    if (observeSections()) {
-      return () => io?.disconnect()
+      return hasAllTargets
     }
 
     const mutationObserver = new MutationObserver(() => {
       if (observeSections()) mutationObserver.disconnect()
     })
-    mutationObserver.observe(document.body, { childList: true, subtree: true })
+
+    const hasAllTargetsInitially = observeSections()
+    if (!hasAllTargetsInitially) {
+      mutationObserver.observe(document.body, { childList: true, subtree: true })
+    }
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId)
