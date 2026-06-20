@@ -1,5 +1,6 @@
 import { m, AnimatePresence, useInView } from "framer-motion"
 import { memo, useContext, useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { ExternalLink, Github, X } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { lockLenisScroll, unlockLenisScroll } from "../hooks/useSmoothScroll"
@@ -130,26 +131,25 @@ const Projects = memo(function Projects() {
           </div>
         )}
 
-        <AnimatePresence>
-          {selected && (
-            <>
+        {createPortal(
+          <AnimatePresence>
+            {selected && (
               <m.div
-                key="backdrop"
+                key="overlay"
+                className="modal-overlay"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="modal-backdrop"
                 onClick={() => setSelected(null)}
-              />
-              <div className="modal-positioner">
+                data-lenis-prevent
+              >
                 <m.div
-                  key="card"
                   initial={{ opacity: 0, y: 30, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 20, scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 220, damping: 26 }}
                   className="modal-card"
-                  data-lenis-prevent
+                  onClick={(e) => e.stopPropagation()}
                   role="dialog"
                   aria-modal="true"
                 >
@@ -161,7 +161,7 @@ const Projects = memo(function Projects() {
                   >
                     <X className="w-4 h-4" />
                   </button>
-                  <h3 className="text-2xl md:text-3xl mb-3 md:mb-4 break-words font-semibold">
+                  <h3 className="text-2xl md:text-3xl mb-3 md:mb-4 pr-12 break-words font-semibold">
                     {selected.name}
                   </h3>
                   <div className="space-y-5 md:space-y-6">
@@ -218,10 +218,11 @@ const Projects = memo(function Projects() {
                     </div>
                   </div>
                 </m.div>
-              </div>
-            </>
-          )}
-        </AnimatePresence>
+              </m.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
       </div>
     </section>
   )
