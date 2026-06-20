@@ -217,9 +217,6 @@ const About = () => {
                 <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                   Education
                 </h3>
-                <p className="mt-2 max-w-2xl text-sm md:text-base text-muted-foreground">
-                  A focused academic journey with measurable growth, strong performance, and consistent progression.
-                </p>
               </div>
               {hasEducation && (
                 <span className="inline-flex rounded-full border border-border/45 bg-background/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
