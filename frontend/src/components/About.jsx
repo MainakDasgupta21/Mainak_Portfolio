@@ -1,6 +1,6 @@
 import { m, useInView, useReducedMotion } from "framer-motion"
 import { useContext, useRef } from "react"
-import { Check, Clock, GraduationCap, School, Sparkles } from "lucide-react"
+import { Check, Clock, GraduationCap, School } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { getProfileDisplayName } from "../utils/profileDisplay"
 import assets from "../assets/assets"
@@ -104,19 +104,6 @@ function GradeRing({ gradeData, shouldReduceMotion }) {
   )
 }
 
-function EducationInsightCard({ icon: Icon, label, value, note }) {
-  return (
-    <div className="surface-card rounded-xl border border-border/45 bg-background/55 p-3.5 md:p-4">
-      <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-accent/25 bg-accent/10 text-accent">
-        <Icon className="h-4 w-4" />
-      </div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-bold text-foreground">{value}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{note}</p>
-    </div>
-  )
-}
-
 const About = () => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -158,16 +145,6 @@ const About = () => {
       Icon,
     }
   })
-  const completedCount = educationItems.filter((item) => item.isCompleted).length
-  const pursuingCount = Math.max(educationItems.length - completedCount, 0)
-  const gradedItems = educationItems.filter((item) => item.gradeData)
-  const bestGradeItem = gradedItems.reduce(
-    (best, item) => (!best || item.gradeData.pct > best.gradeData.pct ? item : best),
-    null
-  )
-  const averageGradePct = gradedItems.length
-    ? gradedItems.reduce((sum, item) => sum + item.gradeData.pct, 0) / gradedItems.length
-    : null
 
   return (
     <section id="about" className="py-20 md:py-32 bg-muted/30" ref={ref}>
@@ -257,37 +234,6 @@ const About = () => {
               </div>
             ) : (
               <div className="relative">
-                <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 md:mb-8">
-                  <EducationInsightCard
-                    icon={Sparkles}
-                    label="Milestones"
-                    value={educationItems.length}
-                    note="Academic checkpoints"
-                  />
-                  <EducationInsightCard
-                    icon={Check}
-                    label="Completed"
-                    value={completedCount}
-                    note={pursuingCount > 0 ? `${pursuingCount} currently pursuing` : "All milestones completed"}
-                  />
-                  <EducationInsightCard
-                    icon={GraduationCap}
-                    label="Best Grade"
-                    value={bestGradeItem?.gradeData?.label || "--"}
-                    note={
-                      bestGradeItem?.gradeData
-                        ? `${Math.round(bestGradeItem.gradeData.pct)}% score equivalent`
-                        : "Grade data unavailable"
-                    }
-                  />
-                  <EducationInsightCard
-                    icon={Clock}
-                    label="Average"
-                    value={averageGradePct !== null ? `${averageGradePct.toFixed(1)}%` : "--"}
-                    note={averageGradePct !== null ? "Across scored milestones" : "Awaiting score entries"}
-                  />
-                </div>
-
                 <div className="pointer-events-none absolute inset-y-0 left-4 md:left-8">
                   <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full bg-border/45" />
                   <m.div
@@ -301,7 +247,6 @@ const About = () => {
 
                 <div className="space-y-6 md:space-y-8">
                   {educationItems.map((item) => {
-                    const isBestScore = bestGradeItem?.key === item.key
                     return (
                       <m.article
                         key={item.key}
@@ -334,15 +279,10 @@ const About = () => {
                         )}
 
                         <m.div
-                          whileHover={shouldReduceMotion ? undefined : { y: -4, scale: 1.005 }}
                           transition={{ duration: 0.24, ease: "easeOut" }}
-                          className="relative overflow-hidden rounded-2xl border border-border/35 bg-card/75 p-4 sm:p-6 md:p-7 shadow-elegant backdrop-blur-sm transition-colors duration-300 group-hover:border-accent/35 group-hover:bg-card/85 group-hover:shadow-[0_0_36px_hsl(var(--ring)_/_0.13)]"
+                          className="relative overflow-hidden rounded-2xl border border-border/35 bg-card/75 p-4 sm:p-6 md:p-7 shadow-elegant backdrop-blur-sm transition-colors duration-300 group-hover:border-accent/35 group-hover:bg-card/85"
                         >
                           <span className="pointer-events-none absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-accent/20 via-foreground/5 to-primary/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                          <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-all duration-700 group-hover:translate-x-full group-hover:opacity-100" />
-                          <span className="absolute right-4 top-4 hidden rounded-full border border-border/45 bg-background/55 px-2 py-0.5 text-[10px] font-semibold tracking-[0.1em] text-muted-foreground sm:inline-flex">
-                            {`#${String(item.index + 1).padStart(2, "0")}`}
-                          </span>
 
                           <div className="relative flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
                             <div className="min-w-0 flex-1">
@@ -361,12 +301,6 @@ const About = () => {
                                   )}
                                   {item.statusLabel}
                                 </span>
-                                {isBestScore && (
-                                  <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/35 bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent">
-                                    <Sparkles className="h-3.5 w-3.5" />
-                                    Top Score
-                                  </span>
-                                )}
                               </div>
 
                               <div className="flex items-start gap-3 sm:gap-4">
