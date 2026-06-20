@@ -154,7 +154,7 @@ const Projects = memo(function Projects() {
                   role="dialog"
                   aria-modal="true"
                 >
-                  <div className="sticky top-0 z-10 -mx-5 mb-5 border-b border-border/50 bg-popover/90 px-5 py-4 backdrop-blur">
+                  <div className="sticky top-0 z-10 mb-4 rounded-t-[inherit] border-b border-border/50 bg-popover/90 px-5 py-4 backdrop-blur md:px-6">
                     <button
                       type="button"
                       onClick={() => setSelected(null)}
@@ -180,7 +180,7 @@ const Projects = memo(function Projects() {
                     </div>
                   </div>
 
-                  <div className="space-y-4 md:space-y-5">
+                  <div className="space-y-4 px-5 pb-5 md:space-y-5 md:px-6 md:pb-6">
                     <section className="rounded-xl border border-border/50 bg-background/35 p-4 md:p-5">
                       <h4 className="text-lg md:text-xl font-semibold mb-2">Overview</h4>
                       <div className="text-muted-foreground text-sm md:text-base leading-relaxed">

@@ -753,7 +753,7 @@
     color: hsl(var(--popover-foreground));
     border: 1px solid hsl(0 0% 100% / 0.26);
     border-radius: 20px;
-    padding: 1.25rem;
+    padding: 0;
     box-shadow: 0 28px 90px -32px hsl(0 0% 0% / 0.75), var(--shadow-lg);
     isolation: isolate;
     contain: paint;
