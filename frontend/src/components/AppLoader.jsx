@@ -7,7 +7,7 @@ const AppLoader = memo(function AppLoader() {
         role="status"
         aria-live="polite"
         aria-label="Loading portfolio content"
-        className="w-full max-w-md rounded-2xl border border-border/30 bg-card/55 p-6 shadow-elegant backdrop-blur-sm"
+        className="surface-card w-full max-w-md rounded-2xl bg-card/55 p-6 shadow-elegant backdrop-blur-sm"
       >
         <div className="flex items-center gap-4">
           <div className="relative h-12 w-12 shrink-0">

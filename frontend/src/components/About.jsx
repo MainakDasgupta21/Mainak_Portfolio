@@ -208,7 +208,7 @@ const About = () => {
                         <m.div
                           whileHover={shouldReduceMotion ? undefined : { y: -4, scale: 1.005 }}
                           transition={{ duration: 0.25, ease: "easeOut" }}
-                          className="surface-card relative overflow-hidden rounded-xl border !border-transparent bg-card/80 p-4 sm:p-5 md:p-6 shadow-elegant backdrop-blur-sm transition-colors duration-200 hover:!border-white/50 hover:shadow-glow"
+                          className="surface-card relative overflow-hidden rounded-xl bg-card/80 p-4 sm:p-5 md:p-6 shadow-elegant backdrop-blur-sm transition-colors duration-200"
                         >
                           <div className="relative flex flex-col gap-4">
                             <div className="min-w-0 flex-1">
