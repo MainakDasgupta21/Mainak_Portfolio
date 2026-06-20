@@ -735,24 +735,48 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem 1rem;
-    background: rgba(0, 0, 0, 0.6);
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    padding: clamp(0.9rem, 2.2vw, 1.75rem);
+    background:
+      radial-gradient(circle at top, hsl(var(--ring) / 0.1) 0%, transparent 42%),
+      rgba(0, 0, 0, 0.68);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     overflow-y: auto;
     overscroll-behavior: contain;
   }
   .modal-card {
     position: relative;
-    width: min(95vw, 48rem);
-    max-height: 85vh;
+    width: min(96vw, 52rem);
+    max-height: min(88vh, 52rem);
     overflow-y: auto;
-    background: hsl(var(--popover));
+    background: linear-gradient(165deg, hsl(var(--popover) / 0.96), hsl(var(--card) / 0.93));
     color: hsl(var(--popover-foreground));
-    border: 1px solid hsl(0 0% 100% / 0.4);
-    border-radius: 14px;
-    padding: 1.25rem 1.25rem 1.5rem;
-    box-shadow: var(--shadow-lg);
+    border: 1px solid hsl(0 0% 100% / 0.26);
+    border-radius: 20px;
+    padding: 1.25rem;
+    box-shadow: 0 28px 90px -32px hsl(0 0% 0% / 0.75), var(--shadow-lg);
+    isolation: isolate;
     contain: paint;
+  }
+
+  .modal-card::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .modal-card::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .modal-card::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.35);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .modal-card::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.55);
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
 }

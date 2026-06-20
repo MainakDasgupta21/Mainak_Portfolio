@@ -17,6 +17,7 @@ const Projects = memo(function Projects() {
   const hasProjects = projects.length > 0
   const selectedGithubUrl = normalizeExternalLink(selected?.github)
   const selectedDemoUrl = normalizeExternalLink(selected?.demo)
+  const modalRoot = typeof document !== "undefined" ? document.body : null
 
   // Esc closes the modal.
   useEffect(() => {
@@ -131,7 +132,7 @@ const Projects = memo(function Projects() {
           </div>
         )}
 
-        {createPortal(
+        {modalRoot && createPortal(
           <AnimatePresence>
             {selected && (
               <m.div
@@ -153,75 +154,103 @@ const Projects = memo(function Projects() {
                   role="dialog"
                   aria-modal="true"
                 >
-                  <button
-                    type="button"
-                    onClick={() => setSelected(null)}
-                    aria-label="Close"
-                    className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                  <h3 className="text-2xl md:text-3xl mb-3 md:mb-4 pr-12 break-words font-semibold">
-                    {selected.name}
-                  </h3>
-                  <div className="space-y-5 md:space-y-6">
-                    <p className="text-muted-foreground text-base md:text-lg">
-                      <InlineMarkdown text={selected.description} />
-                    </p>
+                  <div className="sticky top-0 z-10 -mx-5 mb-5 border-b border-border/50 bg-popover/90 px-5 py-4 backdrop-blur">
+                    <button
+                      type="button"
+                      onClick={() => setSelected(null)}
+                      aria-label="Close"
+                      className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border/40 bg-background/60 hover:bg-muted transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <div className="pr-12">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <h3 className="text-2xl md:text-3xl break-words font-semibold leading-tight">
+                          {selected.name}
+                        </h3>
+                        {selected.featured && (
+                          <span className="bg-accent/10 text-accent border border-accent/20 text-xs px-2.5 py-0.5 rounded-full">
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                        Project Details
+                      </p>
+                    </div>
+                  </div>
 
-                    <div>
+                  <div className="space-y-4 md:space-y-5">
+                    <section className="rounded-xl border border-border/50 bg-background/35 p-4 md:p-5">
+                      <h4 className="text-lg md:text-xl font-semibold mb-2">Overview</h4>
+                      <div className="text-muted-foreground text-sm md:text-base leading-relaxed">
+                        <InlineMarkdown text={selected.description} />
+                      </div>
+                    </section>
+
+                    <section className="rounded-xl border border-border/50 bg-background/35 p-4 md:p-5">
                       <h4 className="text-lg md:text-xl font-semibold mb-3">Technologies</h4>
                       <div className="flex flex-wrap gap-2">
-                        {(selected.technologies || []).map((tech, index) => (
-                          <span key={index} className="bg-secondary text-secondary-foreground border border-border/40 text-xs px-2.5 py-0.5 rounded-full">
-                            {tech}
-                          </span>
-                        ))}
+                        {(selected.technologies || []).length > 0 ? (
+                          (selected.technologies || []).map((tech, index) => (
+                            <span key={index} className="bg-secondary/65 text-secondary-foreground border border-border/50 text-xs md:text-sm px-2.5 py-1 rounded-full">
+                              {tech}
+                            </span>
+                          ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Technologies will be updated soon.</p>
+                        )}
                       </div>
-                    </div>
+                    </section>
 
-                    <div>
+                    <section className="rounded-xl border border-border/50 bg-background/35 p-4 md:p-5">
                       <h4 className="text-lg md:text-xl font-semibold mb-3">Key Features</h4>
-                      <ul className="space-y-2">
-                        {(selected.highlights || []).map((highlight, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-accent mt-1">•</span>
-                            <span className="text-sm md:text-base text-muted-foreground">{highlight}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                      {(selected.highlights || []).length > 0 ? (
+                        <ul className="space-y-2.5">
+                          {(selected.highlights || []).map((highlight, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                              <span className="mt-2 h-2 w-2 rounded-full bg-accent flex-shrink-0" />
+                              <span className="text-sm md:text-base text-muted-foreground leading-relaxed">{highlight}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Feature details will be added soon.</p>
+                      )}
+                    </section>
 
-                    <div className="flex flex-wrap gap-3 md:gap-4 pt-4">
-                      {selectedGithubUrl && (
-                        <a
-                          href={selectedGithubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm px-4 h-10"
-                        >
-                          <Github className="w-4 h-4" />
-                          View Code
-                        </a>
-                      )}
-                      {selectedDemoUrl && (
-                        <a
-                          href={selectedDemoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors text-sm px-4 h-10"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Live Demo
-                        </a>
-                      )}
-                    </div>
+                    {(selectedGithubUrl || selectedDemoUrl) && (
+                      <div className="grid sm:grid-cols-2 gap-3 pt-1">
+                        {selectedGithubUrl && (
+                          <a
+                            href={selectedGithubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="gap-2 inline-flex items-center justify-center rounded-lg border border-input bg-background/70 hover:bg-accent hover:text-accent-foreground transition-colors text-sm font-medium px-4 h-11"
+                          >
+                            <Github className="w-4 h-4" />
+                            View Code
+                          </a>
+                        )}
+                        {selectedDemoUrl && (
+                          <a
+                            href={selectedDemoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="gap-2 inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium px-4 h-11"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            Live Demo
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </m.div>
               </m.div>
             )}
           </AnimatePresence>,
-          document.body
+          modalRoot
         )}
       </div>
     </section>
