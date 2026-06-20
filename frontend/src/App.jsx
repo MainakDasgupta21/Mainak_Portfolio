@@ -1,5 +1,5 @@
 import { lazy, Suspense, useContext, useEffect, useState } from "react"
-import { LazyMotion, MotionConfig, domAnimation } from "framer-motion"
+import { LazyMotion, MotionConfig, domMax } from "framer-motion"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
@@ -36,7 +36,7 @@ const App = () => {
 
   if (loading) {
     return (
-      <LazyMotion features={domAnimation}>
+      <LazyMotion features={domMax}>
         <MotionConfig reducedMotion="user">
           <div className="min-h-screen relative">
             <ToastContainer position="bottom-right" theme="dark" />
@@ -55,7 +55,7 @@ const App = () => {
   }
 
   return (
-    <LazyMotion features={domAnimation}>
+    <LazyMotion features={domMax}>
       <MotionConfig reducedMotion="user">
         <div className="min-h-screen relative">
           <ToastContainer position="bottom-right" theme="dark" />

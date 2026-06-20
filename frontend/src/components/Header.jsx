@@ -22,6 +22,7 @@ const NAV_ITEMS = [
 ]
 const PRIMARY_CTA = { label: "Let's Talk", href: "#contact" }
 const OBSERVED_SECTION_HASHES = [...new Set([...NAV_ITEMS.map((item) => item.href), PRIMARY_CTA.href])]
+const NAV_ACTIVE_LOCK_MS = 1150
 
 function getBrandShortName(profile, fallbackName) {
   if (profile.brandShortName?.trim()) return profile.brandShortName
@@ -56,6 +57,15 @@ const Header = memo(function Header() {
   const menuRef = useRef(null)
   const toggleButtonRef = useRef(null)
   const lastScrolledRef = useRef(false)
+  const activeLockUntilRef = useRef(0)
+
+  const selectNavTarget = (href, { closeMobile = false } = {}) => {
+    setActive(href)
+    activeLockUntilRef.current = performance.now() + NAV_ACTIVE_LOCK_MS
+    if (closeMobile) {
+      setMobileOpen(false)
+    }
+  }
 
   useEffect(() => {
     let ticking = false
@@ -79,33 +89,57 @@ const Header = memo(function Header() {
   }, [])
 
   useEffect(() => {
-    let io = null
     let rafId = 0
     let observedSections = []
-    const ratios = new Map()
+    let headerOffset = 0
     const totalObservedTargets = OBSERVED_SECTION_HASHES.length
 
-    const recompute = () => {
-      let bestId = "#home"
-      let bestRatio = 0
-
-      ratios.forEach((ratio, section) => {
-        if (ratio > bestRatio) {
-          bestRatio = ratio
-          bestId = `#${section.id}`
-        }
-      })
-
-      if (bestRatio < 0.05 && observedSections.length > 0) {
-        const probeY = window.scrollY + window.innerHeight * 0.35
-        for (const section of observedSections) {
-          if (section.offsetTop <= probeY) {
-            bestId = `#${section.id}`
-          }
-        }
+    const updateHeaderOffset = () => {
+      const firstSection = observedSections[0]
+      if (!(firstSection instanceof HTMLElement)) {
+        headerOffset = 0
+        return
       }
 
-      setActive((prev) => (prev === bestId ? prev : bestId))
+      const styles = window.getComputedStyle(firstSection)
+      headerOffset = parseFloat(styles.scrollMarginTop || "0") || 0
+    }
+
+    const computeActiveSection = () => {
+      if (!observedSections.length) return "#home"
+
+      const scrollY = window.scrollY
+      const viewportBottom = scrollY + window.innerHeight
+      const documentBottom = document.documentElement.scrollHeight - 2
+
+      if (scrollY <= 2) {
+        return "#home"
+      }
+
+      if (viewportBottom >= documentBottom) {
+        const lastSection = observedSections[observedSections.length - 1]
+        return lastSection ? `#${lastSection.id}` : "#home"
+      }
+
+      const probeY = scrollY + headerOffset + 1
+      let bestId = "#home"
+
+      for (const section of observedSections) {
+        const sectionTop = section.getBoundingClientRect().top + scrollY
+        if (sectionTop <= probeY) {
+          bestId = `#${section.id}`
+          continue
+        }
+        break
+      }
+
+      return bestId
+    }
+
+    const recompute = () => {
+      if (performance.now() < activeLockUntilRef.current) return
+      const nextId = computeActiveSection()
+      setActive((prev) => (prev === nextId ? prev : nextId))
     }
 
     const scheduleRecompute = () => {
@@ -122,37 +156,30 @@ const Header = memo(function Header() {
       )
 
       if (!sections.length) return false
-      const hasAllTargets = sections.length === totalObservedTargets
 
-      const sectionsUnchanged =
-        sections.length === observedSections.length &&
-        sections.every((section, index) => section === observedSections[index])
-      if (sectionsUnchanged) {
-        scheduleRecompute()
-        return hasAllTargets
+      const sectionsChanged =
+        sections.length !== observedSections.length ||
+        sections.some((section, index) => section !== observedSections[index])
+      if (sectionsChanged) {
+        observedSections = sections
       }
 
-      io?.disconnect()
-      ratios.clear()
-      observedSections = sections
-      sections.forEach((section) => ratios.set(section, 0))
-
-      io = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            ratios.set(entry.target, entry.intersectionRatio)
-          }
-          scheduleRecompute()
-        },
-        {
-          threshold: [0, 0.2, 0.4, 0.6, 0.8],
-          rootMargin: "-18% 0px -56% 0px",
-        }
-      )
-      sections.forEach((section) => io.observe(section))
+      updateHeaderOffset()
       scheduleRecompute()
-      return hasAllTargets
+      return sections.length === totalObservedTargets
     }
+
+    const onScroll = () => {
+      scheduleRecompute()
+    }
+
+    const onResize = () => {
+      updateHeaderOffset()
+      scheduleRecompute()
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onResize)
 
     const mutationObserver = new MutationObserver(() => {
       if (observeSections()) mutationObserver.disconnect()
@@ -165,8 +192,23 @@ const Header = memo(function Header() {
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId)
+      window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("resize", onResize)
       mutationObserver.disconnect()
-      io?.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    const clearActiveLock = () => {
+      activeLockUntilRef.current = 0
+    }
+
+    window.addEventListener("wheel", clearActiveLock, { passive: true })
+    window.addEventListener("touchmove", clearActiveLock, { passive: true })
+
+    return () => {
+      window.removeEventListener("wheel", clearActiveLock)
+      window.removeEventListener("touchmove", clearActiveLock)
     }
   }, [])
 
@@ -270,8 +312,7 @@ const Header = memo(function Header() {
               href="#home"
               aria-label={`${ariaDisplayName} - Home`}
               onClick={() => {
-                setActive("#home")
-                setMobileOpen(false)
+                selectNavTarget("#home", { closeMobile: true })
               }}
               whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
               className={`inline-flex items-center gap-2.5 rounded-full px-1.5 py-1 ${focusRingClass}`}
@@ -295,7 +336,7 @@ const Header = memo(function Header() {
                     <m.a
                       key={item.href}
                       href={item.href}
-                      onClick={() => setActive(item.href)}
+                      onClick={() => selectNavTarget(item.href)}
                       aria-current={isActive ? "page" : undefined}
                       initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -312,7 +353,7 @@ const Header = memo(function Header() {
                           layoutId="navActivePill"
                           aria-hidden
                           className="absolute inset-0 rounded-full border border-foreground/20 bg-foreground/10"
-                          transition={{ type: "spring", stiffness: 460, damping: 42, mass: 0.6 }}
+                          transition={{ type: "spring", stiffness: 360, damping: 40, mass: 0.6 }}
                         />
                       )}
                       <span className="relative z-10">{item.label}</span>
@@ -323,6 +364,7 @@ const Header = memo(function Header() {
 
               <a
                 href={PRIMARY_CTA.href}
+                onClick={() => selectNavTarget(PRIMARY_CTA.href)}
                 className={`inline-flex h-10 items-center justify-center rounded-full border border-foreground/30 bg-foreground px-4 text-sm font-semibold text-background hover-glow hover:bg-foreground/90 transition-colors ${focusRingClass}`}
               >
                 {PRIMARY_CTA.label}
@@ -393,8 +435,7 @@ const Header = memo(function Header() {
                       variants={mobileItemVariants}
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => {
-                        setActive(item.href)
-                        setMobileOpen(false)
+                        selectNavTarget(item.href, { closeMobile: true })
                       }}
                       className={`block rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
                         isActive
@@ -412,8 +453,7 @@ const Header = memo(function Header() {
                 href={PRIMARY_CTA.href}
                 variants={mobileItemVariants}
                 onClick={() => {
-                  setActive(PRIMARY_CTA.href)
-                  setMobileOpen(false)
+                  selectNavTarget(PRIMARY_CTA.href, { closeMobile: true })
                 }}
                 className={`mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl border border-foreground/30 bg-foreground px-4 text-sm font-semibold text-background hover:bg-foreground/90 transition-colors ${focusRingClass}`}
               >
