@@ -104,7 +104,7 @@ const Achievements = memo(function Achievements() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-accent/20 to-accent/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
 
-                  <div className="relative glass-card p-6 md:p-8 rounded-2xl border border-accent/10 bg-gradient-to-br from-background to-muted/5 shadow-2xl shadow-accent/5 hover:shadow-3xl hover:shadow-accent/10 transition-all duration-500 overflow-hidden flex flex-col h-full">
+                  <div className="relative glass-card p-6 md:p-8 rounded-2xl border border-accent/10 bg-gradient-to-br from-background to-muted/5 shadow-2xl shadow-accent/5 hover:shadow-3xl hover:shadow-accent/10 transition-all duration-500 overflow-hidden flex h-full min-h-[300px] flex-col sm:min-h-[320px] md:min-h-[340px]">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
 
                   <m.div
@@ -112,32 +112,34 @@ const Achievements = memo(function Achievements() {
                     animate={isInView ? { scale: 1, rotate: 0 } : {}}
                     transition={{ duration: 0.8, delay: 0.5 + index * 0.15, type: "spring", stiffness: 100 }}
                     whileHover={{ scale: 1.1, rotate: 5, transition: { duration: 0.3 } }}
-                    className="relative inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 mb-5 md:mb-6 group-hover:from-accent/30 group-hover:to-accent/20 transition-all duration-500"
+                    className="relative inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 mb-4 md:mb-5 group-hover:from-accent/30 group-hover:to-accent/20 transition-all duration-500"
                   >
                     <div className="absolute inset-0 bg-accent/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <Icon className="w-8 h-8 md:w-10 md:h-10 text-accent relative z-10 drop-shadow-lg" />
                   </m.div>
 
-                  <m.h3
-                    className="text-xl md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent break-words"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ delay: 0.8 + index * 0.15 }}
-                  >
-                    {achievement.title}
-                  </m.h3>
+                  <div className="flex min-h-0 flex-1 flex-col">
+                    <m.h3
+                      className="text-xl md:text-2xl font-semibold leading-tight tracking-tight text-foreground mb-3 md:mb-4 break-words"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={isInView ? { opacity: 1, y: 0 } : {}}
+                      transition={{ delay: 0.8 + index * 0.15 }}
+                    >
+                      {achievement.title}
+                    </m.h3>
 
-                  <m.p
-                    className="text-sm md:text-lg text-muted-foreground leading-relaxed font-light"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ delay: 1 + index * 0.15 }}
-                  >
-                    {achievement.description}
-                  </m.p>
+                    <m.p
+                      className="flex-1 text-sm md:text-base text-muted-foreground leading-relaxed font-normal"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={isInView ? { opacity: 1, y: 0 } : {}}
+                      transition={{ delay: 1 + index * 0.15 }}
+                    >
+                      {achievement.description}
+                    </m.p>
+                  </div>
 
                   <m.div
-                    className="w-full h-0.5 bg-gradient-to-r from-accent to-accent/60 mt-auto rounded-full origin-left"
+                    className="w-full h-0.5 bg-gradient-to-r from-accent to-accent/60 mt-5 rounded-full origin-left"
                     initial={{ scaleX: 0 }}
                     animate={isInView ? { scaleX: 1 } : {}}
                     transition={{ delay: 1.2 + index * 0.15, duration: 0.8 }}
