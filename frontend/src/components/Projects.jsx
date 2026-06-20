@@ -4,6 +4,7 @@ import { ExternalLink, Github, X } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { lockLenisScroll, unlockLenisScroll } from "../hooks/useSmoothScroll"
 import { normalizeExternalLink } from "../utils/externalLink"
+import { InlineMarkdown } from "../utils/inlineMarkdown"
 
 const Projects = memo(function Projects() {
   const ref = useRef(null)
@@ -81,7 +82,7 @@ const Projects = memo(function Projects() {
                   </div>
 
                   <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4 line-clamp-3 md:line-clamp-2">
-                    {project.description}
+                    <InlineMarkdown text={project.description} />
                   </p>
 
                   <div className="flex flex-wrap gap-2 mb-3 md:mb-4">
@@ -164,7 +165,7 @@ const Projects = memo(function Projects() {
                 </h3>
                 <div className="space-y-5 md:space-y-6">
                   <p className="text-muted-foreground text-base md:text-lg">
-                    {selected.description}
+                    <InlineMarkdown text={selected.description} />
                   </p>
 
                   <div>
