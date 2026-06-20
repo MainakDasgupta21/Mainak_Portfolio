@@ -207,7 +207,7 @@ const About = () => {
 
                         <m.div
                           transition={{ duration: 0.2, ease: "easeOut" }}
-                          className="surface-card relative overflow-hidden rounded-xl border border-border/55 bg-card/80 p-4 sm:p-5 md:p-6 shadow-sm backdrop-blur-sm transition-colors duration-200 group-hover:border-border/70 group-hover:bg-card/85"
+                          className="surface-card relative overflow-hidden rounded-xl border border-border/55 bg-card/80 p-4 sm:p-5 md:p-6 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:border-white/60 group-hover:bg-card/85 group-hover:shadow-[0_0_26px_rgba(255,255,255,0.22)]"
                         >
                           <div className="relative flex flex-col gap-4">
                             <div className="min-w-0 flex-1">
