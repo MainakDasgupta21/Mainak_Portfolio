@@ -47,7 +47,7 @@ const Projects = memo(function Projects() {
         </m.div>
 
         {!hasProjects ? (
-          <div className="max-w-4xl mx-auto glass-card rounded-lg p-6 text-center text-muted-foreground">
+          <div className="max-w-4xl mx-auto surface-card rounded-lg p-6 text-center text-muted-foreground">
             Projects will appear here once they are published.
           </div>
         ) : (
@@ -59,7 +59,7 @@ const Projects = memo(function Projects() {
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 whileHover={{ y: -8 }}
-                className="glass-card p-5 md:p-8 rounded-lg shadow-elegant hover:shadow-glow transition-all cursor-pointer group"
+                className="surface-card p-5 md:p-8 rounded-lg shadow-elegant hover:shadow-glow transition-all cursor-pointer group"
                 onClick={() => setSelected(project)}
               >
                 <div className="flex items-start justify-between gap-3 mb-3 md:mb-4">

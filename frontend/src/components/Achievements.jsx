@@ -69,9 +69,9 @@ const Achievements = memo(function Achievements() {
           </m.div>
 
           <m.div
-            className="w-20 md:w-24 h-1 bg-gradient-to-r from-accent to-accent/60 mx-auto mb-6 md:mb-8 rounded-full"
-            initial={{ width: 0 }}
-            animate={isInView ? { width: 96 } : {}}
+            className="w-20 md:w-24 h-1 bg-gradient-to-r from-accent to-accent/60 mx-auto mb-6 md:mb-8 rounded-full origin-center"
+            initial={{ scaleX: 0 }}
+            animate={isInView ? { scaleX: 1 } : {}}
             transition={{ delay: 0.5, duration: 0.8 }}
           />
 
@@ -137,9 +137,9 @@ const Achievements = memo(function Achievements() {
                   </m.p>
 
                   <m.div
-                    className="w-0 h-0.5 bg-gradient-to-r from-accent to-accent/60 mt-auto rounded-full group-hover:w-full transition-all duration-500 delay-100"
-                    initial={{ width: 0 }}
-                    animate={isInView ? { width: "100%" } : {}}
+                    className="w-full h-0.5 bg-gradient-to-r from-accent to-accent/60 mt-auto rounded-full origin-left"
+                    initial={{ scaleX: 0 }}
+                    animate={isInView ? { scaleX: 1 } : {}}
                     transition={{ delay: 1.2 + index * 0.15, duration: 0.8 }}
                   />
                   </div>

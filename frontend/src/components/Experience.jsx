@@ -37,16 +37,16 @@ const Experience = memo(function Experience() {
             <div className="pointer-events-none absolute inset-y-0 left-4 md:left-1/2 md:-translate-x-1/2">
               <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full bg-border/45" />
               <m.div
-                className="absolute left-1/2 top-0 -translate-x-1/2 w-[2px] rounded-full bg-gradient-to-b from-accent via-accent/55 to-accent/15"
-                initial={{ height: "0%" }}
-                animate={{ height: timelineInView ? "100%" : "0%" }}
+                className="absolute left-1/2 top-0 h-full origin-top -translate-x-1/2 w-[2px] rounded-full bg-gradient-to-b from-accent via-accent/55 to-accent/15"
+                initial={shouldReduceMotion ? { scaleY: 1 } : { scaleY: 0 }}
+                animate={{ scaleY: timelineInView ? 1 : 0 }}
                 transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
               />
             </div>
 
             {!hasExperience ? (
               <div className="pl-12 md:pl-0">
-                <div className="glass-card rounded-2xl border border-border/35 p-6 md:p-8 text-center text-muted-foreground max-w-3xl md:mx-auto">
+                <div className="surface-card rounded-2xl p-6 md:p-8 text-center text-muted-foreground max-w-3xl md:mx-auto">
                   Experience entries will appear here once they are published.
                 </div>
               </div>
@@ -88,7 +88,7 @@ const Experience = memo(function Experience() {
                       <m.div
                         whileHover={shouldReduceMotion ? undefined : { y: -4, scale: 1.005 }}
                         transition={{ duration: 0.25, ease: "easeOut" }}
-                        className={`glass-card rounded-2xl border border-border/35 p-4 sm:p-5 md:p-7 shadow-elegant hover:shadow-glow md:w-[calc(50%-1.5rem)] ${cardDockClass}`}
+                        className={`surface-card rounded-2xl p-4 sm:p-5 md:p-7 shadow-elegant hover:shadow-glow md:w-[calc(50%-1.5rem)] ${cardDockClass}`}
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <span className="inline-flex items-center rounded-full border border-accent/25 bg-accent/10 px-3 py-1.5 text-[11px] font-semibold tracking-wide text-accent sm:text-xs">

@@ -142,11 +142,25 @@
 @layer utilities {
   .glass-card {
     background: hsl(var(--glass-bg));
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     border: 1px solid hsl(var(--glass-border));
     contain: paint;
     transform: translateZ(0);
+  }
+
+  .surface-card {
+    background: hsl(var(--card) / 0.82);
+    border: 1px solid hsl(var(--border) / 0.55);
+    box-shadow: var(--shadow-sm);
+  }
+
+  @media (max-width: 768px) {
+    .glass-card {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: hsl(var(--card) / 0.78);
+    }
   }
 
   .text-gradient {
@@ -273,6 +287,27 @@
   .animate-float-particle {
     animation: float-particle 4s ease-in-out infinite;
     will-change: transform, opacity;
+  }
+
+  .animated-bg-blob {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+
+  @media (max-width: 640px) {
+    .animated-bg-layer .animate-float-slow,
+    .animated-bg-layer .animate-float-slow-reverse {
+      animation: none !important;
+    }
+
+    .animated-bg-layer .animate-gradient-shift {
+      animation-duration: 32s;
+    }
+
+    .animated-bg-layer .animated-bg-blob {
+      filter: blur(20px);
+      opacity: 0.38;
+    }
   }
 
   /* ========================= */

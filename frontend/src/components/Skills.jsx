@@ -36,7 +36,7 @@ const Skills = memo(function Skills() {
 
         <div className="max-w-6xl mx-auto">
           {!hasSkillCategories ? (
-            <div className="glass-card rounded-lg p-6 text-center text-muted-foreground">
+            <div className="surface-card rounded-lg p-6 text-center text-muted-foreground">
               Skills will appear here once they are published.
             </div>
           ) : (
@@ -77,7 +77,7 @@ const Skills = memo(function Skills() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
-                    className="glass-card p-4 md:p-6 rounded-lg"
+                    className="surface-card p-4 md:p-6 rounded-lg"
                   >
                     <div className="flex justify-between items-start gap-3 mb-3">
                       <span className="font-medium text-sm md:text-base break-words">{skill.name}</span>
@@ -92,14 +92,14 @@ const Skills = memo(function Skills() {
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <m.div
-                        initial={{ width: 0 }}
-                        animate={isInView ? { width: `${skill.proficiency}%` } : {}}
+                        initial={{ scaleX: 0 }}
+                        animate={isInView ? { scaleX: Math.max(0, Math.min(Number(skill.proficiency) || 0, 100)) / 100 } : {}}
                         transition={{
                           duration: 1,
                           delay: 0.3 + index * 0.05,
                           ease: "easeOut",
                         }}
-                        className="h-full bg-gradient-to-r from-accent to-accent/70"
+                        className="h-full w-full bg-gradient-to-r from-accent to-accent/70 origin-left"
                       />
                     </div>
                   </m.div>

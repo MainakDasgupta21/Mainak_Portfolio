@@ -157,15 +157,15 @@ const About = () => {
                   <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[4px] bg-gradient-to-b from-white/10 via-white/20 to-white/10 rounded-full" />
 
                   <m.div
-                    initial={{ height: 0 }}
-                    animate={{ height: `${Math.max(progress, 0.02) * 100}%` }}
+                    initial={{ scaleY: 0 }}
+                    animate={{ scaleY: Math.max(progress, 0.02) }}
                     transition={{
                       type: "spring",
                       stiffness: 80,
                       damping: 15,
                       duration: 1.2,
                     }}
-                    className="absolute left-1/2 -translate-x-1/2 top-0 w-[8px] rounded-full overflow-hidden"
+                    className="absolute left-1/2 -translate-x-1/2 top-0 h-full w-[8px] rounded-full overflow-hidden origin-top"
                   >
                     <div className="w-full h-full relative bg-gradient-to-b from-white/10 via-white/60 to-white/10">
                       <m.div

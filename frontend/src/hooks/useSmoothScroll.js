@@ -5,7 +5,10 @@ let lenisInstance = null
 let lenisLockCount = 0
 let bodyLockState = null
 const ANCHOR_LOOKUP_TIMEOUT_MS = 800
-const LENIS_SCROLL_DURATION = 1.1
+const LENIS_SCROLL_DURATION = 0.95
+const LENIS_LERP = 0.14
+const LENIS_WHEEL_MULTIPLIER = 1
+const LENIS_TOUCH_MULTIPLIER = 1.05
 
 const lockBodyScroll = () => {
   if (typeof window === "undefined" || typeof document === "undefined") return
@@ -146,11 +149,11 @@ export function useSmoothScroll() {
 
     if (shouldUseLenis) {
       lenis = new Lenis({
-        lerp: 0.1,
-        wheelMultiplier: 1,
-        touchMultiplier: 1.2,
+        lerp: LENIS_LERP,
+        wheelMultiplier: LENIS_WHEEL_MULTIPLIER,
+        touchMultiplier: LENIS_TOUCH_MULTIPLIER,
         smoothWheel: true,
-        syncTouch: false,
+        syncTouch: true,
         autoRaf: false,
       })
       lenisInstance = lenis

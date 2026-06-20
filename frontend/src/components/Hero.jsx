@@ -54,12 +54,11 @@ const Hero = () => {
   const heroItemVariants = useMemo(
     () => ({
       hidden: shouldReduceMotion
-        ? { opacity: 1, y: 0, filter: "blur(0px)" }
-        : { opacity: 0, y: 20, filter: "blur(8px)" },
+        ? { opacity: 1, y: 0 }
+        : { opacity: 0, y: 20 },
       show: {
         opacity: 1,
         y: 0,
-        filter: "blur(0px)",
         transition: shouldReduceMotion
           ? { duration: 0 }
           : { duration: 0.72, ease: EASE_OUT_QUINT },

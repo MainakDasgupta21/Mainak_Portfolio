@@ -3,7 +3,6 @@ import {
   m,
   useReducedMotion,
   useScroll,
-  useSpring,
 } from "framer-motion"
 import { memo, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
@@ -39,11 +38,7 @@ function getBrandMonogram(profile, fallbackName) {
 const Header = memo(function Header() {
   const shouldReduceMotion = useReducedMotion()
   const { scrollYProgress } = useScroll()
-  const progressScaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
-    mass: 0.2,
-  })
+  const progressScaleX = scrollYProgress
 
   const { loading, profile } = useContext(PortfolioContext)
   const displayName = getProfileDisplayName(profile, loading ? "" : "Mainak Dasgupta")
@@ -68,31 +63,20 @@ const Header = memo(function Header() {
   }
 
   useEffect(() => {
-    let ticking = false
-    const update = () => {
-      ticking = false
+    let rafId = 0
+    let observedSections = []
+    let sectionMetrics = []
+    let headerOffset = 0
+    let sectionResizeObserver = null
+    const totalObservedTargets = OBSERVED_SECTION_HASHES.length
+
+    const syncScrolledState = () => {
       const nextValue = window.scrollY > 28
       if (nextValue !== lastScrolledRef.current) {
         lastScrolledRef.current = nextValue
         setScrolled(nextValue)
       }
     }
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true
-        requestAnimationFrame(update)
-      }
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    update()
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
-
-  useEffect(() => {
-    let rafId = 0
-    let observedSections = []
-    let headerOffset = 0
-    const totalObservedTargets = OBSERVED_SECTION_HASHES.length
 
     const updateHeaderOffset = () => {
       const firstSection = observedSections[0]
@@ -105,8 +89,18 @@ const Header = memo(function Header() {
       headerOffset = parseFloat(styles.scrollMarginTop || "0") || 0
     }
 
+    const syncSectionMetrics = () => {
+      const baseScrollY = window.scrollY
+      sectionMetrics = observedSections
+        .map((section) => ({
+          id: `#${section.id}`,
+          top: section.getBoundingClientRect().top + baseScrollY,
+        }))
+        .sort((a, b) => a.top - b.top)
+    }
+
     const computeActiveSection = () => {
-      if (!observedSections.length) return "#home"
+      if (!sectionMetrics.length) return "#home"
 
       const scrollY = window.scrollY
       const viewportBottom = scrollY + window.innerHeight
@@ -117,17 +111,15 @@ const Header = memo(function Header() {
       }
 
       if (viewportBottom >= documentBottom) {
-        const lastSection = observedSections[observedSections.length - 1]
-        return lastSection ? `#${lastSection.id}` : "#home"
+        return sectionMetrics[sectionMetrics.length - 1]?.id || "#home"
       }
 
       const probeY = scrollY + headerOffset + 1
       let bestId = "#home"
 
-      for (const section of observedSections) {
-        const sectionTop = section.getBoundingClientRect().top + scrollY
-        if (sectionTop <= probeY) {
-          bestId = `#${section.id}`
+      for (const metric of sectionMetrics) {
+        if (metric.top <= probeY) {
+          bestId = metric.id
           continue
         }
         break
@@ -137,6 +129,7 @@ const Header = memo(function Header() {
     }
 
     const recompute = () => {
+      syncScrolledState()
       if (performance.now() < activeLockUntilRef.current) return
       const nextId = computeActiveSection()
       setActive((prev) => (prev === nextId ? prev : nextId))
@@ -162,9 +155,14 @@ const Header = memo(function Header() {
         sections.some((section, index) => section !== observedSections[index])
       if (sectionsChanged) {
         observedSections = sections
+        if (sectionResizeObserver) {
+          sectionResizeObserver.disconnect()
+          sections.forEach((section) => sectionResizeObserver.observe(section))
+        }
       }
 
       updateHeaderOffset()
+      syncSectionMetrics()
       scheduleRecompute()
       return sections.length === totalObservedTargets
     }
@@ -175,7 +173,15 @@ const Header = memo(function Header() {
 
     const onResize = () => {
       updateHeaderOffset()
+      syncSectionMetrics()
       scheduleRecompute()
+    }
+
+    if (typeof ResizeObserver !== "undefined") {
+      sectionResizeObserver = new ResizeObserver(() => {
+        syncSectionMetrics()
+        scheduleRecompute()
+      })
     }
 
     window.addEventListener("scroll", onScroll, { passive: true })
@@ -189,12 +195,14 @@ const Header = memo(function Header() {
     if (!hasAllTargetsInitially) {
       mutationObserver.observe(document.body, { childList: true, subtree: true })
     }
+    scheduleRecompute()
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId)
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onResize)
       mutationObserver.disconnect()
+      sectionResizeObserver?.disconnect()
     }
   }, [])
 
