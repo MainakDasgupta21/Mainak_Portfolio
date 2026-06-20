@@ -1,5 +1,6 @@
 import validator from "validator";
 import contactModel from "../models/contactModel.js"
+import { sendContactNotification } from "../utils/contactMail.js"
 
 // Public — anyone visiting the portfolio can POST a contact submission.
 // Like Forever's open endpoints, we accept the open shape but lightly
@@ -24,6 +25,17 @@ const submitContact = async (req, res) => {
             status: "new",
         });
         await doc.save();
+
+        try {
+            await sendContactNotification({
+                name: doc.name,
+                email: doc.email,
+                subject: doc.subject,
+                message: doc.message,
+            })
+        } catch (mailErr) {
+            console.error("Contact email failed:", mailErr?.message || mailErr)
+        }
 
         res.json({ success: true, message: "Message received. Thank you!" });
     } catch (error) {

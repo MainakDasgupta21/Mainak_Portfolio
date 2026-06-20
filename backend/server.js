@@ -17,7 +17,16 @@ import mediaRouter from './routes/mediaRoute.js'
 // App Config
 const app = express()
 const port = process.env.PORT || 4000
-connectDB()
+
+// Avoid crashing the process during local development when Atlas is
+// temporarily unreachable (for example, IP not allowlisted).
+connectDB().then((connected) => {
+    if (!connected) {
+        console.warn("Running without database connection; DB-backed routes may fail until connectivity is restored.")
+    }
+}).catch((err) => {
+    console.error("Unexpected DB bootstrap error:", err?.message || err)
+})
 connectCloudinary()
 
 // middlewares
