@@ -11,7 +11,7 @@ const NAV_PILL_SHIMMERS = [
   "shimmer-delay-2",
 ]
 
-const AppLoader = memo(function AppLoader() {
+const AppLoader = memo(function AppLoader({ isExiting = false }) {
   const { profile } = useContext(PortfolioContext)
   const brandShortName = (profile?.brandShortName || "").trim() || "Mainak."
   const brandMonogram = (profile?.brandMonogram || "").trim() || brandShortName.charAt(0).toUpperCase() || "M"
@@ -22,9 +22,17 @@ const AppLoader = memo(function AppLoader() {
       aria-live="polite"
       aria-busy="true"
       aria-label="Loading portfolio content"
-      className="relative min-h-screen overflow-hidden"
+      className={`loader-root fixed inset-0 z-40 overflow-x-hidden overflow-y-auto ${isExiting ? "is-exiting" : ""}`}
     >
       <span className="sr-only">Loading portfolio content. Preparing your experience.</span>
+
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="loader-noise-overlay" />
+        <div className="loader-vignette-overlay" />
+        <div className="loader-ambient-orb loader-ambient-orb-1" />
+        <div className="loader-ambient-orb loader-ambient-orb-2" />
+        <div className="loader-ambient-orb loader-ambient-orb-3" />
+      </div>
 
       <div className="loader-topbar" aria-hidden="true" />
 
@@ -62,6 +70,14 @@ const AppLoader = memo(function AppLoader() {
             </div>
           </div>
         </nav>
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="skeleton-in skeleton-delay-2 pointer-events-none absolute right-4 top-24 z-30 hidden items-center gap-2.5 rounded-full border border-border/35 bg-card/55 px-3 py-1.5 backdrop-blur-sm lg:flex"
+      >
+        <span className="blink-dot" />
+        <div className="loading-shimmer shimmer-delay-3 h-2.5 w-24 rounded-full" />
       </div>
 
       <section
@@ -124,7 +140,7 @@ const AppLoader = memo(function AppLoader() {
         </div>
       </section>
 
-      <div aria-hidden="true" className="pointer-events-none relative -mt-10 hidden sm:block">
+      <div aria-hidden="true" className="pointer-events-none relative -mt-10 sm:-mt-12">
         <div className="mx-auto w-full max-w-5xl px-4 pb-10 sm:px-6">
           <div className="skeleton-in skeleton-delay-6 rounded-3xl border border-border/35 bg-card/35 p-5 backdrop-blur-sm">
             <div className="loading-shimmer shimmer-delay-2 h-5 w-40 rounded-md" />
