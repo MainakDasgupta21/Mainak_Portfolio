@@ -39,8 +39,8 @@ const Header = memo(function Header() {
   const { scrollYProgress } = useScroll()
   const progressScaleX = scrollYProgress
 
-  const { loading, profile } = useContext(PortfolioContext)
-  const displayName = getProfileDisplayName(profile, loading ? "" : "Mainak Dasgupta")
+  const { profile } = useContext(PortfolioContext)
+  const displayName = getProfileDisplayName(profile, "Mainak Dasgupta")
   const brandShortName = getBrandShortName(profile, displayName)
   const brandMonogram = getBrandMonogram(profile, displayName)
   const ariaDisplayName = displayName || brandShortName || "Portfolio"

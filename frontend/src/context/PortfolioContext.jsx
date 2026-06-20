@@ -1,14 +1,20 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useEffect, useMemo, useState } from "react"
+import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 
 export const PortfolioContext = createContext({})
 
+// Keep skeletons on screen for at least this long once a real fetch starts, so a
+// fast/cached response can't cause a sub-second flicker as cards swap in.
+const MIN_SKELETON_MS = 420
+
 const DEFAULTS = {
   profile: {
-    name: "Mainak Dasgupta",
-    title: "Software Developer",
+    // Mirrors the backend profile shape (name + title) so the hero renders
+    // pixel-identical on first paint and never flashes a different name.
+    name: "Mainak",
+    title: "Dasgupta",
     tagline: "Building scalable systems and intelligent solutions",
     bio: "",
     email: "",
@@ -60,16 +66,51 @@ const PortfolioContextProvider = (props) => {
   const [skills, setSkills] = useState(DEFAULTS.skills)
   const [achievements, setAchievements] = useState(DEFAULTS.achievements)
   const [education, setEducation] = useState(DEFAULTS.education)
-  // `loading` tracks the initial content hydration window.
-  const [loading, setLoading] = useState(true)
+  // `loading` tracks the initial content hydration window. When there's no
+  // backend we render defaults immediately, so we start `false` to avoid a
+  // one-frame skeleton flash before the effect runs.
+  const [loading, setLoading] = useState(() => Boolean(backendUrl))
+  const [error, setError] = useState(false)
+  // Bumping this key re-runs the fetch effect (used by the retry button).
+  const [reloadToken, setReloadToken] = useState(0)
+  const minTimerRef = useRef(null)
+
+  const retry = useCallback(() => {
+    setReloadToken((token) => token + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
-    async function load() {
-      if (!backendUrl) {
+    if (minTimerRef.current) {
+      clearTimeout(minTimerRef.current)
+      minTimerRef.current = null
+    }
+
+    if (!backendUrl) {
+      setLoading(false)
+      setError(false)
+      return
+    }
+
+    setLoading(true)
+    setError(false)
+    const startedAt = Date.now()
+
+    // Delay flipping `loading` off until skeletons have shown for a graceful
+    // minimum, preventing a flash on fast/cached responses.
+    const finishLoading = () => {
+      if (cancelled) return
+      const remaining = MIN_SKELETON_MS - (Date.now() - startedAt)
+      if (remaining > 0) {
+        minTimerRef.current = setTimeout(() => {
+          if (!cancelled) setLoading(false)
+        }, remaining)
+      } else {
         setLoading(false)
-        return
       }
+    }
+
+    async function load() {
       try {
         const [
           profileRes,
@@ -110,15 +151,25 @@ const PortfolioContextProvider = (props) => {
         if (skillsRes.data?.success) setSkills(skillsRes.data.skills || [])
         if (achievementsRes.data?.success) setAchievements(achievementsRes.data.achievements || [])
         if (educationRes.data?.success) setEducation(educationRes.data.education || [])
+        setError(false)
       } catch (err) {
+        if (cancelled) return
+        setError(true)
         toast.error("Failed to load portfolio content")
       } finally {
-        if (!cancelled) setLoading(false)
+        finishLoading()
       }
     }
     load()
-    return () => { cancelled = true }
-  }, [backendUrl])
+
+    return () => {
+      cancelled = true
+      if (minTimerRef.current) {
+        clearTimeout(minTimerRef.current)
+        minTimerRef.current = null
+      }
+    }
+  }, [backendUrl, reloadToken])
 
   // Skills are stored as a flat list with a `category` column. Group them
   // by category for the Skills section (mirroring resume.json shape).
@@ -135,6 +186,8 @@ const PortfolioContextProvider = (props) => {
     backendUrl,
     loading,
     isHydrated: !loading,
+    error,
+    retry,
     profile,
     projects,
     experience,

@@ -10,19 +10,19 @@ const EASE_OUT_QUINT = [0.22, 1, 0.36, 1]
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion()
-  const { loading, profile } = useContext(PortfolioContext)
+  const { profile } = useContext(PortfolioContext)
   const sectionRef = useRef(null)
   const videoRef = useRef(null)
   const heroUi = profile.heroUi || {}
   const media = profile.media || {}
-  const displayName = getProfileDisplayName(profile, loading ? "" : "Mainak Dasgupta")
+  const displayName = getProfileDisplayName(profile, "Mainak Dasgupta")
   const heroRole = typeof heroUi.role === "string" ? heroUi.role.trim() : ""
-  const role = heroRole || (loading ? "" : "Software Developer")
-  const introPrefix = heroUi.introPrefix || (loading ? "" : "Hi, I'm")
-  const badgeText = heroUi.badge || (loading ? "" : "Crafting Unique Solutions")
-  const tagline = profile.tagline || (loading ? "" : "Building scalable systems and intelligent solutions")
-  const scrollHintTop = heroUi.scrollHintTop || (loading ? "" : "Scroll down")
-  const scrollHintBottom = heroUi.scrollHintBottom || (loading ? "" : "to see projects")
+  const role = heroRole || "Software Developer"
+  const introPrefix = heroUi.introPrefix || "Hi, I'm"
+  const badgeText = heroUi.badge || "Crafting Unique Solutions"
+  const tagline = profile.tagline || "Building scalable systems and intelligent solutions"
+  const scrollHintTop = heroUi.scrollHintTop || "Scroll down"
+  const scrollHintBottom = heroUi.scrollHintBottom || "to see projects"
   const heroVideoSrc = media.heroVideoSrc || assets.heroVideo
   const heroVideoWebmSrc = media.heroVideoWebmSrc || assets.heroVideoWebm
   const heroPosterSrc = media.heroPosterSrc || assets.heroPoster
