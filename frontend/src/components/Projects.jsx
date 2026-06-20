@@ -3,6 +3,7 @@ import { memo, useContext, useEffect, useRef, useState } from "react"
 import { ExternalLink, Github, X } from "lucide-react"
 import { PortfolioContext } from "../context/PortfolioContext"
 import { lockLenisScroll, unlockLenisScroll } from "../hooks/useSmoothScroll"
+import { normalizeExternalLink } from "../utils/externalLink"
 
 const Projects = memo(function Projects() {
   const ref = useRef(null)
@@ -12,6 +13,8 @@ const Projects = memo(function Projects() {
     profile.sectionSubtitles?.projects || "Transforming ideas into elegant solutions"
   const [selected, setSelected] = useState(null)
   const hasProjects = projects.length > 0
+  const selectedGithubUrl = normalizeExternalLink(selected?.github)
+  const selectedDemoUrl = normalizeExternalLink(selected?.demo)
 
   // Esc closes the modal.
   useEffect(() => {
@@ -52,68 +55,77 @@ const Projects = memo(function Projects() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-5 md:gap-8 max-w-6xl mx-auto">
-            {projects.map((project, index) => (
-              <m.div
-                key={project._id || index}
-                initial={{ opacity: 0, y: 50 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ y: -8 }}
-                className="surface-card p-5 md:p-8 rounded-lg shadow-elegant hover:shadow-glow transition-all cursor-pointer group"
-                onClick={() => setSelected(project)}
-              >
-                <div className="flex items-start justify-between gap-3 mb-3 md:mb-4">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold group-hover:text-accent transition-colors break-words min-w-0">
-                    {project.name}
-                  </h3>
-                  {project.featured && (
-                    <span className="bg-accent/10 text-accent border border-accent/20 flex-shrink-0 text-xs px-2.5 py-0.5 rounded-full">
-                      Featured
-                    </span>
-                  )}
-                </div>
+            {projects.map((project, index) => {
+              const githubUrl = normalizeExternalLink(project.github)
+              const demoUrl = normalizeExternalLink(project.demo)
 
-                <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4 line-clamp-3 md:line-clamp-2">
-                  {project.description}
-                </p>
+              return (
+                <m.div
+                  key={project._id || index}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                  whileHover={{ y: -8 }}
+                  className="surface-card p-5 md:p-8 rounded-lg shadow-elegant hover:shadow-glow transition-all cursor-pointer group"
+                  onClick={() => setSelected(project)}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-3 md:mb-4">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold group-hover:text-accent transition-colors break-words min-w-0">
+                      {project.name}
+                    </h3>
+                    {project.featured && (
+                      <span className="bg-accent/10 text-accent border border-accent/20 flex-shrink-0 text-xs px-2.5 py-0.5 rounded-full">
+                        Featured
+                      </span>
+                    )}
+                  </div>
 
-                <div className="flex flex-wrap gap-2 mb-3 md:mb-4">
-                  {(project.technologies || []).slice(0, 3).map((tech, techIndex) => (
-                    <span key={techIndex} className="px-2.5 py-0.5 md:px-3 md:py-1 bg-secondary/50 rounded-full text-xs">
-                      {tech}
-                    </span>
-                  ))}
-                  {(project.technologies?.length || 0) > 3 && (
-                    <span className="px-2.5 py-0.5 md:px-3 md:py-1 bg-secondary/50 rounded-full text-xs">
-                      +{project.technologies.length - 3} more
-                    </span>
-                  )}
-                </div>
+                  <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4 line-clamp-3 md:line-clamp-2">
+                    {project.description}
+                  </p>
 
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                  {project.github && (
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); window.open(project.github, "_blank") }}
-                      className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors text-sm px-3 h-9"
-                    >
-                      <Github className="w-4 h-4" />
-                      Code
-                    </button>
-                  )}
-                  {project.demo && (
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); window.open(project.demo, "_blank") }}
-                      className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm px-3 h-9"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Demo
-                    </button>
-                  )}
-                </div>
-              </m.div>
-            ))}
+                  <div className="flex flex-wrap gap-2 mb-3 md:mb-4">
+                    {(project.technologies || []).slice(0, 3).map((tech, techIndex) => (
+                      <span key={techIndex} className="px-2.5 py-0.5 md:px-3 md:py-1 bg-secondary/50 rounded-full text-xs">
+                        {tech}
+                      </span>
+                    ))}
+                    {(project.technologies?.length || 0) > 3 && (
+                      <span className="px-2.5 py-0.5 md:px-3 md:py-1 bg-secondary/50 rounded-full text-xs">
+                        +{project.technologies.length - 3} more
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                    {githubUrl && (
+                      <a
+                        href={githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors text-sm px-3 h-9"
+                      >
+                        <Github className="w-4 h-4" />
+                        Code
+                      </a>
+                    )}
+                    {demoUrl && (
+                      <a
+                        href={demoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm px-3 h-9"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Demo
+                      </a>
+                    )}
+                  </div>
+                </m.div>
+              )
+            })}
           </div>
         )}
 
@@ -179,9 +191,9 @@ const Projects = memo(function Projects() {
                   </div>
 
                   <div className="flex flex-wrap gap-3 md:gap-4 pt-4">
-                    {selected.github && (
+                    {selectedGithubUrl && (
                       <a
-                        href={selected.github}
+                        href={selectedGithubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm px-4 h-10"
@@ -190,9 +202,9 @@ const Projects = memo(function Projects() {
                         View Code
                       </a>
                     )}
-                    {selected.demo && (
+                    {selectedDemoUrl && (
                       <a
-                        href={selected.demo}
+                        href={selectedDemoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors text-sm px-4 h-10"

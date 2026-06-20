@@ -14,6 +14,36 @@ import LoadingState from "../components/ui/LoadingState"
 import PageHeader from "../components/ui/PageHeader"
 import Textarea from "../components/ui/Textarea"
 
+const EXTERNAL_PROTOCOL_RE = /^[a-z][a-z\d+.-]*:\/\//i
+const LOCALHOST_RE = /^localhost(?::\d+)?(?:\/|$)/i
+const IPV4_RE = /^(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?(?:\/|$)/
+const DOMAIN_LIKE_RE = /^(?:[a-z\d-]+\.)+[a-z]{2,}(?::\d+)?(?:\/|$)/i
+
+const looksLikeExternalHost = (value) =>
+  LOCALHOST_RE.test(value) || IPV4_RE.test(value) || DOMAIN_LIKE_RE.test(value)
+
+const normalizeExternalUrl = (value) => {
+  if (typeof value !== "string") return ""
+  const trimmed = value.trim()
+  if (!trimmed) return ""
+
+  let candidate = trimmed
+  if (candidate.startsWith("//")) {
+    candidate = `https:${candidate}`
+  } else if (!EXTERNAL_PROTOCOL_RE.test(candidate) && looksLikeExternalHost(candidate)) {
+    candidate = `https://${candidate}`
+  }
+
+  try {
+    const parsed = new URL(candidate)
+    const protocol = parsed.protocol.toLowerCase()
+    if (protocol !== "http:" && protocol !== "https:") return ""
+    return parsed.toString()
+  } catch {
+    return ""
+  }
+}
+
 const initialState = {
   name: "",
   description: "",
@@ -84,18 +114,39 @@ const AddProject = ({ token }) => {
     setImages((prev) => ({ ...prev, [field]: file }))
   }
 
+  const normalizeUrlField = (field) => {
+    const normalized = normalizeExternalUrl(form[field])
+    if (normalized && normalized !== form[field].trim()) {
+      setField(field, normalized)
+    }
+  }
+
   const onSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
     try {
+      const normalizedGithub = normalizeExternalUrl(form.github)
+      const normalizedDemo = normalizeExternalUrl(form.demo)
+
+      if (form.github.trim() && !normalizedGithub) {
+        toast.error("Please enter a valid GitHub URL (http/https).")
+        setSaving(false)
+        return
+      }
+      if (form.demo.trim() && !normalizedDemo) {
+        toast.error("Please enter a valid Demo URL (http/https).")
+        setSaving(false)
+        return
+      }
+
       const fd = new FormData()
       if (isEditMode) fd.append("id", id)
       fd.append("name", form.name)
       fd.append("description", form.description)
       fd.append("technologies", JSON.stringify(form.technologies.split(",").map((s) => s.trim()).filter(Boolean)))
       fd.append("highlights", JSON.stringify(form.highlights.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)))
-      fd.append("github", form.github)
-      fd.append("demo", form.demo)
+      fd.append("github", normalizedGithub)
+      fd.append("demo", normalizedDemo)
       fd.append("featured", form.featured)
       fd.append("order", form.order)
       if (images.image1) fd.append("image1", images.image1)
@@ -198,13 +249,20 @@ const AddProject = ({ token }) => {
                 id="project-github"
                 value={form.github}
                 onChange={(e) => setField("github", e.target.value)}
+                onBlur={() => normalizeUrlField("github")}
+                placeholder="https://github.com/username/repo"
               />
+              <p className="mt-1 text-xs text-text-muted">
+                Tip: you can paste <code>github.com/...</code>; HTTPS is added automatically.
+              </p>
             </Field>
             <Field label="Demo URL" htmlFor="project-demo">
               <Input
                 id="project-demo"
                 value={form.demo}
                 onChange={(e) => setField("demo", e.target.value)}
+                onBlur={() => normalizeUrlField("demo")}
+                placeholder="https://your-demo-domain.com"
               />
             </Field>
 
