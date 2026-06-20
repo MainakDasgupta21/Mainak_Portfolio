@@ -94,9 +94,6 @@ const Experience = memo(function Experience() {
                           <span className="inline-flex items-center rounded-full border border-accent/25 bg-accent/10 px-3 py-1.5 text-[11px] font-semibold tracking-wide text-accent sm:text-xs">
                             {periodLabel}
                           </span>
-                          <span className="hidden sm:inline-flex rounded-full border border-border/50 px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground">
-                            Experience {index + 1}
-                          </span>
                         </div>
 
                         <div className="mt-4 flex items-start gap-3 sm:gap-4">

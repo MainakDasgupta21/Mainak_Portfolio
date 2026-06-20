@@ -141,82 +141,84 @@ const Projects = memo(function Projects() {
                 className="modal-backdrop"
                 onClick={() => setSelected(null)}
               />
-              <m.div
-                key="card"
-                initial={{ opacity: 0, y: 30, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 220, damping: 26 }}
-                className="modal-card"
-                data-lenis-prevent
-                role="dialog"
-                aria-modal="true"
-              >
-                <button
-                  type="button"
-                  onClick={() => setSelected(null)}
-                  aria-label="Close"
-                  className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted"
+              <div className="modal-positioner">
+                <m.div
+                  key="card"
+                  initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 220, damping: 26 }}
+                  className="modal-card"
+                  data-lenis-prevent
+                  role="dialog"
+                  aria-modal="true"
                 >
-                  <X className="w-4 h-4" />
-                </button>
-                <h3 className="text-2xl md:text-3xl mb-3 md:mb-4 break-words font-semibold">
-                  {selected.name}
-                </h3>
-                <div className="space-y-5 md:space-y-6">
-                  <p className="text-muted-foreground text-base md:text-lg">
-                    <InlineMarkdown text={selected.description} />
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSelected(null)}
+                    aria-label="Close"
+                    className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <h3 className="text-2xl md:text-3xl mb-3 md:mb-4 break-words font-semibold">
+                    {selected.name}
+                  </h3>
+                  <div className="space-y-5 md:space-y-6">
+                    <p className="text-muted-foreground text-base md:text-lg">
+                      <InlineMarkdown text={selected.description} />
+                    </p>
 
-                  <div>
-                    <h4 className="text-lg md:text-xl font-semibold mb-3">Technologies</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {(selected.technologies || []).map((tech, index) => (
-                        <span key={index} className="bg-secondary text-secondary-foreground border border-border/40 text-xs px-2.5 py-0.5 rounded-full">
-                          {tech}
-                        </span>
-                      ))}
+                    <div>
+                      <h4 className="text-lg md:text-xl font-semibold mb-3">Technologies</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {(selected.technologies || []).map((tech, index) => (
+                          <span key={index} className="bg-secondary text-secondary-foreground border border-border/40 text-xs px-2.5 py-0.5 rounded-full">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-lg md:text-xl font-semibold mb-3">Key Features</h4>
+                      <ul className="space-y-2">
+                        {(selected.highlights || []).map((highlight, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-accent mt-1">•</span>
+                            <span className="text-sm md:text-base text-muted-foreground">{highlight}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3 md:gap-4 pt-4">
+                      {selectedGithubUrl && (
+                        <a
+                          href={selectedGithubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm px-4 h-10"
+                        >
+                          <Github className="w-4 h-4" />
+                          View Code
+                        </a>
+                      )}
+                      {selectedDemoUrl && (
+                        <a
+                          href={selectedDemoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors text-sm px-4 h-10"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Live Demo
+                        </a>
+                      )}
                     </div>
                   </div>
-
-                  <div>
-                    <h4 className="text-lg md:text-xl font-semibold mb-3">Key Features</h4>
-                    <ul className="space-y-2">
-                      {(selected.highlights || []).map((highlight, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="text-accent mt-1">•</span>
-                          <span className="text-sm md:text-base text-muted-foreground">{highlight}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 md:gap-4 pt-4">
-                    {selectedGithubUrl && (
-                      <a
-                        href={selectedGithubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm px-4 h-10"
-                      >
-                        <Github className="w-4 h-4" />
-                        View Code
-                      </a>
-                    )}
-                    {selectedDemoUrl && (
-                      <a
-                        href={selectedDemoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="gap-2 w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors text-sm px-4 h-10"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        Live Demo
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </m.div>
+                </m.div>
+              </div>
             </>
           )}
         </AnimatePresence>
